@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 #  NTTDATA IBM TWX Suite — Instalador desde GitHub
 #  Uso:
 #    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -8,6 +8,10 @@
 # ============================================================
 
 $ErrorActionPreference = "Stop"
+
+# Forzar UTF-8 para caracteres del banner
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 
 $REPO_URL = "https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite.git"
 $DEST     = Join-Path $env:USERPROFILE "Documents\NTTDATA-IBM-TWX-Suite"

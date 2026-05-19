@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitectura de Conocimiento — Cómo se procesó el TWX para llegar a la Extracción v3</title>
+<style>
+  :root {
+    --blue-dark: #0a2540;
+    --blue-mid: #1a3a5c;
+    --blue-light: #2563eb;
+    --teal: #0d9488;
+    --amber: #d97706;
+    --red: #dc2626;
+    --green: #16a34a;
+    --purple: #7c3aed;
+    --gray-bg: #f8fafc;
+    --gray-border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; color: var(--text); background: #f1f5f9; }
+
+  header { background: var(--blue-dark); color: white; padding: 28px 36px; border-bottom: 3px solid var(--blue-light); }
+  header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  header .subtitle { font-size: 13px; color: #94a3b8; margin-bottom: 14px; }
+  .meta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .meta-pill { background: rgba(255,255,255,0.12); border-radius: 20px; padding: 4px 14px; font-size: 11px; }
+  .meta-pill.highlight { background: var(--blue-light); color: white; }
+
+  nav { background: var(--blue-mid); padding: 0 36px; display: flex; flex-wrap: wrap; }
+  nav a { color: #cbd5e1; text-decoration: none; padding: 10px 14px; font-size: 11px; display: block; transition: background 0.2s; }
+  nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 28px 36px; }
+
+  section { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.09); margin-bottom: 28px; overflow: hidden; }
+  .section-header { background: var(--blue-dark); color: white; padding: 16px 22px; display: flex; align-items: center; gap: 14px; }
+  .section-header h2 { font-size: 15px; font-weight: 600; }
+  .section-header .badge { background: rgba(255,255,255,0.18); border-radius: 12px; padding: 3px 11px; font-size: 11px; }
+  .section-body { padding: 22px; }
+
+  /* PIPELINE */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .pipeline-step { display: flex; gap: 0; }
+  .pipeline-number { width: 44px; display: flex; flex-direction: column; align-items: center; }
+  .pipeline-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: white; flex-shrink: 0; }
+  .pipeline-line { width: 2px; flex: 1; min-height: 20px; background: var(--gray-border); margin: 2px auto; }
+  .pipeline-content { flex: 1; padding: 0 0 24px 16px; }
+  .step-title { font-size: 13px; font-weight: 700; color: var(--blue-dark); margin-bottom: 6px; }
+  .step-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+
+  /* JSON block */
+  .json-block { background: #0f172a; border-radius: 8px; padding: 16px; margin: 10px 0; overflow-x: auto; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 11px; line-height: 1.6; }
+  .j-key { color: #7dd3fc; }
+  .j-str { color: #86efac; }
+  .j-num { color: #f9a8d4; }
+  .j-bool { color: #fb923c; }
+  .j-arr { color: #e2e8f0; }
+  .j-cmt { color: #475569; font-style: italic; }
+  .j-label { color: #fbbf24; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+  th { background: var(--blue-dark); color: white; padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; }
+  td { padding: 7px 12px; border-bottom: 1px solid var(--gray-border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) { background: #f8fafc; }
+  tr:hover { background: #eff6ff; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+  .badge-gray { background: #f1f5f9; color: #475569; }
+  .badge-teal { background: #ccfbf1; color: #134e4a; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+  code { font-family: 'Cascadia Code', 'Consolas', monospace; background: #1e293b; color: #e2e8f0; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 14px; border-radius: 6px; font-size: 11px; font-family: 'Cascadia Code', monospace; overflow-x: auto; margin: 8px 0; line-height: 1.5; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .card { background: var(--gray-bg); border: 1px solid var(--gray-border); border-radius: 8px; padding: 16px; }
+  .card h4 { font-size: 12px; font-weight: 700; color: var(--blue-dark); margin-bottom: 8px; border-bottom: 1px solid var(--gray-border); padding-bottom: 6px; }
+
+  .alert { background: #fef3c7; border-left: 4px solid var(--amber); padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-size: 12px; }
+  .alert-info { background: #dbeafe; border-left: 4px solid var(--blue-light); padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-size: 12px; }
+  .alert-green { background: #dcfce7; border-left: 4px solid var(--green); padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-size: 12px; }
+  .alert-red { background: #fee2e2; border-left: 4px solid var(--red); padding: 12px 16px; border-radius: 4px; margin: 12px 0; font-size: 12px; }
+
+  .version-timeline { display: flex; gap: 0; }
+  .version-box { flex: 1; border: 2px solid var(--gray-border); border-radius: 8px; padding: 14px; position: relative; margin: 0 6px; }
+  .version-box.v3 { border-color: var(--green); background: #f0fdf4; }
+  .version-label { font-size: 18px; font-weight: 800; color: var(--blue-dark); margin-bottom: 4px; }
+  .version-arrow { display: flex; align-items: center; color: var(--text-muted); font-size: 20px; padding: 0 4px; }
+  .version-box ul { padding-left: 16px; font-size: 11px; color: var(--text-muted); line-height: 1.8; }
+  .version-box li.new { color: var(--green); font-weight: 600; }
+  .version-box li.fixed { color: var(--amber); font-weight: 600; }
+  .version-box li.removed { color: var(--red); }
+
+  .retro-item { border: 1px solid var(--gray-border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; }
+  .retro-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--gray-bg); border-bottom: 1px solid var(--gray-border); }
+  .retro-header .num { width: 24px; height: 24px; background: var(--blue-dark); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .retro-header .title { font-weight: 600; font-size: 12px; }
+  .retro-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .retro-before { padding: 12px 14px; border-right: 1px solid var(--gray-border); background: #fff5f5; }
+  .retro-after { padding: 12px 14px; background: #f0fdf4; }
+  .retro-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .retro-label.before { color: var(--red); }
+  .retro-label.after { color: var(--green); }
+  .retro-text { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+
+  .arch-layer { border: 2px solid; border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; }
+  .arch-layer.layer1 { border-color: #7c3aed; background: #faf5ff; }
+  .arch-layer.layer2 { border-color: #0d9488; background: #f0fdfa; }
+  .arch-layer.layer3 { border-color: #d97706; background: #fffbeb; }
+  .arch-layer.layer4 { border-color: #2563eb; background: #eff6ff; }
+  .arch-layer h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .arch-layer.layer1 h3 { color: #7c3aed; }
+  .arch-layer.layer2 h3 { color: #0d9488; }
+  .arch-layer.layer3 h3 { color: #d97706; }
+  .arch-layer.layer4 h3 { color: #2563eb; }
+
+  .twx-tree { font-family: 'Cascadia Code', monospace; font-size: 11px; background: #0f172a; color: #e2e8f0; padding: 16px; border-radius: 8px; line-height: 1.7; }
+  .twx-prefix { color: #fbbf24; font-weight: 700; }
+  .twx-type { color: #7dd3fc; }
+  .twx-count { color: #86efac; }
+  .twx-note { color: #64748b; }
+
+  .flow-h { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .flow-node { background: var(--blue-dark); color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; }
+  .flow-arrow { color: var(--text-muted); font-size: 14px; }
+  .flow-file { background: #7c3aed; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-family: monospace; }
+  .flow-html { background: var(--green); color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; }
+
+  h3 { font-size: 13px; color: var(--blue-dark); font-weight: 700; margin: 18px 0 8px; }
+  h3:first-child { margin-top: 0; }
+
+  footer { background: var(--blue-dark); color: #64748b; text-align: center; padding: 18px; font-size: 11px; margin-top: 32px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Arquitectura de Conocimiento — Cómo llegamos a la Extracción Técnica v3</h1>
+  <p class="subtitle">Reconstrucción completa del pipeline: desde el archivo TWX hasta la documentación orientada a migración Appian</p>
+  <div class="meta-row">
+    <span class="meta-pill">Proceso: MP Redención de Bono</span>
+    <span class="meta-pill">Fuente: Profuturo_Redencion_Bono_AP v1.17.51.twx</span>
+    <span class="meta-pill highlight">Versión final: ExtraccionTecnica_v3</span>
+    <span class="meta-pill">Fecha: 18 mayo 2026</span>
+    <span class="meta-pill">NTT DATA · Profuturo F3 GenAI</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#s1">¿Qué es un TWX?</a>
+  <a href="#s2">Arquitectura de capas</a>
+  <a href="#s3">Pipeline de extracción</a>
+  <a href="#s4">Prompts ejecutados</a>
+  <a href="#s5">Evolución v1→v3</a>
+  <a href="#s6">Retro → Correcciones</a>
+  <a href="#s7">Mapa de conocimiento</a>
+</nav>
+
+<div class="container">
+
+<!-- SECTION 1: QUÉ ES UN TWX -->
+<section id="s1">
+  <div class="section-header">
+    <h2>1. ¿Qué es un archivo TWX y cómo lo lee la IA?</h2>
+    <span class="badge">Capa 0 — Fuente primaria</span>
+  </div>
+  <div class="section-body">
+
+    <div class="alert-info">
+      <strong>Punto de partida honesto:</strong> La IA no "abre" el TWX como lo haría IBM Process Center. Lee el TWX como un archivo ZIP, descomprime los XML internos, y aplica análisis semántico sobre la estructura XML para inferir qué significa cada elemento dentro del modelo de proceso IBM BPM.
+    </div>
+
+    <div class="grid-2" style="margin-top:18px;">
+      <div>
+        <h3>Un TWX es un ZIP con XMLs nombrados por GUID</h3>
+        <div class="twx-tree">
+<span class="twx-note">Profuturo_Redencion_Bono_AP_1.17.51.twx</span>
+<span class="twx-note">└── [ZIP]</span>
+    <span class="twx-prefix">    1.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ Servicios</span> <span class="twx-count">(HHS / IS / GSS)</span>
+    <span class="twx-prefix">    4.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ UCAs</span> <span class="twx-count">(15 agentes)</span>
+    <span class="twx-prefix">    7.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ WebService files</span> <span class="twx-count">(2)</span>
+    <span class="twx-prefix">   12.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ Business Objects</span> <span class="twx-count">(54)</span>
+    <span class="twx-prefix">   25.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ BPDs</span> <span class="twx-count">(44 procesos)</span>
+    <span class="twx-prefix">   64.</span><span class="twx-note">&lt;GUID&gt;.xml</span>  <span class="twx-type">→ Coach Views</span> <span class="twx-count">(39 componentes UI)</span>
+    <span class="twx-note">    manifest.xml  → Índice y metadatos</span>
+        </div>
+      </div>
+      <div>
+        <h3>Lo que la IA buscó en cada prefijo</h3>
+        <table>
+          <tr><th>Prefijo</th><th>Propiedad XML clave</th><th>Para extraer</th></tr>
+          <tr><td><code>1.*</code></td><td><code>processType</code></td><td>3=HHS (pantallas), 4=IS (integraciones), 6=GSS (automáticos)</td></tr>
+          <tr><td><code>4.*</code></td><td><code>schedType</code>, <code>schedEvent</code></td><td>UCAs: tipo On Message, evento BUS, servicio enlazado</td></tr>
+          <tr><td><code>12.*</code></td><td><code>twClass</code>, <code>fields</code></td><td>Business Objects: nombre y campos tipados</td></tr>
+          <tr><td><code>25.*</code></td><td><code>BPD</code>, <code>lane</code>, <code>sequenceFlow</code></td><td>Flujo principal, nodos, conexiones, condiciones gateway</td></tr>
+          <tr><td><code>64.*</code></td><td><code>boundaryEvent</code>, <code>postponeAction</code></td><td>Botones reales de cada Coach, PostponeAction</td></tr>
+          <tr><td><code>manifest.xml</code></td><td><code>twx:snapshot</code>, <code>environmentVariables</code></td><td>Constantes <code>tw.env.*</code> por ambiente</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <h3>¿Cómo sabe la IA qué buscar?</h3>
+    <p style="font-size:12px;color:var(--text-muted);line-height:1.8;">
+      El modelo tiene conocimiento previo de la <strong>especificación IBM BPM/BAW</strong> — sabe que <code>processType=3</code> significa HHS, que <code>boundaryEvent</code> representa un botón en un Coach, que <code>sequenceFlow</code> con <code>condition</code> es un gateway condicional, etc. Esto es <em>conocimiento paramétrico</em> del modelo, no inferencia: es parte del entrenamiento. Lo que varía por proyecto son los nombres, GUIDs y valores concretos — eso se extrae del XML.
+    </p>
+  </div>
+</section>
+
+<!-- SECTION 2: ARQUITECTURA DE CAPAS -->
+<section id="s2">
+  <div class="section-header">
+    <h2>2. Arquitectura de Conocimiento — 4 Capas</h2>
+    <span class="badge">Del TWX al HTML — cómo se transforma el conocimiento</span>
+  </div>
+  <div class="section-body">
+
+    <div class="arch-layer layer1">
+      <h3>Capa 1 — Conocimiento Paramétrico (entrenamiento del modelo)</h3>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.7;">Lo que la IA ya sabe sin necesidad de que se lo digan: estructura del formato TWX, semántica IBM BPM (BPD, HHS, IS, GSS, UCA, Lane, Gateway, BoundaryEvent, Coach, PostponeAction), patrones de integración (SOAP/WSDL), patrones BUS/MQ, especificación BPMN 2.0. <strong>No requiere prompt — es conocimiento base.</strong></p>
+    </div>
+
+    <div class="arch-layer layer2">
+      <h3>Capa 2 — Conocimiento del Contexto (compartido en cada sesión)</h3>
+      <div class="grid-2">
+        <div>
+          <p style="font-size:12px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Lo que se le pasó a la IA sobre <em>este proyecto específico</em>:</p>
+          <ul style="font-size:11px;color:var(--text-muted);padding-left:18px;line-height:2;">
+            <li>El archivo TWX completo (o fragmentos XML)</li>
+            <li>Los JSON extraídos: <code>_services.json</code>, <code>_ucas.json</code>, <code>_bos_v2.json</code>, <code>_bpd_nodes.json</code>, <code>_subprocs.json</code></li>
+            <li>El DDL <code>NOV_INSTANCE_MANAGEMENT.sql</code></li>
+            <li>Las imágenes de pantallas reales (imagen1–imagen4.jpg)</li>
+            <li>El feedback de la retro del equipo</li>
+          </ul>
+        </div>
+        <div>
+          <div class="flow-h" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div class="flow-h"><span class="flow-file">TWX (ZIP+XML)</span><span class="flow-arrow">→</span><span class="flow-file">_services.json</span></div>
+            <div class="flow-h"><span class="flow-file">TWX (ZIP+XML)</span><span class="flow-arrow">→</span><span class="flow-file">_ucas.json</span></div>
+            <div class="flow-h"><span class="flow-file">TWX (ZIP+XML)</span><span class="flow-arrow">→</span><span class="flow-file">_bos_v2.json</span></div>
+            <div class="flow-h"><span class="flow-file">TWX (ZIP+XML)</span><span class="flow-arrow">→</span><span class="flow-file">_bpd_nodes.json</span></div>
+            <div class="flow-h"><span class="flow-file">imagen1–4.jpg</span><span class="flow-arrow">→</span><span style="font-size:11px;color:var(--text-muted);">Botones reales, correlaciones UCA, decisiones gateway</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-layer layer3">
+      <h3>Capa 3 — Conocimiento de Requisitos (la retro del equipo)</h3>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.7;">Las 10 extracciones que el equipo pidió explícitamente, más las correcciones de las versiones anteriores. Esta capa es la que transforma la extracción técnica genérica en documentación útil para la migración. <strong>Sin esta capa, el resultado sería correcto pero no útil.</strong></p>
+    </div>
+
+    <div class="arch-layer layer4">
+      <h3>Capa 4 — Conocimiento de Destino (Appian + NOV_INSTANCE_MANAGEMENT)</h3>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.7;">El DDL de <code>NOV_INSTANCE_MANAGEMENT</code> y el entendimiento de cómo Appian maneja tareas (PostponeAction = Cerrar tarea, no Posponer) permitió que la IA no solo extrajera datos sino que los <em>mapease</em> al destino. Esta es la diferencia entre un catálogo y una guía de migración.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 3: PIPELINE -->
+<section id="s3">
+  <div class="section-header">
+    <h2>3. Pipeline de Extracción — Paso a Paso</h2>
+    <span class="badge">8 pasos · De XML crudo a HTML documentado</span>
+  </div>
+  <div class="section-body">
+
+    <div class="pipeline">
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#7c3aed;">1</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Exploración de estructura TWX</div>
+          <div class="step-meta">Entrada: .twx (ZIP) · Salida: mapa de prefijos y conteo de artefactos</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">El primer paso fue entender qué había dentro del ZIP. La IA listó todos los archivos, los agrupó por prefijo numérico, y estableció el inventario base: 72 archivos prefijo-1 (servicios), 15 prefijo-4 (UCAs), 54 prefijo-12 (BOs), 44 prefijo-25 (BPDs), 39 prefijo-64 (Coach Views).</p>
+          <div class="alert-info" style="font-size:11px;">
+            <strong>Por qué importa:</strong> Sin este mapeo inicial, cualquier búsqueda posterior sería ciega. El prefijo es el "tipo" del artefacto — es la taxonomía del TWX.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#0d9488;">2</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de BPD principal y sub-procesos</div>
+          <div class="step-meta">Entrada: archivos 25.*.xml · Salida: _bpd_nodes.json, _subprocs.json</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Se identificó el BPD principal <code>MP Redencion de Bono</code> (25.05242216-4484-4c63-ae2d-768d5f596825.xml). Se extrajeron los nodos con sus coordenadas X/Y, los <code>sequenceFlow</code> con condiciones, y la asignación de lanes. Los 44 BPDs contienen: 1 proceso principal + 43 sub-procesos.</p>
+          <div class="alert-info" style="font-size:11px;">
+            <strong>Error corregido en v3:</strong> Las versiones anteriores ordenaban los pasos por coordenadas X/Y (visual). La v3 usa <code>sequenceFlow</code> que es el orden real de ejecución definido en el XML — no el visual.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#d97706;">3</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de constantes y variables de entorno</div>
+          <div class="step-meta">Entrada: manifest.xml (environmentVariables) · Salida: Sección 1 del v3 — 71 constantes</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">El <code>manifest.xml</code> contiene la sección <code>&lt;environmentVariables&gt;</code> con todas las variables <code>tw.env.*</code> y sus valores por ambiente (DEV, TEST, STAGING, PROD). La IA las agrupó por categoría: HOST_PUERTO (URLs IIB), IDs de proceso/subproceso/estado/subetapa, plantillas de notificación, URLs REST.</p>
+          <div class="alert-green" style="font-size:11px;">
+            <strong>Hallazgo importante descubierto aquí:</strong> <code>ID_SUBETAPA_GENERACION_ARCHIVO_RESPUESTA_81</code> tiene valor diferente en Producción (8628 vs 8627 en otros ambientes) — dato crítico para la migración que las versiones anteriores no habían detectado.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#2563eb;">4</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de Integration Services (IS) y payloads</div>
+          <div class="step-meta">Entrada: archivos 1.*.xml con processType=4 · Salida: _services.json → Secciones 2 y 3 del v3</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Dentro de los archivos prefijo-1, la IA filtró los que tienen <code>processType=4</code> (IS). Para cada uno extrajo: nombre del WSDL binding, operación SOAP, input parameters (campo → tipo → <code>tw.local.*</code>), output parameters, fault types. También clasificó cada IS como síncrono o asíncrono según si el proceso entra en espera UCA después de la llamada.</p>
+          <div class="alert" style="font-size:11px;">
+            <strong>Corrección crítica de la retro:</strong> IS "IG Revisión UDI" fue incorrectamente clasificado como ASYNC en v1 y v2. Al revisar el BPD: después de llamarlo, el flujo continúa directamente al GSS "Respuesta RevisionUDI GS" <em>sin</em> pasar por un UCA de espera. → Reclasificado como <strong>SÍNCRONO</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#dc2626;">5</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de acciones de usuario desde Coach Views</div>
+          <div class="step-meta">Entrada: archivos 64.*.xml (Coach Views) + imagen1.jpg · Salida: Sección 4 del v3 — 105 botones</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Este fue el cambio más significativo entre v2 y v3. Las versiones anteriores infirieron los botones desde las descripciones de los HHS. La v3 lee los <strong>Coach Views</strong> (prefijo 64) que son los componentes de UI reales. Cada <code>&lt;boundaryEvent&gt;</code> dentro de un Coach es un botón. El <code>&lt;postponeAction&gt;</code> es el botón especial "Salir/Posponer". La imagen1.jpg del equipo confirmó los botones reales de la pantalla de Coincidencia de Saldos.</p>
+          <div class="alert-red" style="font-size:11px;">
+            <strong>Error en v1/v2 — por qué pasó:</strong> Los HHS (prefijo 1, processType=3) tienen <em>referencias</em> a los Coach Views, no los botones directamente. Leer solo los HHS da nombres de actividades, no botones. Los botones viven en los archivos 64.* — capa diferente del TWX.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#0d9488;">6</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de UCAs con correlación de datos</div>
+          <div class="step-meta">Entrada: archivos 4.*.xml + imágenes 2,3,4.jpg · Salida: _ucas.json → Sección 7 del v3</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Los UCAs en IBM BPM tienen 3 cosas clave: (1) el evento BUS que los activa (<code>schedEvent</code>), (2) el servicio que ejecutan (<code>linkedService</code>), y (3) la correlación de datos — cómo los datos de la respuesta BUS se asignan a variables <code>tw.local.*</code> del proceso. Las imágenes 2–4 mostraron exactamente cómo se ve esta correlación en IBM Process Center (pestaña "Correlación de datos") y la tabla de decisiones del gateway posterior.</p>
+          <div class="alert-green" style="font-size:11px;">
+            <strong>Aporte de las imágenes:</strong> imagen2 = correlación de datos (folio/exitoso/identificados100 → tw.local.*). imagen3 y imagen4 = tabla de decisiones del gateway (condición exacta → ruta). Sin las imágenes, esto habría requerido leer cada BPD individualmente para encontrar el gateway post-UCA.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#7c3aed;">7</div>
+          <div class="pipeline-line"></div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Extracción de GSS con orden por sequenceFlow</div>
+          <div class="step-meta">Entrada: archivos 1.*.xml con processType=6 · Salida: Sección 8 del v3 — 22 GSS</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Los GSS (prefijo 1, processType=6) son servicios automáticos. Cada uno tiene una lista de actividades (<code>activity</code>) y conexiones (<code>sequenceFlow</code>). La IA construyó el grafo de cada GSS siguiendo los <code>sequenceFlow</code> desde el nodo inicial hasta el ExitPoint, produciendo el orden real de pasos. Se identificó el patrón común de 5-6 pasos que siguen casi todos los GSS de tipo "Respuesta X".</p>
+          <div class="alert" style="font-size:11px;">
+            <strong>Por qué las versiones anteriores fallaban:</strong> Listaban las actividades en el orden en que aparecen en el XML (no en el de ejecución). El XML no garantiza orden secuencial — el orden real está en los <code>sequenceFlow</code>.
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-step">
+        <div class="pipeline-number">
+          <div class="pipeline-circle" style="background:#16a34a;">8</div>
+        </div>
+        <div class="pipeline-content">
+          <div class="step-title">Mapeo a NOV_INSTANCE_MANAGEMENT + Tabla de decisiones</div>
+          <div class="step-meta">Entrada: DDL SQL + _ucas.json + BPD gateways · Salida: Secciones 6 y 10 del v3</div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.7;margin-bottom:8px;">Con el DDL de <code>NOV_INSTANCE_MANAGEMENT</code>, la IA pudo construir el mapeo explícito: cada campo de la respuesta BUS/UCA (<code>tw.local.salida</code>, <code>tw.local.exitoso</code>, <code>tw.local.mensaje</code>) se mapea a una columna de la tabla Appian (<code>ACTION_OUT</code>, <code>STATUS_ID</code>, <code>RESPONSE_OUT</code>). Esto convierte el análisis de "qué hace IBM" en "cómo construirlo en Appian".</p>
+          <div class="alert-green" style="font-size:11px;">
+            <strong>Lo que hace útil este paso:</strong> Sin el DDL, la sección sería abstracta ("hay que migrar los UCAs"). Con el DDL, es accionable: "INSERT cuando IS llama, UPDATE IS_ACTIVE=0 cuando IIB responde, el proceso Appian reacciona al cambio de STATUS_ID".
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: PROMPTS EN JSON -->
+<section id="s4">
+  <div class="section-header">
+    <h2>4. Prompts Ejecutados — Formato JSON</h2>
+    <span class="badge">Reconstrucción basada en los artefactos producidos</span>
+  </div>
+  <div class="section-body">
+
+    <div class="alert" style="margin-bottom:18px;">
+      <strong>Nota importante:</strong> Estos prompts son una <strong>reconstrucción fiel</strong> basada en el análisis de los artefactos producidos (JSONs, HTMLs, correcciones). No son transcripciones literales de la sesión — son la representación estructurada de qué se le pidió a la IA y qué conocimiento recibió en cada paso.
+    </div>
+
+    <h3>Prompt 0 — Contexto inicial de sesión</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">0</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"contexto"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Establecer el marco del proyecto antes de cualquier extracción"</span>,
+  <span class="j-key">"conocimiento_aportado"</span>: {
+    <span class="j-key">"proyecto"</span>: <span class="j-str">"Migración IBM BPM → Appian, proceso MP Redención de Bono, Profuturo F3"</span>,
+    <span class="j-key">"objetivo_extraccion"</span>: <span class="j-str">"El equipo no tiene acceso al servidor IBM productivo. Los WSDLs no están en el TWX. Toda la documentación debe salir del archivo TWX."</span>,
+    <span class="j-key">"destino"</span>: <span class="j-str">"Appian — no es migración 1:1, es reimplementación en nuevo paradigma"</span>,
+    <span class="j-key">"tabla_clave"</span>: <span class="j-str">"NOV_ARCHIVO_MAIN (FOLIO como UNIQUE key), NOV_INSTANCE_MANAGEMENT (reemplaza BUS/MQ)"</span>
+  },
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Analiza el archivo TWX adjunto. Primero mapea la estructura completa antes de extraer contenido específico."</span>
+}
+    </div>
+
+    <h3>Prompt 1 — Exploración de estructura TWX</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">1</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"exploration"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Mapear qué artefactos contiene el TWX y cuántos de cada tipo"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Descomprime el TWX como ZIP. Lista todos los archivos XML. Agrupa por prefijo numérico (antes del punto). Para cada prefijo, lee 1 archivo de muestra e identifica a qué artefacto IBM BPM corresponde. Devuelve conteo por tipo."</span>,
+  <span class="j-key">"resultado_esperado"</span>: {
+    <span class="j-key">"1.*"</span>: <span class="j-str">"~72 servicios (HHS+IS+GSS — distinguir por processType)"</span>,
+    <span class="j-key">"4.*"</span>: <span class="j-str">"~15 UCAs"</span>,
+    <span class="j-key">"12.*"</span>: <span class="j-str">"~54 Business Objects"</span>,
+    <span class="j-key">"25.*"</span>: <span class="j-str">"~44 BPDs"</span>,
+    <span class="j-key">"64.*"</span>: <span class="j-str">"~39 Coach Views (componentes UI)"</span>
+  },
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"inventario_twx + identificación del BPD principal por nombre"</span>
+}
+    </div>
+
+    <h3>Prompt 2 — Extracción de constantes tw.env.*</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">2</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Extraer todos los valores de variables de entorno con sus valores por ambiente"</span>,
+  <span class="j-key">"archivo_fuente"</span>: <span class="j-str">"manifest.xml → sección environmentVariables"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Del manifest.xml extrae todas las environmentVariables. Para cada variable: nombre (tw.env.*), valor en cada ambiente (DEV/TEST/STAGING/PROD). Agrupa por categoría semántica: HOST_PUERTO, IDs proceso/subproceso/estado, IDs subetapa, plantillas notificación, URLs REST."</span>,
+  <span class="j-key">"hallazgo_clave"</span>: <span class="j-str">"ID_SUBETAPA_GENERACION_ARCHIVO_RESPUESTA_81 es 8627 en Dev/Test/Stage pero 8628 en Prod — diferencia crítica"</span>,
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"Sección 1 del v3 — 71 constantes categorizadas"</span>
+}
+    </div>
+
+    <h3>Prompt 3 — Extracción de IS con payloads SOAP</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">3</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Extraer todos los Integration Services con sus inputs, outputs y clasificación sync/async"</span>,
+  <span class="j-key">"filtro"</span>: <span class="j-str">"archivos 1.*.xml donde processType = 4"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Para cada IS: nombre, operación WSDL, URL patrón, campos INPUT (nombre/tipo/tw.local.*), campos OUTPUT (nombre/tipo/tw.local.*), fault types. Clasifica como SYNC si el BPD continúa directamente después, ASYNC si el proceso espera en un UCA antes de continuar."</span>,
+  <span class="j-key">"correccion_retro"</span>: {
+    <span class="j-key">"servicio"</span>: <span class="j-str">"IS IG Revisión UDI"</span>,
+    <span class="j-key">"clasificacion_anterior"</span>: <span class="j-str">"ASYNC"</span>,
+    <span class="j-key">"clasificacion_correcta"</span>: <span class="j-str">"SYNC"</span>,
+    <span class="j-key">"razon"</span>: <span class="j-str">"El BPD pasa directamente al GSS Respuesta RevisionUDI GS sin nodo UCA intermedio"</span>
+  },
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"_services.json → Secciones 2 y 3 del v3"</span>
+}
+    </div>
+
+    <h3>Prompt 4 — Extracción de botones desde Coach Views (corrección retro)</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">4</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction + correction"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Extraer acciones reales de usuario desde las pantallas (Coach Views), NO desde descripciones"</span>,
+  <span class="j-key">"error_a_corregir"</span>: <span class="j-str">"v1/v2 inferían botones desde el texto de descripción de los HHS — incorrecto"</span>,
+  <span class="j-key">"archivo_fuente"</span>: <span class="j-str">"archivos 64.*.xml (Coach Views) — cada boundaryEvent es un botón real"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Para cada Coach View (64.*): extrae todos los boundaryEvent — cada uno es un botón. Obtén: label visible, actividad que dispara, si es postponeAction. Confirmar: postponeAction = 'Cerrar tarea en Appian' (no Posponer). Incluye imagen1.jpg como evidencia del equipo para la pantalla Coincidencia de Saldos."</span>,
+  <span class="j-key">"conocimiento_adicional"</span>: {
+    <span class="j-key">"imagen1"</span>: <span class="j-str">"Captura real de pantalla IBM BPM mostrando botones: Reprocesar, Rechazar Folio, Rechazar Registros, tw.options.nombreBoton (dinámico), Salir"</span>,
+    <span class="j-key">"nota_dinamico"</span>: <span class="j-str">"tw.options.nombreBoton es un botón cuyo label viene de una variable — en Appian se implementa con expresión en propiedad label"</span>
+  },
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"Sección 4 del v3 — 21 HHS con 105 botones documentados"</span>
+}
+    </div>
+
+    <h3>Prompt 5 — Extracción de UCAs con correlación y validación posterior</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">5</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction + enrichment"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Para cada UCA: dónde se usa, qué datos correlaciona, qué decisión toma el proceso después"</span>,
+  <span class="j-key">"archivo_fuente"</span>: <span class="j-str">"archivos 4.*.xml + BPDs que los invocan (25.*.xml) + imágenes 2,3,4"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Para cada UCA: (1) nombre y schedEvent, (2) el BPD/sub-proceso donde se reanuda la instancia, (3) la correlación de datos (qué campos de la respuesta BUS → qué tw.local.*), (4) el gateway inmediatamente posterior y su condición de decisión."</span>,
+  <span class="j-key">"conocimiento_adicional"</span>: {
+    <span class="j-key">"imagen2"</span>: <span class="j-str">"Pestaña Correlación de datos en IBM Process Center: mensaje/folio/exitoso/identificados100 → tw.local.*"</span>,
+    <span class="j-key">"imagen3"</span>: <span class="j-str">"Tabla Decisiones gateway: tw.local.exitoso == false → No exitoso Coincidencia"</span>,
+    <span class="j-key">"imagen4"</span>: <span class="j-str">"Tabla Decisiones gateway: tw.local.identificados100 == true → Fin"</span>
+  },
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"_ucas.json → Sección 7 del v3 — 15 UCAs con correlación completa"</span>
+}
+    </div>
+
+    <h3>Prompt 6 — GSS en orden correcto por sequenceFlow</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">6</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction + correction"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Listar pasos de cada GSS en el orden real de ejecución (no XML, no visual)"</span>,
+  <span class="j-key">"error_a_corregir"</span>: <span class="j-str">"v1/v2 listaban actividades en orden de aparición en el XML — no es el orden de ejecución"</span>,
+  <span class="j-key">"filtro"</span>: <span class="j-str">"archivos 1.*.xml donde processType = 6"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Para cada GSS: construye el grafo de ejecución siguiendo los sequenceFlow desde el nodo startEvent hasta el ExitPoint. El orden es el que determina sequenceFlow, no la posición en el XML. Identifica si hay gateways de decisión y bajo qué condición se toma cada rama."</span>,
+  <span class="j-key">"patron_detectado"</span>: <span class="j-str">"12 de 22 GSS siguen el mismo patrón 5-6 pasos: Mapeo Entrada → Validar Parámetros → ¿es datos válido? → Invocar UCA → Datos de Salida → Finalizar"</span>,
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"Sección 8 del v3 — inventario 22 GSS con pasos ordenados"</span>
+}
+    </div>
+
+    <h3>Prompt 7 — Tabla de decisiones del flujo principal</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">7</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"extraction"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Documentar todas las condiciones de gateway: variable → valor → ruta"</span>,
+  <span class="j-key">"archivo_fuente"</span>: <span class="j-str">"BPD principal + sub-procesos (25.*.xml) → elementos exclusiveGateway + conditionExpression"</span>,
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Del MP Redencion de Bono y sub-procesos clave (SP Coincidencia Saldos, SP Confirmación Movimientos): extrae todos los gateways exclusivos. Para cada gateway: condición exacta (tw.local.X == valor), ruta tomada si true, ruta predeterminada si false. Incluye los scripts JavaScript de asignación de variables previos al gateway."</span>,
+  <span class="j-key">"variables_clave_encontradas"</span>: [
+    <span class="j-str">"tw.local.salida (0-3): controla acción en SP Confirmacion Movimientos"</span>,
+    <span class="j-str">"tw.local.exitoso (bool): éxito/fallo de cada servicio"</span>,
+    <span class="j-str">"tw.local.esAcreditacion (bool): flujo alternativo acreditación vs devolución"</span>,
+    <span class="j-str">"tw.local.finalizarFlujo (bool): termina el proceso"</span>,
+    <span class="j-str">"tw.local.existeNoRechazados (bool): determina si hay registros pendientes"</span>,
+    <span class="j-str">"tw.local.rechazarFolio (bool): rechaza el folio completo"</span>
+  ],
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"Sección 6 del v3 — tabla de decisiones + scripts JS documentados"</span>
+}
+    </div>
+
+    <h3>Prompt 8 — Mapeo BUS/MQ → NOV_INSTANCE_MANAGEMENT</h3>
+    <div class="json-block">
+{
+  <span class="j-key">"step"</span>: <span class="j-num">8</span>,
+  <span class="j-key">"tipo"</span>: <span class="j-str">"mapping + migration"</span>,
+  <span class="j-key">"objetivo"</span>: <span class="j-str">"Traducir el patrón asíncrono IBM BUS/MQ al patrón Appian con NOV_INSTANCE_MANAGEMENT"</span>,
+  <span class="j-key">"conocimiento_aportado"</span>: {
+    <span class="j-key">"ddl"</span>: <span class="j-str">"NOV_INSTANCE_MANAGEMENT.sql — estructura completa de la tabla"</span>,
+    <span class="j-key">"patron_ibm"</span>: <span class="j-str">"IS → BUS message → IIB → GSS Respuesta → InvokeUCA → BPD reanuda"</span>
+  },
+  <span class="j-key">"instruccion"</span>: <span class="j-str">"Construye el mapeo explícito: cada campo de correlación UCA (tw.local.*) → columna NOV_INSTANCE_MANAGEMENT. Documenta el nuevo flujo Appian: INSERT al llamar IS, UPDATE IS_ACTIVE=0 cuando IIB responde, proceso Appian reacciona. Para cada UCA, identifica el STEP_ID correspondiente usando los ID_SUBETAPA_* de las constantes."</span>,
+  <span class="j-key">"instruccion_adicional"</span>: <span class="j-str">"Identifica los UCAs cuyos STEP_ID aún no tienen ID_SUBETAPA_* definido — son acción pendiente del equipo"</span>,
+  <span class="j-key">"output_generado"</span>: <span class="j-str">"Sección 10 del v3 — mapeo completo IBM→Appian con tabla de UCAs y STEP_IDs"</span>
+}
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 5: EVOLUCIÓN V1→V3 -->
+<section id="s5">
+  <div class="section-header">
+    <h2>5. Evolución de Versiones — v1 → v2 → v3</h2>
+    <span class="badge">Qué cambió en cada iteración y por qué</span>
+  </div>
+  <div class="section-body">
+
+    <div class="version-timeline">
+      <div class="version-box">
+        <div class="version-label">v1</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;"><em>Análisis_Tecnico + ReporteCompleto</em></p>
+        <ul>
+          <li>Inventario general de artefactos</li>
+          <li>BPDs listados con coordenadas</li>
+          <li class="removed">Botones inferidos de descripciones</li>
+          <li class="removed">UCAs sin correlación de datos</li>
+          <li class="removed">GSS sin orden de pasos</li>
+          <li class="removed">IS IG Revision UDI → ASYNC (error)</li>
+          <li class="removed">Sin constantes extraídas</li>
+          <li class="removed">Sin endpoints por ambiente</li>
+          <li class="removed">Sin payloads documentados</li>
+          <li class="removed">Guía migración 1:1 incluida</li>
+        </ul>
+      </div>
+      <div class="version-arrow">→</div>
+      <div class="version-box">
+        <div class="version-label">v2</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;"><em>AnalisisTecnico_v2 + ContratosREST</em></p>
+        <ul>
+          <li class="new">+ Contratos REST (endpoints básicos)</li>
+          <li class="new">+ Business Objects con campos</li>
+          <li class="new">+ Diagrama BPD mejorado</li>
+          <li class="fixed">~ Botones: aún desde descripciones</li>
+          <li class="fixed">~ UCAs: sin correlación explícita</li>
+          <li class="fixed">~ GSS: orden parcialmente corregido</li>
+          <li class="removed">IS IG Revision UDI → aún ASYNC</li>
+          <li class="removed">Sin tabla de decisiones</li>
+          <li class="removed">Sin mapeo BUS→NOV</li>
+        </ul>
+      </div>
+      <div class="version-arrow">→</div>
+      <div class="version-box v3">
+        <div class="version-label" style="color:var(--green);">v3 ✓</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;"><em>ExtraccionTecnica_v3 — orientada a migración</em></p>
+        <ul>
+          <li class="new">+ 71 constantes por ambiente</li>
+          <li class="new">+ 12 endpoints con URL completa</li>
+          <li class="new">+ Payloads INPUT/OUTPUT por IS</li>
+          <li class="new">+ 105 botones desde Coach Views</li>
+          <li class="new">+ Correlación datos UCA completa</li>
+          <li class="new">+ GSS en orden sequenceFlow</li>
+          <li class="new">+ Tabla de decisiones (gateways)</li>
+          <li class="new">+ Mapeo BUS/MQ → NOV tabla</li>
+          <li class="new">+ IDs subetapa por ambiente</li>
+          <li class="fixed">✓ IG Revision UDI → SYNC</li>
+          <li class="fixed">✓ PostponeAction = Cerrar tarea</li>
+          <li class="removed">− Guía migración 1:1 eliminada</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert-info" style="margin-top:16px;">
+      <strong>Por qué se necesitaron 3 versiones:</strong> Cada versión respondió a una capa diferente de feedback. v1 → v2: más datos (contratos, BOs). v2 → v3: datos correctos (Coach Views en vez de descripciones, sequenceFlow en vez de XML order, correlación UCA real, corrección IG Revision UDI) + datos útiles (mapeo a Appian destino).
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: RETRO → CORRECCIONES -->
+<section id="s6">
+  <div class="section-header">
+    <h2>6. Retro del Equipo → Correcciones en v3</h2>
+    <span class="badge">11 puntos de feedback · Todos resueltos</span>
+  </div>
+  <div class="section-body">
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">1</div>
+        <div class="title">Sub-Procesos BPD — Etapas y subetapas sin identificar</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">Agrupaciones sin identificar etapas. Pasos inferidos escuetamente. Tamaño de archivo listado (dato inútil).</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Cada BPD documentado con sus lanes (perfiles de asignación), pasos en orden sequenceFlow, y vínculo a la etapa del proceso. Tamaño eliminado.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">2</div>
+        <div class="title">Flujo Principal — Lanes sin asignación de actividades</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">Se extrajo el nombre del lane pero no se estableció qué actividades pertenecen a cada lane.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">En el XML del BPD, cada actividad tiene un atributo <code>laneId</code>. La propiedad del lane se buscó directamente en el XML. Sección 5 del v3 asigna cada HHS/tarea a su lane (perfil).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">3</div>
+        <div class="title">Pasos del Flujo — Orden incorrecto</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">El orden de pasos seguía la posición en el XML o las coordenadas X/Y visuales, no el flujo real de ejecución.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">El orden se construye siguiendo los <code>&lt;sequenceFlow&gt;</code> desde el StartEvent. Esto produce el orden real de ejecución del proceso, no el orden visual del diagrama.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">4</div>
+        <div class="title">HHS — Acciones extraídas de descripciones, no de pantallas reales</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">Los botones se inferían del texto de descripción del flujo de interfaz. Incompleto e impreciso.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Botones extraídos de los <strong>Coach Views</strong> (prefijo 64.*). Cada <code>boundaryEvent</code> en el XML del Coach es un botón real. La imagen1.jpg del equipo confirmó los botones de la pantalla de Coincidencia de Saldos.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">4b</div>
+        <div class="title">PostponeAction = Cerrar tarea en Appian</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">PostponeAction no se documentaba o se describía sin equivalente Appian.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">PostponeAction es el botón que en IBM BPM "pospone" la tarea. En Appian, el equivalente funcional es <strong>Cerrar tarea</strong> (no Posponer, no Cancelar). Documentado en todas las HHS que lo usan.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">5</div>
+        <div class="title">IS — Necesitamos payloads y objects de respuesta</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">Solo se listaban los servicios con nombre y tipo. Sin payloads ni campos.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Sección 3: cada IS con tabla INPUT (campo/tipo/requerido), tabla OUTPUT (campo/tipo), fault type, y nota si el output llega vía UCA (async) o directo (sync).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">5b</div>
+        <div class="title">IS IG Revisión UDI identificado como asíncrono — es síncrono</div>
+        <span class="badge badge-green" style="margin-left:auto;">Corregido en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Error (v1/v2)</div>
+          <div class="retro-text">Clasificado como ASYNC porque recibe un resultado vía BUS en el contexto general del patrón.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Corrección en v3</div>
+          <div class="retro-text">El BPD pasa directamente del nodo IS al GSS "Respuesta RevisionUDI GS" <strong>sin nodo UCA intermedio</strong>. El servicio IIB es síncrono. El resultado no espera en una cola BUS — llega directo al GSS. Corregido a <strong>SYNC</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">6</div>
+        <div class="title">GSS — Sin orden de pasos, descripciones sin valor</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">GSS listados con pasos en orden XML, con descripciones genéricas que no aportan información accionable.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Sección 8: pasos ordenados por sequenceFlow, identificando tipo de cada paso (Script, InvokeUCA, ExitPoint, Gateway), el pre-script si existe, y qué UCA/IS invoca. Se eliminaron las descripciones genéricas.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">7</div>
+        <div class="title">UCAs — Necesitamos correlación de datos y validación posterior</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">UCAs solo listados por nombre y queue. Sin correlación de datos ni decisión post-UCA.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Sección 7: cada UCA con proceso que reanuda, campos mapeados (output BUS → tw.local.*), y decisión del gateway inmediatamente siguiente. Imágenes 2–4 del equipo proporcionaron la evidencia visual de la correlación real en IBM Process Center.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">11</div>
+        <div class="title">Guía de Migración — No usar recomendaciones 1:1</div>
+        <span class="badge badge-green" style="margin-left:auto;">Resuelto en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Problema (v1/v2)</div>
+          <div class="retro-text">Se incluían recomendaciones de migración que asumían correspondencia 1:1 entre IBM BPM y Appian — no aplica al enfoque del proyecto.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Solución en v3</div>
+          <div class="retro-text">Guía 1:1 eliminada por completo. En su lugar: mapeo explícito al patrón Appian real (NOV_INSTANCE_MANAGEMENT). El documento ahora documenta <em>qué hay</em> en IBM, no <em>cómo replicarlo</em>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="retro-item">
+      <div class="retro-header">
+        <div class="num">BUS</div>
+        <div class="title">Patrón BUS/MQ → NOV_INSTANCE_MANAGEMENT</div>
+        <span class="badge badge-green" style="margin-left:auto;">Nuevo en v3</span>
+      </div>
+      <div class="retro-body">
+        <div class="retro-before">
+          <div class="retro-label before">Situación anterior</div>
+          <div class="retro-text">El patrón asíncrono se identificaba correctamente pero sin guía de migración al destino Appian.</div>
+        </div>
+        <div class="retro-after">
+          <div class="retro-label after">Aportado en v3</div>
+          <div class="retro-text">Sección 10: mapeo completo campo-a-campo de los 15 UCAs a la tabla NOV_INSTANCE_MANAGEMENT, con el nuevo flujo Appian (INSERT al llamar, UPDATE al responder, poll/webhook para reaccionar). Identifica los STEP_IDs pendientes de definir.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SECTION 7: MAPA DE CONOCIMIENTO -->
+<section id="s7">
+  <div class="section-header">
+    <h2>7. Mapa de Conocimiento Completo — Qué información entró y qué salió</h2>
+    <span class="badge">Vista consolidada de todo el proceso</span>
+  </div>
+  <div class="section-body">
+
+    <h3>Entradas → Procesamiento → Salidas</h3>
+    <table>
+      <tr>
+        <th>Entrada (lo que se le dio a la IA)</th>
+        <th>Tipo de conocimiento</th>
+        <th>Procesamiento aplicado</th>
+        <th>Sección de salida en v3</th>
+      </tr>
+      <tr>
+        <td><code>manifest.xml</code> → <code>environmentVariables</code></td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Extracción directa + categorización por tipo</td>
+        <td>Sección 1 — 71 constantes</td>
+      </tr>
+      <tr>
+        <td><code>1.*.xml</code> (processType=4) + WSDL bindings</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Extracción + construcción URL patrón + clasificación sync/async</td>
+        <td>Sección 2 — Endpoints · Sección 3 — Payloads</td>
+      </tr>
+      <tr>
+        <td><code>64.*.xml</code> (Coach Views) + imagen1.jpg</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span> + <span class="badge badge-amber">Evidencia visual</span></td>
+        <td>Extracción boundaryEvent + confirmación visual</td>
+        <td>Sección 4 — Acciones usuario (105 botones)</td>
+      </tr>
+      <tr>
+        <td><code>25.*.xml</code> (BPDs) → <code>lane</code> properties</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Lectura propiedad lane + asignación por laneId</td>
+        <td>Sección 5 — Lanes y perfiles</td>
+      </tr>
+      <tr>
+        <td><code>25.*.xml</code> → gateways + conditionExpression + scripts JS</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Extracción condición + resolución de rutas</td>
+        <td>Sección 6 — Tabla de decisiones</td>
+      </tr>
+      <tr>
+        <td><code>4.*.xml</code> (UCAs) + imagen2,3,4.jpg</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span> + <span class="badge badge-amber">Evidencia visual</span></td>
+        <td>Extracción schedEvent + correlación datos + validación post-UCA</td>
+        <td>Sección 7 — Correlación UCA</td>
+      </tr>
+      <tr>
+        <td><code>1.*.xml</code> (processType=6) → sequenceFlow</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Construcción grafo de ejecución + detección patrón común</td>
+        <td>Sección 8 — GSS pasos</td>
+      </tr>
+      <tr>
+        <td><code>manifest.xml</code> → ID_SUBETAPA_* (subset constantes)</td>
+        <td><span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Extracción + tabla por ambiente + detección diferencia Prod</td>
+        <td>Sección 9 — IDs subetapa y notificación</td>
+      </tr>
+      <tr>
+        <td><code>NOV_INSTANCE_MANAGEMENT.sql</code> + _ucas.json + constantes</td>
+        <td><span class="badge badge-blue">DDL destino</span> + <span class="badge badge-purple">Datos del proyecto</span></td>
+        <td>Mapeo campo-a-campo IBM→Appian + flujo nuevo documentado</td>
+        <td>Sección 10 — Migración BUS→NOV</td>
+      </tr>
+      <tr style="background:#f0fdf4;">
+        <td><strong>Retro del equipo (texto + imágenes)</strong></td>
+        <td><span class="badge badge-green">Requisitos de migración</span></td>
+        <td>Corrección de errores + eliminación de secciones inaplicables + reorientación al destino Appian</td>
+        <td><strong>Todas las secciones</strong> — delta v2→v3</td>
+      </tr>
+    </table>
+
+    <h3 style="margin-top:24px;">¿Qué hace que la v3 sea diferente a solo "leer el XML"?</h3>
+    <div class="grid-3" style="margin-top:10px;">
+      <div class="card">
+        <h4>Leer XML</h4>
+        <p style="font-size:11px;color:var(--text-muted);line-height:1.7;">Te da los datos en bruto. Sabes que hay un <code>boundaryEvent</code> con id="abc123" en el archivo 64.xyz. No sabes que eso es el botón "Rechazar Folio" de la pantalla de Coincidencia de Saldos.</p>
+      </div>
+      <div class="card">
+        <h4>Leer XML + Conocimiento IBM BPM</h4>
+        <p style="font-size:11px;color:var(--text-muted);line-height:1.7;">Sabes que <code>boundaryEvent</code> = botón, que <code>postponeAction</code> = botón especial, que <code>processType=4</code> = servicio de integración. Puedes construir una estructura semántica.</p>
+      </div>
+      <div class="card" style="border-color:var(--green);background:#f0fdf4;">
+        <h4>Lo anterior + Contexto de migración</h4>
+        <p style="font-size:11px;color:var(--text-muted);line-height:1.7;">Sabes que <code>postponeAction</code> = "Cerrar tarea en Appian" (no Posponer), que los UCAs se reemplazan por <code>NOV_INSTANCE_MANAGEMENT</code>, que el orden real viene de <code>sequenceFlow</code>. Esto es la v3.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Arquitectura de Conocimiento — Extracción Técnica IBM BPM v3 · MP Redención de Bono · NTT DATA · Profuturo Fase 3 GenAI · 18 mayo 2026 · Reconstrucción basada en artefactos producidos
+</footer>
+
+</body>
+</html>

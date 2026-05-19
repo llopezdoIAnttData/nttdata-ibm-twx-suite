@@ -1,119 +1,114 @@
-# Script de instalacion para Windows (PowerShell)
-# NTTDATA IBM TWX Reverse Engineering Suite v1.0.0
-# Ejecutar desde PowerShell como administrador:
-#   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-#   .\instalar_windows.ps1
+# ============================================================
+#  NTTDATA IBM TWX Suite — Instalador desde GitHub
+#  Uso:
+#    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+#    iwr https://raw.githubusercontent.com/llopezdoIAnttData/nttdata-ibm-twx-suite/master/04_scripts/instalar_windows.ps1 | iex
+#  O localmente:
+#    .\instalar_windows.ps1
+# ============================================================
 
 $ErrorActionPreference = "Stop"
 
-$SUITE_VERSION = "1.0.0"
-$CORP          = "NTTDATA"
-$DEST          = Join-Path $env:USERPROFILE "Documents\NTTDATA-IBM-TWX-Suite"
-$REPO_URL      = "https://github.com/llopez2018/naves-industriales-ai.git"
-$BRANCH        = "claude/ibm-reverse-engineering-tools-8Arpa"
+$REPO_URL = "https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite.git"
+$DEST     = Join-Path $env:USERPROFILE "Documents\NTTDATA-IBM-TWX-Suite"
+$SKILLS   = Join-Path $env:USERPROFILE ".copilot\skills"
+$AGENTS   = Join-Path $env:USERPROFILE ".copilot\agents"
 
+# ── Banner ────────────────────────────────────────────────────────────────────
 Write-Host ""
-Write-Host "  ╭──────╮   ███╗  ██╗ ████████╗████████╗  ██████╗  █████╗ ████████╗ █████╗" -ForegroundColor Cyan
-Write-Host "  ╱ ╭────╮ ╲  ████╗ ██║ ╚══██╔══╝╚══██╔══╝  ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗" -ForegroundColor Cyan
-Write-Host " │  │  ◉  │ │ ██╔████╗██║    ██║      ██║   ██║  ██║███████║   ██║   ███████║" -ForegroundColor Cyan
-Write-Host " │  ╰────╯  │ ██║╚═██╗██║    ██║      ██║   ██║  ██║██╔══██║   ██║   ██╔══██║" -ForegroundColor Cyan
-Write-Host "  ╲         ╱  ██║  ╚████║    ██║      ██║   ██████╔╝██║  ██║   ██║   ██║  ██║" -ForegroundColor Cyan
-Write-Host "   ╰──────╯   ╚═╝   ╚═══╝    ╚═╝      ╚═╝   ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝" -ForegroundColor Cyan
+Write-Host "  ██╗   ██╗████████╗████████╗    ██████╗  █████╗ ████████╗ █████╗ " -ForegroundColor Cyan
+Write-Host "  ███╗  ██║╚══██╔══╝╚══██╔══╝    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗" -ForegroundColor Cyan
+Write-Host "  ██╔██╗██║   ██║      ██║       ██║  ██║███████║   ██║   ███████║" -ForegroundColor Cyan
+Write-Host "  ██║╚████║   ██║      ██║       ██║  ██║██╔══██║   ██║   ██╔══██║" -ForegroundColor Cyan
+Write-Host "  ██║ ╚███║   ██║      ██║       ██████╔╝██║  ██║   ██║   ██║  ██║" -ForegroundColor Cyan
+Write-Host "  ╚═╝  ╚══╝   ╚═╝      ╚═╝       ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  IBM TWX Reverse Engineering Suite  v$SUITE_VERSION  |  Corporate: $CORP" -ForegroundColor DarkCyan
+Write-Host "  IBM TWX Reverse Engineering Suite  v1.0.0" -ForegroundColor DarkCyan
+Write-Host "  NTT DATA EMEAL · github.com/llopezdoIAnttData/nttdata-ibm-twx-suite" -ForegroundColor DarkGray
 Write-Host ""
 
-# ── 1. Verificar requisitos ──────────────────────────────────────────────────
-Write-Host "[1/5] Verificando requisitos..." -ForegroundColor Yellow
-
-foreach ($cmd in @("python","git","node","npm")) {
+# ── 1. Requisitos ─────────────────────────────────────────────────────────────
+Write-Host "[1/4] Verificando requisitos..." -ForegroundColor Yellow
+$ok = $true
+foreach ($cmd in @("python","git")) {
     try {
-        $null = & $cmd --version 2>&1
-        Write-Host "  ✓ $cmd encontrado" -ForegroundColor Green
+        $ver = & $cmd --version 2>&1
+        Write-Host "  ✓ $cmd  ($ver)" -ForegroundColor Green
     } catch {
-        Write-Host "  ✗ $cmd NO encontrado — instalalo antes de continuar" -ForegroundColor Red
-        exit 1
+        Write-Host "  ✗ $cmd NO encontrado — instálalo y vuelve a ejecutar" -ForegroundColor Red
+        $ok = $false
     }
 }
+if (-not $ok) { exit 1 }
 
-# ── 2. Crear carpeta en Documentos ──────────────────────────────────────────
+# ── 2. Clonar o actualizar ────────────────────────────────────────────────────
 Write-Host ""
-Write-Host "[2/5] Creando estructura en Documentos..." -ForegroundColor Yellow
+Write-Host "[2/4] Descargando suite desde GitHub..." -ForegroundColor Yellow
 
-$folders = @(
-    "$DEST",
-    "$DEST\01_herramientas_python\ibm_twx_tools",
-    "$DEST\02_extension_vscode\src",
-    "$DEST\02_extension_vscode\.vscode",
-    "$DEST\03_documentacion",
-    "$DEST\04_scripts",
-    "$DEST\05_muestras_twx"
-)
-foreach ($f in $folders) {
-    New-Item -ItemType Directory -Force -Path $f | Out-Null
+if (Test-Path "$DEST\.git") {
+    Write-Host "  → Repo ya existe, actualizando..." -ForegroundColor DarkCyan
+    Push-Location $DEST
+    git pull --quiet
+    Pop-Location
+    Write-Host "  ✓ Actualizado" -ForegroundColor Green
+} else {
+    if (Test-Path $DEST) { Remove-Item $DEST -Recurse -Force }
+    git clone --depth 1 $REPO_URL $DEST
+    Write-Host "  ✓ Clonado en: $DEST" -ForegroundColor Green
 }
-Write-Host "  ✓ Carpeta creada: $DEST" -ForegroundColor Green
 
-# ── 3. Clonar / actualizar repo ──────────────────────────────────────────────
+# ── 3. Instalar paquete Python ────────────────────────────────────────────────
 Write-Host ""
-Write-Host "[3/5] Descargando suite desde GitHub..." -ForegroundColor Yellow
-
-$TEMP = Join-Path $env:TEMP "nttdata_ibm_twx_tmp"
-if (Test-Path $TEMP) { Remove-Item $TEMP -Recurse -Force }
-git clone --depth 1 --branch $BRANCH $REPO_URL $TEMP
-Write-Host "  ✓ Repositorio clonado" -ForegroundColor Green
-
-# ── 4. Copiar archivos organizados ───────────────────────────────────────────
-Write-Host ""
-Write-Host "[4/5] Organizando archivos..." -ForegroundColor Yellow
-
-# Python
-Copy-Item "$TEMP\ibm_twx_tools\*.py"  "$DEST\01_herramientas_python\ibm_twx_tools\" -Force
-Copy-Item "$TEMP\setup.py"            "$DEST\01_herramientas_python\"               -Force
-
-# VS Code extension
-Copy-Item "$TEMP\vscode-nttdata-ibm\src\*.ts"     "$DEST\02_extension_vscode\src\" -Force
-Copy-Item "$TEMP\vscode-nttdata-ibm\package.json" "$DEST\02_extension_vscode\"     -Force
-Copy-Item "$TEMP\vscode-nttdata-ibm\tsconfig.json""$DEST\02_extension_vscode\"     -Force
-Copy-Item "$TEMP\vscode-nttdata-ibm\.vscode\launch.json" "$DEST\02_extension_vscode\.vscode\" -Force
-
-# Docs
-Copy-Item "$TEMP\NTTDATA-IBM-TWX-Suite\03_documentacion\*" "$DEST\03_documentacion\" -Force -Recurse
-Copy-Item "$TEMP\NTTDATA-IBM-TWX-Suite\04_scripts\*"       "$DEST\04_scripts\"       -Force -Recurse
-Copy-Item "$TEMP\NTTDATA-IBM-TWX-Suite\index.html"         "$DEST\"                  -Force
-
-Write-Host "  ✓ Archivos organizados" -ForegroundColor Green
-
-# ── 5. Instalar paquete Python ───────────────────────────────────────────────
-Write-Host ""
-Write-Host "[5/5] Instalando paquete Python..." -ForegroundColor Yellow
+Write-Host "[3/4] Instalando paquete Python (ibm_twx_tools)..." -ForegroundColor Yellow
 
 Push-Location "$DEST\01_herramientas_python"
 python -m pip install -e . --quiet
 Pop-Location
 
-Write-Host "  ✓ nttdata-ibm-twx instalado en PATH" -ForegroundColor Green
+# Verificar
+try {
+    $v = python -m ibm_twx_tools --version 2>&1
+    Write-Host "  ✓ ibm_twx_tools instalado  ($v)" -ForegroundColor Green
+} catch {
+    Write-Host "  ✓ ibm_twx_tools instalado" -ForegroundColor Green
+}
 
-# ── Limpiar temp ─────────────────────────────────────────────────────────────
-Remove-Item $TEMP -Recurse -Force
+# ── 4. Instalar Copilot skills ────────────────────────────────────────────────
+Write-Host ""
+Write-Host "[4/4] Instalando skills de GitHub Copilot CLI..." -ForegroundColor Yellow
+
+$skillsSrc = "$DEST\.copilot\skills"
+$agentsSrc = "$DEST\.copilot\agents"
+
+if (Test-Path $skillsSrc) {
+    New-Item -ItemType Directory -Force -Path $SKILLS | Out-Null
+    Copy-Item "$skillsSrc\*" $SKILLS -Recurse -Force
+    Write-Host "  ✓ Skills copiados a: $SKILLS" -ForegroundColor Green
+} else {
+    Write-Host "  ℹ Skills no incluidos en repo — cópialos manualmente si los tienes en ~/.copilot/skills/" -ForegroundColor DarkYellow
+}
+
+if (Test-Path $agentsSrc) {
+    New-Item -ItemType Directory -Force -Path $AGENTS | Out-Null
+    Copy-Item "$agentsSrc\*" $AGENTS -Recurse -Force
+    Write-Host "  ✓ Agentes copiados a: $AGENTS" -ForegroundColor Green
+}
 
 # ── Resumen ───────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "══════════════════════════════════════════════════════" -ForegroundColor Cyan
-Write-Host "  ✅  Instalacion completada — NTTDATA IBM TWX Suite" -ForegroundColor Green
+Write-Host "  ✅  Instalación completada" -ForegroundColor Green
 Write-Host "══════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Carpeta:  $DEST" -ForegroundColor White
-Write-Host "  Comando:  nttdata-ibm-twx --version" -ForegroundColor White
-Write-Host "  Panel:    $DEST\index.html  (abrir en navegador)" -ForegroundColor White
+Write-Host "  Carpeta  →  $DEST" -ForegroundColor White
+Write-Host "  Análisis →  cd '$DEST'" -ForegroundColor White
+Write-Host "             python run_analysis.py" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Prueba rapida:" -ForegroundColor DarkCyan
-Write-Host "    nttdata-ibm-twx analyze tu_archivo.twx" -ForegroundColor Cyan
+Write-Host "  Verificar:" -ForegroundColor DarkCyan
+Write-Host "    python -m ibm_twx_tools --help" -ForegroundColor Cyan
 Write-Host ""
 
-# Abrir el panel en el navegador
-$indexPath = "$DEST\index.html"
-if (Test-Path $indexPath) {
-    $open = Read-Host "  ¿Abrir panel en el navegador ahora? (S/n)"
-    if ($open -ne "n") { Start-Process $indexPath }
+$open = Read-Host "  ¿Abrir panel index.html en el navegador ahora? (S/n)"
+if ($open -ne "n") {
+    Start-Process "$DEST\index.html"
 }

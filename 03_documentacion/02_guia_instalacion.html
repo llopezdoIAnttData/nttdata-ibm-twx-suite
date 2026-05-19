@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTTDATA · Guía de Instalación · IBM TWX Suite + GitHub Copilot CLI</title>
+  <style>
+    /* ── Tokens ─────────────────────────────────────────────── */
+    :root{
+      --blue:#0077C8; --blue-d:#005BAC; --blue-dd:#003D7A;
+      --cyan:#00AEEF; --cyan-d:#0097D1;
+      --green:#10B981; --green-l:#34D399;
+      --amber:#F59E0B; --amber-l:#FCD34D;
+      --red:#EF4444;   --purple:#A78BFA;
+      --bg:#080D18; --bg2:#0D1529; --bg3:#111827;
+      --border:#1A2E4A; --border-hi:#1E4070;
+      --text:#E2E8F0; --muted:#64748B; --muted2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Courier New',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+      --r:10px; --r-sm:6px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--ui);line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--blue-d);border-radius:3px}
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+    /* ── Nav ────────────────────────────────────────────────── */
+    nav{position:sticky;top:0;z-index:99;background:rgba(8,13,24,.92);
+        backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-in{display:flex;align-items:center;justify-content:space-between;
+            max-width:920px;margin:0 auto;padding:10px 20px;gap:12px}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;
+               font-size:.9rem;color:#fff;white-space:nowrap}
+    .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+    .nav-links a{color:var(--muted2);font-size:.78rem;padding:4px 10px;
+                 border-radius:5px;text-decoration:none;transition:.2s}
+    .nav-links a:hover{color:#fff;background:rgba(0,119,200,.15)}
+    .pill{font-family:var(--mono);font-size:.68rem;padding:2px 9px;
+          border-radius:999px;background:rgba(0,119,200,.1);
+          border:1px solid var(--border);color:var(--muted2)}
+
+    /* ── Hero ───────────────────────────────────────────────── */
+    #hero{padding:64px 20px 48px;text-align:center;position:relative;overflow:hidden}
+    #hero::before{content:'';position:absolute;inset:0;
+      background-image:linear-gradient(rgba(0,119,200,.06) 1px,transparent 1px),
+                       linear-gradient(90deg,rgba(0,119,200,.06) 1px,transparent 1px);
+      background-size:40px 40px;animation:gs 18s linear infinite}
+    @keyframes gs{to{background-position:40px 40px}}
+    #hero::after{content:'';position:absolute;top:-160px;left:50%;transform:translateX(-50%);
+      width:700px;height:500px;
+      background:radial-gradient(ellipse,rgba(0,119,200,.16) 0%,transparent 70%);
+      pointer-events:none}
+    .hero-logo{position:relative;z-index:1;display:inline-flex;
+               align-items:center;gap:14px;margin-bottom:28px}
+    .shonai{width:56px;height:56px;animation:glow 3s ease-in-out infinite}
+    @keyframes glow{
+      0%,100%{filter:drop-shadow(0 0 10px rgba(0,174,239,.5))}
+      50%{filter:drop-shadow(0 0 22px rgba(0,174,239,.9))}}
+    .hero-corp{font-size:2rem;font-weight:900;color:#fff;line-height:1}
+    .hero-corp span{color:var(--cyan)}
+    .hero-h1{position:relative;z-index:1;
+             font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:800;
+             color:#fff;margin-bottom:12px;line-height:1.25}
+    .hero-h1 em{font-style:normal;
+      background:linear-gradient(90deg,var(--blue),var(--cyan));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text}
+    .hero-sub{position:relative;z-index:1;color:var(--muted2);
+              font-size:1rem;max-width:580px;margin:0 auto 28px}
+    .hero-badges{position:relative;z-index:1;display:flex;flex-wrap:wrap;
+                 gap:8px;justify-content:center;margin-bottom:36px}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;
+           border-radius:999px;font-size:.73rem;font-weight:700;
+           letter-spacing:.04em;text-transform:uppercase}
+    .b-blue{background:rgba(0,119,200,.14);color:var(--cyan);
+            border:1px solid rgba(0,174,239,.25)}
+    .b-green{background:rgba(16,185,129,.1);color:var(--green-l);
+             border:1px solid rgba(16,185,129,.22)}
+    .b-amber{background:rgba(245,158,11,.1);color:var(--amber-l);
+             border:1px solid rgba(245,158,11,.22)}
+    .b-purple{background:rgba(167,139,250,.1);color:var(--purple);
+              border:1px solid rgba(167,139,250,.22)}
+
+    /* ── Progress tracker ───────────────────────────────────── */
+    #tracker{position:relative;z-index:1;display:flex;
+             align-items:center;justify-content:center;
+             gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0}
+    .tr-step{display:flex;flex-direction:column;align-items:center;
+             gap:6px;cursor:pointer;transition:.2s;min-width:80px}
+    .tr-dot{width:34px;height:34px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-size:.75rem;font-weight:800;transition:.3s;
+            border:2px solid var(--border);background:var(--bg2);
+            color:var(--muted)}
+    .tr-step.done .tr-dot{background:rgba(16,185,129,.2);
+      border-color:var(--green);color:var(--green-l)}
+    .tr-step.active .tr-dot{background:rgba(0,119,200,.2);
+      border-color:var(--cyan);color:var(--cyan);
+      box-shadow:0 0 16px rgba(0,174,239,.35)}
+    .tr-label{font-size:.62rem;color:var(--muted);text-align:center;
+              white-space:nowrap;max-width:72px}
+    .tr-step.done .tr-label,.tr-step.active .tr-label{color:var(--text)}
+    .tr-line{flex:1;height:2px;background:var(--border);
+             min-width:20px;max-width:48px;transition:.3s}
+    .tr-line.done{background:var(--green)}
+
+    /* ── Step sections ──────────────────────────────────────── */
+    .step-section{padding:56px 0;border-bottom:1px solid var(--border)}
+    .step-section:last-of-type{border-bottom:none}
+    .step-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:28px}
+    .step-num{width:44px;height:44px;border-radius:50%;flex-shrink:0;
+              background:linear-gradient(135deg,var(--blue),var(--cyan));
+              color:#fff;font-weight:900;font-size:.9rem;
+              display:flex;align-items:center;justify-content:center;
+              box-shadow:0 0 20px rgba(0,119,200,.35)}
+    .step-info h2{font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:4px}
+    .step-info p{font-size:.9rem;color:var(--muted2)}
+
+    /* ── OS tabs ────────────────────────────────────────────── */
+    .os-tabs{display:flex;gap:4px;margin-bottom:-1px}
+    .os-tab{padding:7px 16px;font-size:.8rem;cursor:pointer;
+            border:1px solid var(--border);border-bottom:none;
+            border-radius:7px 7px 0 0;background:var(--bg2);
+            color:var(--muted);transition:.2s;display:flex;align-items:center;gap:6px}
+    .os-tab:hover{color:var(--text)}
+    .os-tab.active{background:#070C16;color:var(--cyan);border-color:var(--border)}
+    .os-panel{display:none}
+    .os-panel.active{display:block}
+
+    /* ── Terminal block ─────────────────────────────────────── */
+    .term{background:#070C16;border:1px solid var(--border);
+          border-radius:0 var(--r) var(--r) var(--r);overflow:hidden;
+          box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .term-bar{display:flex;align-items:center;gap:7px;
+              padding:9px 14px;background:#0F1829;
+              border-bottom:1px solid var(--border)}
+    .dot{width:11px;height:11px;border-radius:50%}
+    .dr{background:#FF5F57}.dy{background:#FFBD2E}.dg{background:#28C840}
+    .term-title{flex:1;text-align:center;font-size:.72rem;
+                color:var(--muted);font-family:var(--mono)}
+    .copy-btn{font-size:.68rem;color:var(--muted);background:none;border:none;
+              cursor:pointer;padding:2px 8px;border-radius:4px;
+              transition:.2s;font-family:var(--ui)}
+    .copy-btn:hover{background:rgba(0,119,200,.15);color:var(--cyan)}
+    .copy-btn.copied{color:var(--green-l)}
+    .term-body{padding:16px 20px;font-family:var(--mono);
+               font-size:.8rem;line-height:1.75;overflow-x:auto}
+
+    /* syntax tokens */
+    .tc{color:var(--cyan)} .tg{color:var(--green-l)} .ta{color:var(--amber-l)}
+    .tm{color:var(--muted)} .tw{color:var(--text)} .tp{color:var(--purple)}
+    .tr_{color:var(--red)}
+
+    /* ── Check cards ────────────────────────────────────────── */
+    .check-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .check-card{background:var(--bg2);border:1px solid var(--border);
+                border-radius:var(--r);padding:18px 20px;
+                display:flex;align-items:flex-start;gap:12px;transition:.2s}
+    .check-card:hover{border-color:var(--border-hi)}
+    .check-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px}
+    .check-card h4{font-size:.9rem;color:#fff;margin-bottom:4px}
+    .check-card p{font-size:.8rem;color:var(--muted2);line-height:1.5}
+    .req-ver{font-family:var(--mono);font-size:.75rem;
+             color:var(--cyan);background:rgba(0,174,239,.08);
+             padding:1px 7px;border-radius:4px;margin-left:6px}
+
+    /* ── Verify block ───────────────────────────────────────── */
+    .verify-box{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);
+                border-radius:var(--r);padding:20px 24px;margin-top:20px}
+    .verify-box h4{font-size:.85rem;font-weight:700;color:var(--green-l);
+                   margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .verify-box .term{border-radius:var(--r-sm)}
+
+    /* ── Info / warn boxes ──────────────────────────────────── */
+    .infobox{border-radius:var(--r-sm);padding:14px 18px;
+             font-size:.83rem;line-height:1.6;margin:16px 0;
+             display:flex;gap:12px;align-items:flex-start}
+    .ib-blue{background:rgba(0,119,200,.08);border:1px solid rgba(0,119,200,.2);color:var(--muted2)}
+    .ib-amber{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--muted2)}
+    .ib-green{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--muted2)}
+    .infobox-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+
+    /* ── File tree ──────────────────────────────────────────── */
+    .tree{background:#070C16;border:1px solid var(--border);border-radius:var(--r-sm);
+          padding:16px 20px;font-family:var(--mono);font-size:.8rem;
+          line-height:1.9;color:var(--muted2)}
+    .tree .dir{color:var(--cyan)}.tree .file{color:var(--text)}
+    .tree .comment{color:var(--muted)}
+
+    /* ── Config table ───────────────────────────────────────── */
+    table{width:100%;border-collapse:collapse;font-size:.84rem}
+    th{text-align:left;padding:10px 14px;background:var(--bg2);
+       color:var(--muted2);font-weight:700;font-size:.72rem;
+       letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+    td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+    td:first-child{font-family:var(--mono);font-size:.78rem;color:var(--cyan);white-space:nowrap}
+    td:last-child{color:var(--muted2)}
+    tr:hover td{background:rgba(0,119,200,.04)}
+    .tbl-wrap{background:var(--bg2);border:1px solid var(--border);
+              border-radius:var(--r);overflow:hidden}
+
+    /* ── Quick ref ──────────────────────────────────────────── */
+    .qref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .qref-card{background:var(--bg2);border:1px solid var(--border);
+               border-radius:var(--r-sm);padding:14px 16px;transition:.2s}
+    .qref-card:hover{border-color:rgba(0,174,239,.35)}
+    .qref-cmd{font-family:var(--mono);font-size:.8rem;color:var(--cyan);
+              background:rgba(0,174,239,.08);padding:3px 10px;
+              border-radius:4px;margin-bottom:8px;display:inline-block}
+    .qref-desc{font-size:.8rem;color:var(--muted2);line-height:1.5}
+
+    /* ── Section label ──────────────────────────────────────── */
+    .slabel{display:inline-flex;align-items:center;gap:8px;
+            font-size:.68rem;font-weight:700;letter-spacing:.14em;
+            text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+    .slabel::before{content:'';width:20px;height:2px;
+                    background:var(--cyan);border-radius:1px}
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer{background:var(--bg2);border-top:1px solid var(--border);
+           padding:32px 20px;text-align:center}
+    footer p{font-size:.8rem;color:var(--muted);margin-top:10px}
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media(max-width:600px){
+      .nav-links{display:none}
+      #tracker{gap:0;justify-content:flex-start}
+      .tr-line{min-width:12px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-in">
+    <div class="nav-brand">
+      <svg width="26" height="26" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="8"/>
+        <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="6"/>
+        <ellipse cx="50" cy="52" rx="10" ry="13" fill="#00AEEF"/>
+        <ellipse cx="50" cy="40" rx="7" ry="7" fill="#00AEEF"/>
+      </svg>
+      NTT DATA &nbsp;<span style="color:var(--muted);font-weight:400">IBM TWX Suite</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#prereqs">Requisitos</a>
+      <a href="#step-clone">Clonar</a>
+      <a href="#step-python">Python</a>
+      <a href="#step-vscode">VS Code</a>
+      <a href="#step-copilot">Copilot CLI</a>
+      <a href="#step-verify">Verificar</a>
+      <a href="#quickref">Referencia</a>
+    </nav>
+    <span class="pill">v1.0.0</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-logo">
+    <svg class="shonai" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="7"/>
+      <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="5.5"/>
+      <ellipse cx="50" cy="53" rx="10" ry="13" fill="#00AEEF"/>
+      <ellipse cx="50" cy="39" rx="7.5" ry="7.5" fill="#00AEEF"/>
+    </svg>
+    <div>
+      <div class="hero-corp">NTT<span> DATA</span></div>
+      <div style="font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">IBM TWX Reverse Engineering Suite</div>
+    </div>
+  </div>
+
+  <h1 class="hero-h1">
+    Guía de instalación para<br>
+    <em>GitHub Copilot CLI</em>
+  </h1>
+  <p class="hero-sub">
+    Instala la suite en 5 pasos y úsala directamente desde la terminal o desde
+    <strong style="color:#fff">@nttdata</strong> en GitHub Copilot Chat.
+  </p>
+
+  <div class="hero-badges">
+    <span class="badge b-blue">🐍 Python 3.10+</span>
+    <span class="badge b-purple">💻 VS Code 1.90+</span>
+    <span class="badge b-green">✓ GitHub Copilot</span>
+    <span class="badge b-amber">🔧 gh CLI</span>
+    <span class="badge b-blue">🪟 Windows · macOS · Linux</span>
+  </div>
+
+  <!-- Progress tracker -->
+  <div id="tracker">
+    <div class="tr-step active" onclick="scrollToStep(1)">
+      <div class="tr-dot">1</div><div class="tr-label">Requisitos</div>
+    </div>
+    <div class="tr-line" id="line-1"></div>
+    <div class="tr-step" onclick="scrollToStep(2)">
+      <div class="tr-dot">2</div><div class="tr-label">Clonar repo</div>
+    </div>
+    <div class="tr-line" id="line-2"></div>
+    <div class="tr-step" onclick="scrollToStep(3)">
+      <div class="tr-dot">3</div><div class="tr-label">Python pkg</div>
+    </div>
+    <div class="tr-line" id="line-3"></div>
+    <div class="tr-step" onclick="scrollToStep(4)">
+      <div class="tr-dot">4</div><div class="tr-label">VS Code ext</div>
+    </div>
+    <div class="tr-line" id="line-4"></div>
+    <div class="tr-step" onclick="scrollToStep(5)">
+      <div class="tr-dot">5</div><div class="tr-label">Copilot CLI</div>
+    </div>
+    <div class="tr-line" id="line-5"></div>
+    <div class="tr-step" onclick="scrollToStep(6)">
+      <div class="tr-dot">✓</div><div class="tr-label">Verificar</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 0 — REQUISITOS ══════════════════════ -->
+<section id="prereqs" class="step-section" data-step="1">
+  <div class="wrap">
+    <div class="slabel">Paso 1</div>
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <h2>Requisitos previos</h2>
+        <p>Verifica que tengas todo instalado antes de continuar.</p>
+      </div>
+    </div>
+
+    <div class="check-grid">
+      <div class="check-card">
+        <div class="check-icon">🐍</div>
+        <div>
+          <h4>Python <span class="req-ver">≥ 3.10</span></h4>
+          <p>La suite usa únicamente stdlib. Descarga en <code style="color:var(--cyan)">python.org</code></p>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-icon">💻</div>
+        <div>
+          <h4>VS Code <span class="req-ver">≥ 1.90</span></h4>
+          <p>Editor donde se activa el participante <code style="color:var(--cyan)">@nttdata</code> en Copilot Chat.</p>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-icon">🤖</div>
+        <div>
+          <h4>GitHub Copilot <span class="req-ver">Chat</span></h4>
+          <p>Extensión <em>GitHub Copilot Chat</em> instalada en VS Code con suscripción activa.</p>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-icon">🔧</div>
+        <div>
+          <h4>gh CLI <span class="req-ver">≥ 2.40</span></h4>
+          <p>GitHub CLI para autenticación y comandos Copilot desde terminal. <code style="color:var(--cyan)">cli.github.com</code></p>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-icon">📦</div>
+        <div>
+          <h4>Node.js <span class="req-ver">≥ 20</span></h4>
+          <p>Solo necesario para compilar la extensión VS Code (<code style="color:var(--cyan)">npm run compile</code>).</p>
+        </div>
+      </div>
+      <div class="check-card">
+        <div class="check-icon">🌿</div>
+        <div>
+          <h4>Git <span class="req-ver">≥ 2.40</span></h4>
+          <p>Para clonar el repositorio y mantener la suite actualizada.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check rápido -->
+    <div class="verify-box" style="margin-top:28px">
+      <h4>⚡ Verificación rápida de requisitos</h4>
+      <div class="os-tabs">
+        <div class="os-tab active" onclick="switchOS(this,'req')">🪟 Windows</div>
+        <div class="os-tab" onclick="switchOS(this,'req')">🍎 macOS</div>
+        <div class="os-tab" onclick="switchOS(this,'req')">🐧 Linux</div>
+      </div>
+      <div class="term" id="req-win">
+        <div class="term-bar">
+          <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">PowerShell</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button>
+        </div>
+        <div class="term-body" data-copy="python --version&#10;node --version&#10;npm --version&#10;git --version&#10;gh --version&#10;code --version"><span class="tm"># Ejecuta en PowerShell para verificar versiones</span>
+<span class="tc">python</span> <span class="tw">--version</span>      <span class="tm"># → Python 3.10+</span>
+<span class="tc">node</span>   <span class="tw">--version</span>      <span class="tm"># → v20+</span>
+<span class="tc">npm</span>    <span class="tw">--version</span>      <span class="tm"># → 10+</span>
+<span class="tc">git</span>    <span class="tw">--version</span>      <span class="tm"># → git 2.40+</span>
+<span class="tc">gh</span>     <span class="tw">--version</span>      <span class="tm"># → gh version 2.40+</span>
+<span class="tc">code</span>   <span class="tw">--version</span>      <span class="tm"># → 1.90+</span></div>
+      </div>
+      <div class="term" id="req-mac" style="display:none">
+        <div class="term-bar">
+          <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">Terminal (zsh)</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button>
+        </div>
+        <div class="term-body" data-copy="python3 --version&#10;node --version&#10;git --version&#10;gh --version&#10;code --version"><span class="tm"># macOS — instalar con Homebrew si falta alguno</span>
+<span class="tm"># brew install python node git gh</span>
+<span class="tc">python3</span> <span class="tw">--version</span>     <span class="tm"># → Python 3.10+</span>
+<span class="tc">node</span>    <span class="tw">--version</span>     <span class="tm"># → v20+</span>
+<span class="tc">git</span>     <span class="tw">--version</span>     <span class="tm"># → git 2.40+</span>
+<span class="tc">gh</span>      <span class="tw">--version</span>     <span class="tm"># → gh version 2.40+</span>
+<span class="tc">code</span>    <span class="tw">--version</span>     <span class="tm"># → 1.90+</span></div>
+      </div>
+      <div class="term" id="req-linux" style="display:none">
+        <div class="term-bar">
+          <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">bash</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button>
+        </div>
+        <div class="term-body" data-copy="python3 --version&#10;node --version&#10;git --version&#10;gh --version&#10;code --version"><span class="tm"># apt · dnf · pacman según tu distro</span>
+<span class="tm"># sudo apt install python3 nodejs git gh</span>
+<span class="tc">python3</span> <span class="tw">--version</span>
+<span class="tc">node</span>    <span class="tw">--version</span>
+<span class="tc">git</span>     <span class="tw">--version</span>
+<span class="tc">gh</span>      <span class="tw">--version</span>
+<span class="tc">code</span>    <span class="tw">--version</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 2 — CLONAR ═════════════════════════ -->
+<section id="step-clone" class="step-section" data-step="2">
+  <div class="wrap">
+    <div class="slabel">Paso 2</div>
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <h2>Clonar el repositorio</h2>
+        <p>Descarga la suite en tu máquina local.</p>
+      </div>
+    </div>
+
+    <div class="os-tabs">
+      <div class="os-tab active" onclick="switchOS(this,'clone')">🪟 Windows</div>
+      <div class="os-tab" onclick="switchOS(this,'clone')">🍎 macOS</div>
+      <div class="os-tab" onclick="switchOS(this,'clone')">🐧 Linux</div>
+    </div>
+    <div class="term" id="clone-win">
+      <div class="term-bar">
+        <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">PowerShell</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button>
+      </div>
+      <div class="term-body" data-copy="git clone https://github.com/llopez2018/naves-industriales-ai.git&#10;cd naves-industriales-ai&#10;git checkout claude/ibm-reverse-engineering-tools-8Arpa"><span class="tm"># 1. Clonar</span>
+<span class="tc">git</span> clone https://github.com/llopez2018/naves-industriales-ai.git
+<span class="tc">cd</span> naves-industriales-ai
+
+<span class="tm"># 2. Cambiar a la rama de la suite</span>
+<span class="tc">git</span> checkout <span class="ta">claude/ibm-reverse-engineering-tools-8Arpa</span>
+
+<span class="tm"># 3. Confirmar estructura</span>
+<span class="tc">dir</span> ibm_twx_tools      <span class="tm"># debe mostrar los 7 módulos .py</span>
+<span class="tc">dir</span> vscode-nttdata-ibm <span class="tm"># debe mostrar src/, package.json</span></div>
+    </div>
+    <div class="term" id="clone-mac" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">zsh</span><button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="git clone https://github.com/llopez2018/naves-industriales-ai.git&#10;cd naves-industriales-ai&#10;git checkout claude/ibm-reverse-engineering-tools-8Arpa">
+<span class="tc">git</span> clone https://github.com/llopez2018/naves-industriales-ai.git
+<span class="tc">cd</span> naves-industriales-ai
+<span class="tc">git</span> checkout <span class="ta">claude/ibm-reverse-engineering-tools-8Arpa</span>
+<span class="tc">ls</span> ibm_twx_tools       <span class="tm"># 7 módulos Python</span>
+<span class="tc">ls</span> vscode-nttdata-ibm  <span class="tm"># extensión VS Code</span></div>
+    </div>
+    <div class="term" id="clone-linux" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">bash</span><button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="git clone https://github.com/llopez2018/naves-industriales-ai.git&#10;cd naves-industriales-ai&#10;git checkout claude/ibm-reverse-engineering-tools-8Arpa">
+<span class="tc">git</span> clone https://github.com/llopez2018/naves-industriales-ai.git
+<span class="tc">cd</span> naves-industriales-ai
+<span class="tc">git</span> checkout <span class="ta">claude/ibm-reverse-engineering-tools-8Arpa</span>
+<span class="tc">ls</span> -la ibm_twx_tools</div>
+    </div>
+
+    <div class="infobox ib-blue" style="margin-top:16px">
+      <span class="infobox-icon">📁</span>
+      <div>Estructura que debes ver en <code style="color:var(--cyan)">ibm_twx_tools/</code>:
+        <div class="tree" style="margin-top:10px">
+<span class="dir">ibm_twx_tools/</span>
+├── <span class="file">__init__.py</span>       <span class="comment"># v1.0.0 · NTTDATA</span>
+├── <span class="file">__main__.py</span>      <span class="comment"># python -m ibm_twx_tools</span>
+├── <span class="file">banner.py</span>        <span class="comment"># ASCII logo NTT DATA</span>
+├── <span class="file">twx_parser.py</span>    <span class="comment"># ZIP + XML parser</span>
+├── <span class="file">entity_extractor.py</span>
+├── <span class="file">service_extractor.py</span>
+├── <span class="file">flow_mapper.py</span>
+├── <span class="file">doc_generator.py</span>
+└── <span class="file">cli.py</span>           <span class="comment"># entry point CLI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 3 — PYTHON ═════════════════════════ -->
+<section id="step-python" class="step-section" data-step="3">
+  <div class="wrap">
+    <div class="slabel">Paso 3</div>
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <h2>Instalar el paquete Python</h2>
+        <p>Registra el comando <code style="font-family:var(--mono);color:var(--cyan)">nttdata-ibm-twx</code> en tu PATH.</p>
+      </div>
+    </div>
+
+    <div class="os-tabs">
+      <div class="os-tab active" onclick="switchOS(this,'py')">🪟 Windows</div>
+      <div class="os-tab" onclick="switchOS(this,'py')">🍎 macOS</div>
+      <div class="os-tab" onclick="switchOS(this,'py')">🐧 Linux</div>
+    </div>
+    <div class="term" id="py-win">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">PowerShell — desde naves-industriales-ai/</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="python -m pip install -e .&#10;nttdata-ibm-twx --version"><span class="tm"># Opción A: instalar editable (recomendado para desarrollo)</span>
+<span class="tc">python</span> -m pip install <span class="ta">-e</span> .
+
+<span class="tm"># Opción B: solo usar sin instalar (sin PATH global)</span>
+<span class="tc">python</span> -m ibm_twx_tools <span class="tw">--version</span>
+
+<span class="tm"># Verificar instalación (Opción A)</span>
+<span class="tc">nttdata-ibm-twx</span> <span class="tw">--version</span>
+<span class="tg"># → NTTDATA TWX Tools v1.0.0</span></div>
+    </div>
+    <div class="term" id="py-mac" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">zsh — desde naves-industriales-ai/</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="python3 -m pip install -e .&#10;nttdata-ibm-twx --version">
+<span class="tc">python3</span> -m pip install <span class="ta">-e</span> .
+<span class="tc">nttdata-ibm-twx</span> <span class="tw">--version</span>
+<span class="tg"># → NTTDATA TWX Tools v1.0.0</span></div>
+    </div>
+    <div class="term" id="py-linux" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">bash</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="pip3 install -e . --user&#10;nttdata-ibm-twx --version">
+<span class="tc">pip3</span> install <span class="ta">-e</span> . <span class="ta">--user</span>
+<span class="tc">nttdata-ibm-twx</span> <span class="tw">--version</span>
+<span class="tg"># → NTTDATA TWX Tools v1.0.0</span></div>
+    </div>
+
+    <div class="verify-box">
+      <h4>✅ Prueba rápida sin archivo TWX real</h4>
+      <div class="term">
+        <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">Cualquier terminal</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+        <div class="term-body" data-copy="python -c &quot;import ibm_twx_tools; print('OK —', ibm_twx_tools.__version__)&quot;"><span class="tc">python</span> -c <span class="ta">"import ibm_twx_tools; print('OK —', ibm_twx_tools.__version__)"</span>
+<span class="tg"># → OK — 1.0.0</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 4 — VS CODE ════════════════════════ -->
+<section id="step-vscode" class="step-section" data-step="4">
+  <div class="wrap">
+    <div class="slabel">Paso 4</div>
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-info">
+        <h2>Activar la extensión VS Code</h2>
+        <p>Compila y carga la extensión que registra el participante <code style="font-family:var(--mono);color:var(--cyan)">@nttdata</code>.</p>
+      </div>
+    </div>
+
+    <div class="os-tabs">
+      <div class="os-tab active" onclick="switchOS(this,'ext')">🪟 Windows</div>
+      <div class="os-tab" onclick="switchOS(this,'ext')">🍎 macOS / 🐧 Linux</div>
+    </div>
+    <div class="term" id="ext-win">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">PowerShell — desde naves-industriales-ai/</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="cd vscode-nttdata-ibm&#10;npm install&#10;npm run compile&#10;cd ..&#10;code ."><span class="tm"># Entrar al directorio de la extensión</span>
+<span class="tc">cd</span> vscode-nttdata-ibm
+
+<span class="tm"># Instalar dependencias TypeScript</span>
+<span class="tc">npm</span> install
+
+<span class="tm"># Compilar TypeScript → JavaScript</span>
+<span class="tc">npm</span> run compile
+
+<span class="tm"># Abrir el proyecto en VS Code</span>
+<span class="tc">cd</span> ..
+<span class="tc">code</span> .
+
+<span class="tm"># En VS Code → presionar F5</span>
+<span class="tm"># Se abre una nueva ventana "Extension Development Host"</span>
+<span class="tm"># La extensión NTTDATA IBM TWX ya está activa en esa ventana</span></div>
+    </div>
+    <div class="term" id="ext-mac" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">bash / zsh</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="cd vscode-nttdata-ibm && npm install && npm run compile && cd .. && code .">
+<span class="tc">cd</span> vscode-nttdata-ibm <span class="tw">&amp;&amp;</span> <span class="tc">npm</span> install <span class="tw">&amp;&amp;</span> <span class="tc">npm</span> run compile
+<span class="tc">cd</span> .. <span class="tw">&amp;&amp;</span> <span class="tc">code</span> .
+<span class="tm"># Luego F5 en VS Code para lanzar el Extension Development Host</span></div>
+    </div>
+
+    <div class="infobox ib-amber" style="margin-top:20px">
+      <span class="infobox-icon">⚙️</span>
+      <div>
+        <strong style="color:var(--amber-l)">Configurar ruta Python en VS Code</strong><br>
+        Abre <code style="color:var(--cyan)">Archivo → Preferencias → Configuración</code> y busca
+        <code style="color:var(--cyan)">nttdata.ibm</code> para ajustar estas opciones:
+      </div>
+    </div>
+
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Configuración</th><th>Valor por defecto</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>nttdata.ibm.pythonPath</td>
+            <td style="color:var(--muted2)"><code style="color:var(--amber-l)">python</code></td>
+            <td>Ruta al ejecutable Python. Ej: <code style="color:var(--cyan)">C:\Python311\python.exe</code></td>
+          </tr>
+          <tr>
+            <td>nttdata.ibm.toolsPath</td>
+            <td style="color:var(--muted2)"><em>(auto)</em></td>
+            <td>Directorio raíz que contiene <code style="color:var(--cyan)">ibm_twx_tools/</code></td>
+          </tr>
+          <tr>
+            <td>nttdata.ibm.defaultVersion</td>
+            <td style="color:var(--muted2)"><code style="color:var(--amber-l)">1.0.0</code></td>
+            <td>Versión que aparece en el banner y la documentación generada</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 5 — COPILOT CLI ════════════════════ -->
+<section id="step-copilot" class="step-section" data-step="5">
+  <div class="wrap">
+    <div class="slabel">Paso 5</div>
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-info">
+        <h2>Configurar GitHub Copilot CLI</h2>
+        <p>Autentícate con <code style="font-family:var(--mono);color:var(--cyan)">gh</code> y activa Copilot en la terminal.</p>
+      </div>
+    </div>
+
+    <div class="os-tabs">
+      <div class="os-tab active" onclick="switchOS(this,'gh')">🪟 Windows</div>
+      <div class="os-tab" onclick="switchOS(this,'gh')">🍎 macOS / 🐧 Linux</div>
+    </div>
+    <div class="term" id="gh-win">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">PowerShell</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="gh auth login&#10;gh copilot --version&#10;gh extension install github/gh-copilot"><span class="tm"># 1. Autenticarse en GitHub</span>
+<span class="tc">gh</span> auth login
+<span class="tm"># → Sigue las instrucciones (browser / token)</span>
+
+<span class="tm"># 2. Verificar Copilot CLI disponible</span>
+<span class="tc">gh</span> copilot <span class="tw">--version</span>
+
+<span class="tm"># 3. Si no está instalado, instalar la extensión oficial</span>
+<span class="tc">gh</span> extension install <span class="ta">github/gh-copilot</span>
+
+<span class="tm"># 4. Probar Copilot explain desde terminal</span>
+<span class="tc">gh</span> copilot explain <span class="ta">"python -m ibm_twx_tools analyze mi_app.twx"</span></div>
+    </div>
+    <div class="term" id="gh-mac" style="display:none">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">bash / zsh</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="gh auth login&#10;gh extension install github/gh-copilot&#10;gh copilot --version">
+<span class="tc">gh</span> auth login
+<span class="tc">gh</span> extension install <span class="ta">github/gh-copilot</span>
+<span class="tc">gh</span> copilot <span class="tw">--version</span></div>
+    </div>
+
+    <!-- alias setup -->
+    <div style="margin-top:24px">
+      <div class="slabel">Alias recomendados</div>
+      <p style="font-size:.88rem;color:var(--muted2);margin-bottom:12px">
+        Agrega estos alias para lanzar la suite más rápido desde cualquier directorio:
+      </p>
+      <div class="os-tabs">
+        <div class="os-tab active" onclick="switchOS(this,'alias')">🪟 PowerShell</div>
+        <div class="os-tab" onclick="switchOS(this,'alias')">🍎 zsh</div>
+        <div class="os-tab" onclick="switchOS(this,'alias')">🐧 bash</div>
+      </div>
+      <div class="term" id="alias-win">
+        <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">$PROFILE (PowerShell)</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+        <div class="term-body" data-copy="notepad $PROFILE"><span class="tm"># Abrir perfil de PowerShell</span>
+<span class="tc">notepad</span> <span class="tw">$PROFILE</span>
+
+<span class="tm"># Agregar estas líneas al archivo:</span>
+<span class="tp">Set-Alias</span> twx    <span class="ta">"nttdata-ibm-twx"</span>
+<span class="tp">function</span> <span class="tc">twx-analyze</span>(<span class="tw">$f</span>)  { nttdata-ibm-twx analyze   $f }
+<span class="tp">function</span> <span class="tc">twx-docs</span>(<span class="tw">$f</span>)     { nttdata-ibm-twx docs      $f }
+<span class="tp">function</span> <span class="tc">twx-flows</span>(<span class="tw">$f</span>)    { nttdata-ibm-twx flows     $f }
+<span class="tp">function</span> <span class="tc">twx-services</span>(<span class="tw">$f</span>) { nttdata-ibm-twx services  $f }
+
+<span class="tm"># Recargar perfil</span>
+<span class="tc">.</span> <span class="tw">$PROFILE</span></div>
+      </div>
+      <div class="term" id="alias-zsh" style="display:none">
+        <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">~/.zshrc</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+        <div class="term-body" data-copy="echo 'alias twx=nttdata-ibm-twx' >> ~/.zshrc && source ~/.zshrc">
+<span class="tm"># Agregar alias a ~/.zshrc</span>
+<span class="tc">echo</span> <span class="ta">'alias twx="nttdata-ibm-twx"'</span> >> ~/.zshrc
+<span class="tc">echo</span> <span class="ta">'alias twx-docs="nttdata-ibm-twx docs"'</span> >> ~/.zshrc
+<span class="tc">echo</span> <span class="ta">'alias twx-flows="nttdata-ibm-twx flows"'</span> >> ~/.zshrc
+<span class="tc">source</span> ~/.zshrc
+
+<span class="tm"># Uso: twx analyze mi_app.twx</span></div>
+      </div>
+      <div class="term" id="alias-bash" style="display:none">
+        <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="term-title">~/.bashrc</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+        <div class="term-body" data-copy="echo 'alias twx=nttdata-ibm-twx' >> ~/.bashrc && source ~/.bashrc">
+<span class="tc">echo</span> <span class="ta">'alias twx="nttdata-ibm-twx"'</span> >> ~/.bashrc
+<span class="tc">source</span> ~/.bashrc</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PASO 6 — VERIFICAR ══════════════════════ -->
+<section id="step-verify" class="step-section" data-step="6">
+  <div class="wrap">
+    <div class="slabel">Paso 6 — Final</div>
+    <div class="step-header">
+      <div class="step-num">✓</div>
+      <div class="step-info">
+        <h2>Verificación completa</h2>
+        <p>Confirma que todo funciona ejecutando este test de extremo a extremo.</p>
+      </div>
+    </div>
+
+    <div class="term">
+      <div class="term-bar">
+        <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">Terminal — test de instalación completo</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button>
+      </div>
+      <div class="term-body" data-copy="python -c &quot;import ibm_twx_tools; print('Suite OK —', ibm_twx_tools.__version__)&quot;&#10;nttdata-ibm-twx --version&#10;gh copilot --version"><span class="tm">## ── 1. Módulo Python ──────────────────────────────────</span>
+<span class="tc">python</span> -c <span class="ta">"import ibm_twx_tools; print('Suite OK —', ibm_twx_tools.__version__)"</span>
+<span class="tg"># → Suite OK — 1.0.0</span>
+
+<span class="tm">## ── 2. Comando global ─────────────────────────────────</span>
+<span class="tc">nttdata-ibm-twx</span> <span class="tw">--version</span>
+<span class="tg"># → NTTDATA TWX Tools v1.0.0</span>
+
+<span class="tm">## ── 3. GitHub Copilot CLI ─────────────────────────────</span>
+<span class="tc">gh</span> copilot <span class="tw">--version</span>
+<span class="tg"># → Copilot CLI vX.X.X</span>
+
+<span class="tm">## ── 4. Análisis de prueba con TWX sintético ───────────</span>
+<span class="tc">python</span> -c <span class="ta">"
+import zipfile, io
+buf = io.BytesIO()
+with zipfile.ZipFile(buf,'w') as z:
+    z.writestr('META-INF/MANIFEST.MF','Process-App-Name: TestNTTDATA\nSnapshot-Name: v1.0\n')
+    z.writestr('test/Demo.service','&lt;service name=\"Demo\"&gt;&lt;input name=\"x\" type=\"String\"/&gt;&lt;/service&gt;')
+buf.seek(0)
+open('/tmp/demo_nttdata.twx','wb').write(buf.read())
+print('TWX de prueba creado en /tmp/demo_nttdata.twx')
+"</span>
+
+<span class="tc">nttdata-ibm-twx</span> analyze <span class="ta">/tmp/demo_nttdata.twx</span>
+<span class="tg"># → JSON con app_name: "TestNTTDATA"</span>
+
+<span class="tm">## ── 5. Copilot Chat (@nttdata) ────────────────────────</span>
+<span class="tm"># Abrir VS Code (F5 si no está corriendo la extensión)</span>
+<span class="tm"># En Copilot Chat escribir:</span>
+<span class="ta">@nttdata help</span>
+<span class="tg"># → Muestra banner ASCII NTT DATA + lista de comandos</span></div>
+    </div>
+
+    <div class="infobox ib-green" style="margin-top:20px">
+      <span class="infobox-icon">🎉</span>
+      <div>
+        <strong style="color:var(--green-l)">¡Instalación completa!</strong><br>
+        Ya puedes usar <code style="color:var(--cyan)">nttdata-ibm-twx</code> desde cualquier terminal,
+        <code style="color:var(--cyan)">@nttdata v1.0 &lt;cmd&gt;</code> en Copilot Chat y pedir ayuda a
+        <code style="color:var(--cyan)">gh copilot explain</code> sobre cualquier comando de la suite.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ QUICK REFERENCE ═════════════════════════ -->
+<section id="quickref" style="padding:56px 0;background:var(--bg2)">
+  <div class="wrap">
+    <div class="slabel">Referencia rápida</div>
+    <h2 style="font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:8px">Cheatsheet de comandos</h2>
+    <p style="font-size:.9rem;color:var(--muted2);margin-bottom:28px">
+      Todos los comandos disponibles en CLI y en Copilot Chat.
+    </p>
+
+    <!-- CLI -->
+    <h3 style="font-size:.85rem;font-weight:700;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">CLI — Terminal</h3>
+    <div class="qref-grid" style="margin-bottom:32px">
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx analyze archivo.twx</div>
+        <div class="qref-desc">Resumen JSON: nombre, versión, conteo de artefactos por tipo</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx entities archivo.twx</div>
+        <div class="qref-desc">Business Objects: campos, tipos, herencias, namespaces</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx services archivo.twx</div>
+        <div class="qref-desc">Servicios: pasos, inputs/outputs, dependencias</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx flows archivo.twx</div>
+        <div class="qref-desc">Diagramas Mermaid flowchart TD por proceso/servicio</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx deps archivo.twx</div>
+        <div class="qref-desc">Grafo de dependencias Mermaid entre artefactos</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx docs archivo.twx -o reporte.md</div>
+        <div class="qref-desc">Documentación Markdown completa con diagramas</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx scripts archivo.twx</div>
+        <div class="qref-desc">Scripts JavaScript/Groovy embebidos en servicios</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx endpoints archivo.twx</div>
+        <div class="qref-desc">URLs REST/SOAP referenciadas en integraciones</div>
+      </div>
+      <div class="qref-card">
+        <div class="qref-cmd">nttdata-ibm-twx entries archivo.twx</div>
+        <div class="qref-desc">Artefactos que no son llamados por ningún otro (entry points)</div>
+      </div>
+    </div>
+
+    <!-- Copilot Chat -->
+    <h3 style="font-size:.85rem;font-weight:700;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">Copilot Chat — @nttdata</h3>
+    <div class="term" style="margin-bottom:32px">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">GitHub Copilot Chat</span></div>
+      <div class="term-body">
+<span class="tm"># Sintaxis: @nttdata &lt;versión&gt; &lt;comando&gt; &lt;archivo.twx&gt;</span>
+
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">analyze</span>   <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">services</span>  <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">flows</span>     <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">entities</span>  <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">docs</span>      <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">scripts</span>   <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">endpoints</span> <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">deps</span>      <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span> <span class="ta">v1.0</span> <span class="tp">entries</span>   <span class="tw">ruta/MiApp.twx</span>
+<span class="tc">@nttdata</span>         <span class="tp">help</span>
+      </div>
+    </div>
+
+    <!-- gh copilot suggest -->
+    <h3 style="font-size:.85rem;font-weight:700;color:var(--cyan);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px">gh copilot — Desde terminal</h3>
+    <div class="term">
+      <div class="term-bar"><div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-title">gh copilot</span>
+        <button class="copy-btn" onclick="copyBlock(this)">Copiar</button></div>
+      <div class="term-body" data-copy="gh copilot explain &quot;nttdata-ibm-twx flows MiApp.twx&quot;&#10;gh copilot suggest &quot;cómo analizar un archivo TWX de IBM con NTTDATA&quot;"><span class="tm"># Pedirle a Copilot que explique el comando</span>
+<span class="tc">gh copilot explain</span> <span class="ta">"nttdata-ibm-twx flows MiApp.twx"</span>
+
+<span class="tm"># Pedirle sugerencias de comandos relacionados</span>
+<span class="tc">gh copilot suggest</span> <span class="ta">"cómo analizar un archivo TWX de IBM con NTTDATA"</span>
+
+<span class="tm"># Generar documentación y abrirla</span>
+<span class="tc">nttdata-ibm-twx</span> docs <span class="ta">MiApp.twx</span> -o reporte.md <span class="tw">&amp;&amp;</span> <span class="tc">code</span> reporte.md</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap">
+    <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="8"/>
+      <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="6"/>
+      <ellipse cx="50" cy="52" rx="10" ry="13" fill="#00AEEF"/>
+      <ellipse cx="50" cy="40" rx="7" ry="7" fill="#00AEEF"/>
+    </svg>
+    <span style="font-weight:800;color:#fff">NTT DATA</span>
+    <span style="color:var(--muted)">IBM TWX Reverse Engineering Suite</span>
+    <span class="pill">v1.0.0</span>
+  </div>
+  <p>Guía de instalación · GitHub Copilot CLI · &copy; 2026 NTT DATA</p>
+</footer>
+
+<!-- ───── JS ───── -->
+<script>
+/* OS tab switcher */
+function switchOS(btn, group) {
+  const tabs   = btn.parentElement.querySelectorAll('.os-tab');
+  const idx    = [...tabs].indexOf(btn);
+  const osKeys = ['win','mac','linux','win','mac','bash','win','zsh','bash'];
+  const keys   = group === 'alias'
+    ? ['win','zsh','bash']
+    : group === 'ext'
+      ? ['win','mac']
+      : ['win','mac','linux'];
+  tabs.forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  keys.forEach((key,i) => {
+    const el = document.getElementById(group + '-' + key);
+    if (el) el.style.display = i === idx ? 'block' : 'none';
+  });
+}
+
+/* Copy button */
+function copyBlock(btn) {
+  const body = btn.closest('.term').querySelector('.term-body');
+  const raw  = body.dataset.copy || body.innerText;
+  navigator.clipboard.writeText(raw.trim()).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* Progress tracker scroll + highlight */
+const sections = document.querySelectorAll('[data-step]');
+const steps    = document.querySelectorAll('.tr-step');
+const lines    = document.querySelectorAll('.tr-line');
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const s = parseInt(e.target.dataset.step);
+    steps.forEach((st, i) => {
+      st.classList.toggle('done',   i + 1 < s);
+      st.classList.toggle('active', i + 1 === s);
+    });
+    lines.forEach((l, i) => l.classList.toggle('done', i + 1 < s));
+  });
+}, { threshold: 0.35 });
+sections.forEach(s => io.observe(s));
+
+/* Scroll helper */
+function scrollToStep(n) {
+  const target = document.querySelector('[data-step="' + n + '"]');
+  if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>

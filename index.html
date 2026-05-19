@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>NTTDATA · IBM TWX Suite · Panel Local</title>
+  <style>
+    :root{
+      --b:#0068B6;--bd:#004E8C;--c:#00AEEF;
+      --g:#10B981;--gl:#34D399;
+      --a:#F59E0B;--al:#FCD34D;
+      --p:#8B5CF6;--pl:#A78BFA;
+      --r:#EF4444;--rl:#F87171;
+      --bg:#060B15;--bg2:#0B1220;--bg3:#0F1829;
+      --brd:#172440;--brdh:#1E3A60;
+      --tx:#E2E8F0;--mu:#64748B;--mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Consolas',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--tx);font-family:var(--ui);
+         min-height:100vh;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:
+        linear-gradient(rgba(0,104,182,.05) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,104,182,.05) 1px,transparent 1px);
+      background-size:44px 44px;animation:bg 22s linear infinite;
+    }
+    @keyframes bg{to{background-position:44px 44px}}
+    .page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 72px}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:50;background:rgba(6,11,21,.92);
+        backdrop-filter:blur(10px);border-bottom:1px solid var(--brd);
+        padding:0 24px;display:flex;align-items:center;gap:0}
+    .nav-inner{max-width:1100px;margin:0 auto;width:100%;
+               display:flex;align-items:center;gap:4px;padding:10px 0}
+    .nav-logo{display:flex;align-items:center;gap:10px;margin-right:auto;
+              text-decoration:none;color:#fff}
+    .nav-logo svg{width:26px;height:26px}
+    .nav-logo-text{font-size:.82rem;font-weight:800;letter-spacing:.02em}
+    .nav-logo-text span{color:var(--c)}
+    .nav-link{font-size:.72rem;font-weight:600;color:var(--mu2);padding:6px 12px;
+              border-radius:6px;text-decoration:none;transition:.2s;letter-spacing:.02em}
+    .nav-link:hover{color:#fff;background:rgba(0,174,239,.1)}
+
+    /* HEADER */
+    header{padding:64px 0 52px;text-align:center;
+           border-bottom:1px solid var(--brd);margin-bottom:56px}
+    .logo-row{display:inline-flex;align-items:center;gap:22px;margin-bottom:24px}
+    .shonai{width:72px;height:72px;
+      filter:drop-shadow(0 0 20px rgba(0,174,239,.7));
+      animation:glow 3s ease-in-out infinite}
+    @keyframes glow{
+      0%,100%{filter:drop-shadow(0 0 12px rgba(0,174,239,.45))}
+      50%{filter:drop-shadow(0 0 32px rgba(0,174,239,1))}}
+    .brand .corp{font-size:2.4rem;font-weight:900;color:#fff;line-height:1}
+    .brand .corp span{color:var(--c)}
+    .brand .sub{font-size:.7rem;color:var(--mu2);letter-spacing:.16em;
+                text-transform:uppercase;margin-top:6px}
+    h1{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;color:#fff;margin-bottom:12px}
+    h1 em{font-style:normal;
+      background:linear-gradient(90deg,var(--b),var(--c));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hdesc{font-size:.95rem;color:var(--mu2);max-width:600px;margin:0 auto 24px;line-height:1.6}
+    .badge-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+    .badge{font-size:.68rem;font-weight:700;letter-spacing:.05em;
+           text-transform:uppercase;padding:4px 14px;border-radius:999px}
+    .bb{background:rgba(0,104,182,.15);color:var(--c);border:1px solid rgba(0,174,239,.3)}
+    .bg_{background:rgba(16,185,129,.1);color:var(--gl);border:1px solid rgba(16,185,129,.25)}
+    .ba{background:rgba(245,158,11,.1);color:var(--al);border:1px solid rgba(245,158,11,.25)}
+    .bp{background:rgba(139,92,246,.1);color:var(--pl);border:1px solid rgba(139,92,246,.25)}
+
+    /* SECTION */
+    .sec{margin-bottom:56px;scroll-margin-top:70px}
+    .sec-label{font-size:.64rem;font-weight:700;letter-spacing:.16em;
+               text-transform:uppercase;color:var(--c);margin-bottom:8px;
+               display:flex;align-items:center;gap:8px}
+    .sec-label::before{content:'';width:18px;height:2px;background:var(--c);border-radius:1px}
+    .sec-title{font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:20px}
+
+    /* PIPELINE */
+    .pipeline{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    @media(max-width:700px){.pipeline{grid-template-columns:1fr}}
+    .pipe-step{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+               padding:22px;position:relative;overflow:hidden}
+    .pipe-step::before{content:'';position:absolute;top:0;left:0;right:0;
+                       height:3px;border-radius:14px 14px 0 0}
+    .ps-blue::before{background:linear-gradient(90deg,var(--b),var(--c))}
+    .ps-green::before{background:linear-gradient(90deg,var(--g),var(--gl))}
+    .ps-purple::before{background:linear-gradient(90deg,var(--p),var(--pl))}
+    .pipe-num{font-size:.62rem;font-weight:700;letter-spacing:.1em;
+              text-transform:uppercase;color:var(--mu);margin-bottom:8px}
+    .pipe-icon{font-size:2rem;margin-bottom:10px}
+    .pipe-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:8px}
+    .pipe-desc{font-size:.8rem;color:var(--mu2);line-height:1.55;margin-bottom:12px}
+    .pipe-items{list-style:none;display:flex;flex-direction:column;gap:4px}
+    .pipe-items li{font-size:.75rem;color:var(--mu2);padding-left:14px;position:relative}
+    .pipe-items li::before{content:'→';position:absolute;left:0;color:var(--c);font-size:.7rem}
+    .pipe-arrow{display:flex;align-items:center;justify-content:center;
+                color:var(--mu);font-size:1.6rem;align-self:center}
+    @media(max-width:700px){.pipe-arrow{transform:rotate(90deg);margin:0 auto}}
+
+    /* CYCLES */
+    .cycles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+    .cycle-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+                padding:18px;display:flex;gap:14px}
+    .cycle-num{min-width:36px;height:36px;border-radius:8px;
+               display:flex;align-items:center;justify-content:center;
+               font-size:.8rem;font-weight:900;flex-shrink:0}
+    .cn-blue{background:rgba(0,104,182,.2);color:var(--c)}
+    .cn-green{background:rgba(16,185,129,.15);color:var(--gl)}
+    .cn-amber{background:rgba(245,158,11,.15);color:var(--al)}
+    .cn-purple{background:rgba(139,92,246,.15);color:var(--pl)}
+    .cycle-body{}
+    .cycle-title{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:4px}
+    .cycle-src{font-family:var(--mono);font-size:.68rem;color:var(--c);
+               background:rgba(0,174,239,.07);border:1px solid rgba(0,174,239,.15);
+               padding:1px 7px;border-radius:3px;margin-bottom:6px;display:inline-block}
+    .cycle-desc{font-size:.76rem;color:var(--mu2);line-height:1.5}
+    .cycle-warn{display:flex;align-items:baseline;gap:5px;margin-top:6px;
+                font-size:.72rem;color:var(--al);background:rgba(245,158,11,.06);
+                border:1px solid rgba(245,158,11,.15);border-radius:5px;padding:4px 8px}
+
+    /* TAXONOMY */
+    .tax-table{width:100%;border-collapse:collapse;font-size:.8rem}
+    .tax-table th{background:var(--bg3);color:var(--mu2);font-weight:700;
+                  font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;
+                  padding:10px 16px;text-align:left;border-bottom:1px solid var(--brd)}
+    .tax-table td{padding:10px 16px;border-bottom:1px solid rgba(23,36,64,.5);color:var(--tx);
+                  vertical-align:middle}
+    .tax-table tr:last-child td{border-bottom:none}
+    .tax-table tr:hover td{background:rgba(0,104,182,.04)}
+    .pfx{font-family:var(--mono);color:var(--c);font-weight:700;font-size:.82rem}
+    .tag-is{background:rgba(0,174,239,.1);color:var(--c);border:1px solid rgba(0,174,239,.2)}
+    .tag-gss{background:rgba(16,185,129,.1);color:var(--gl);border:1px solid rgba(16,185,129,.2)}
+    .tag-hhs{background:rgba(245,158,11,.1);color:var(--al);border:1px solid rgba(245,158,11,.2)}
+    .tag-uca{background:rgba(139,92,246,.1);color:var(--pl);border:1px solid rgba(139,92,246,.2)}
+    .tag-bpd{background:rgba(239,68,68,.1);color:var(--rl);border:1px solid rgba(239,68,68,.2)}
+    .tag-bo{background:rgba(16,185,129,.08);color:var(--gl);border:1px solid rgba(16,185,129,.15)}
+    .tag-cv{background:rgba(245,158,11,.08);color:var(--al);border:1px solid rgba(245,158,11,.15)}
+    .type-tag{font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:999px;
+              font-family:var(--ui);letter-spacing:.03em}
+    .count-pill{font-family:var(--mono);font-size:.72rem;color:var(--mu2);
+                background:rgba(255,255,255,.04);border:1px solid var(--brd);
+                padding:1px 8px;border-radius:999px}
+    .table-wrap{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+                overflow:hidden}
+
+    /* SKILLS */
+    .skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .skill-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;
+                padding:16px;display:flex;gap:12px;align-items:flex-start}
+    .sk-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px}
+    .sk-name{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:3px;font-family:var(--mono)}
+    .sk-desc{font-size:.74rem;color:var(--mu2);line-height:1.45}
+    .sk-tag{display:inline-block;font-size:.62rem;color:var(--gl);
+            background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.18);
+            padding:1px 7px;border-radius:3px;margin-top:5px;font-family:var(--mono)}
+
+    /* DOC CARDS */
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .doc-card{background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+              padding:0;overflow:hidden;text-decoration:none;color:inherit;
+              transition:.25s;display:flex;flex-direction:column}
+    .doc-card:hover{border-color:rgba(0,174,239,.45);transform:translateY(-3px);
+                    box-shadow:0 14px 40px rgba(0,0,0,.45)}
+    .doc-card-top{height:4px;border-radius:14px 14px 0 0}
+    .tc-blue{background:linear-gradient(90deg,var(--b),var(--c))}
+    .tc-green{background:linear-gradient(90deg,var(--g),var(--gl))}
+    .tc-amber{background:linear-gradient(90deg,var(--a),var(--al))}
+    .tc-purple{background:linear-gradient(90deg,var(--p),var(--pl))}
+    .doc-card-body{padding:22px;flex:1;display:flex;flex-direction:column;gap:10px}
+    .doc-num{font-size:.62rem;font-weight:700;letter-spacing:.1em;
+             text-transform:uppercase;color:var(--mu)}
+    .doc-icon{font-size:2rem}
+    .doc-title{font-size:1rem;font-weight:700;color:#fff}
+    .doc-desc{font-size:.81rem;color:var(--mu2);line-height:1.55;flex:1}
+    .doc-open{display:inline-flex;align-items:center;gap:6px;margin-top:4px;
+              font-size:.76rem;font-weight:700;color:var(--c);
+              background:rgba(0,174,239,.08);border:1px solid rgba(0,174,239,.2);
+              border-radius:6px;padding:6px 14px;transition:.2s;align-self:flex-start}
+    .doc-card:hover .doc-open{background:rgba(0,174,239,.18)}
+
+    /* PROJECT STRUCTURE GRID */
+    .proj-root-row{background:var(--bg3);border:1px solid var(--brd);border-radius:10px;
+      padding:12px 18px;display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .proj-root-name{font-family:var(--mono);font-size:.8rem;color:var(--c);font-weight:700;margin-right:auto}
+    .proj-file-chip{font-family:var(--mono);font-size:.7rem;color:var(--mu2);
+      background:var(--bg2);border:1px solid var(--brd);border-radius:6px;padding:3px 10px}
+    .proj-file-chip.proj-new{border-color:rgba(52,211,153,.3);color:var(--gl)}
+    .pc-note{color:var(--mu);font-size:.66rem;margin-left:4px}
+    .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media(max-width:860px){.proj-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:560px){.proj-grid{grid-template-columns:1fr}}
+    .proj-card{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+      overflow:hidden;display:flex;flex-direction:column}
+    .proj-card-head{padding:11px 15px;background:rgba(255,255,255,.02);
+      border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+    .pcn{font-size:.62rem;font-weight:900;letter-spacing:.04em;padding:1px 7px;
+      border-radius:4px;background:rgba(255,255,255,.07);color:var(--mu2);flex-shrink:0}
+    .pct{font-family:var(--mono);font-size:.73rem;font-weight:700;color:#fff;flex:1;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+    .pcbadge{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+      padding:2px 7px;border-radius:20px;flex-shrink:0;
+      background:rgba(255,255,255,.05);color:var(--mu);border:1px solid var(--brd)}
+    .pcbadge-new{background:rgba(52,211,153,.08);color:var(--gl);border-color:rgba(52,211,153,.2)}
+    .proj-card-sub{padding:8px 15px 2px;font-family:var(--mono);font-size:.67rem;color:var(--mu)}
+    .proj-file-list{padding:8px 15px 12px;display:flex;flex-direction:column;gap:5px;flex:1}
+    .pfl-item{display:flex;align-items:baseline;gap:6px}
+    .pf-name{font-family:var(--mono);font-size:.71rem;color:var(--mu2);flex-shrink:0}
+    .pf-note{font-size:.67rem;color:var(--mu)}
+    .pf-badge{font-size:.57rem;font-weight:800;padding:1px 5px;border-radius:3px;
+      background:rgba(52,211,153,.1);color:var(--gl);border:1px solid rgba(52,211,153,.18);flex-shrink:0}
+    .pf-new .pf-name{color:var(--gl)}
+    .pf-green{color:var(--gl) !important}
+    .pf-amber{color:var(--al) !important}
+    .pf-folder{color:var(--c) !important}
+    .pfl-out{padding:8px 15px 12px;display:grid;grid-template-columns:1fr 1fr;gap:5px 14px}
+    .pfl-item-wide{grid-column:span 2}
+    .pc-blue{border-top:3px solid var(--b)}
+    .pc-purple{border-top:3px solid var(--p)}
+    .pc-green{border-top:3px solid var(--g)}
+    .pc-amber{border-top:3px solid var(--a)}
+    .pc-cyan{border-top:3px solid var(--c)}
+    .pc-teal{border-top:3px solid #14B8A6}
+
+    /* TERMINAL */
+    .term{background:#070C16;border:1px solid var(--brd);border-radius:10px;overflow:hidden}
+    .term-bar{display:flex;align-items:center;gap:7px;padding:9px 14px;
+              background:#0F1829;border-bottom:1px solid var(--brd)}
+    .dot{width:11px;height:11px;border-radius:50%}
+    .dr{background:#FF5F57}.dy{background:#FFBD2E}.dg{background:#28C840}
+    .term-lbl{flex:1;text-align:center;font-size:.72rem;color:var(--mu);font-family:var(--mono)}
+    .copy-btn{font-size:.68rem;color:var(--mu);background:none;border:none;
+              cursor:pointer;padding:2px 8px;border-radius:4px;transition:.2s;font-family:var(--ui)}
+    .copy-btn:hover{background:rgba(0,119,200,.15);color:var(--c)}
+    .copy-btn.ok{color:var(--gl)}
+    .term-body{padding:16px 20px;font-family:var(--mono);font-size:.8rem;
+               line-height:1.8;overflow-x:auto;white-space:pre}
+    .tc2{color:var(--c)}.tg2{color:var(--gl)}.ta2{color:var(--al)}
+    .tm2{color:var(--mu)}.tw{color:var(--tx)}.tp2{color:var(--pl)}.tr2{color:var(--rl)}
+
+    /* QUICK REF */
+    .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+    .qr{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;
+        padding:12px 16px;display:flex;gap:12px;align-items:flex-start}
+    .qr-cmd{font-family:var(--mono);font-size:.74rem;color:var(--c);
+            background:rgba(0,174,239,.07);border:1px solid rgba(0,174,239,.15);
+            padding:2px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+    .qr-desc{font-size:.77rem;color:var(--mu2);line-height:1.4}
+
+    /* OUTPUT TABLE */
+    .out-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .out-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:16px}
+    .out-file{font-family:var(--mono);font-size:.78rem;color:var(--c);margin-bottom:6px;
+              font-weight:700}
+    .out-size{font-size:.68rem;color:var(--gl);margin-bottom:6px}
+    .out-desc{font-size:.76rem;color:var(--mu2);line-height:1.4}
+
+    /* SCRIPT CARDS */
+    .script-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+    .script-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;
+                 padding:18px;display:flex;gap:14px;align-items:flex-start;
+                 text-decoration:none;color:inherit;transition:.2s}
+    .script-card:hover{border-color:rgba(0,174,239,.4);transform:translateY(-2px)}
+    .sc-icon{font-size:1.6rem;flex-shrink:0}
+    .sc-title{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:4px}
+    .sc-desc{font-size:.76rem;color:var(--mu2);line-height:1.4}
+    .sc-tag{display:inline-block;font-family:var(--mono);font-size:.62rem;
+            color:var(--c);background:rgba(0,174,239,.07);
+            border:1px solid rgba(0,174,239,.15);padding:1px 6px;
+            border-radius:3px;margin-top:6px}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--brd);padding:28px 0;
+           display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .f-brand{display:flex;align-items:center;gap:10px}
+    .f-copy{font-size:.74rem;color:var(--mu)}
+    .ver-pill{font-family:var(--mono);font-size:.68rem;padding:2px 10px;
+              border-radius:999px;background:rgba(0,104,182,.1);
+              border:1px solid var(--brd);color:var(--mu2)}
+    .author{font-size:.72rem;color:var(--mu2)}
+
+    /* INFO BOX */
+    .info-box{background:rgba(0,174,239,.05);border:1px solid rgba(0,174,239,.2);
+              border-radius:10px;padding:14px 18px;font-size:.8rem;
+              color:var(--mu2);line-height:1.6;display:flex;gap:10px;align-items:flex-start}
+    .warn-box{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);
+              border-radius:10px;padding:14px 18px;font-size:.8rem;
+              color:var(--mu2);line-height:1.6;margin-top:14px}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="44" fill="#0068B6" opacity=".9"/>
+        <rect x="28" y="28" width="44" height="44" rx="8" fill="none" stroke="#fff" stroke-width="6"/>
+        <rect x="37" y="37" width="26" height="26" rx="4" fill="none" stroke="#fff" stroke-width="5"/>
+        <circle cx="28" cy="28" r="6" fill="#fff"/>
+      </svg>
+      <span class="nav-logo-text">NTT<span> DATA</span> · IBM TWX Suite</span>
+    </a>
+    <a class="nav-link" href="#pipeline">Flujo</a>
+    <a class="nav-link" href="#metodologia">Metodología v3</a>
+    <a class="nav-link" href="#taxonomia">Taxonomía</a>
+    <a class="nav-link" href="#skills">Skills</a>
+    <a class="nav-link" href="#comandos">Comandos</a>
+    <a class="nav-link" href="#docs">Docs</a>
+  </div>
+</nav>
+
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-row">
+    <svg class="shonai" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="44" fill="#0068B6"/>
+      <rect x="26" y="26" width="48" height="48" rx="10" fill="none" stroke="#fff" stroke-width="7"/>
+      <rect x="35" y="35" width="30" height="30" rx="5" fill="none" stroke="#fff" stroke-width="6"/>
+      <circle cx="26" cy="26" r="7" fill="#fff"/>
+    </svg>
+    <div class="brand">
+      <div class="corp">NTT<span> DATA</span></div>
+      <div class="sub">IBM Integration Services · Legacy Migration · CP4BA</div>
+    </div>
+  </div>
+  <h1>IBM TWX <em>Reverse Engineering Suite</em></h1>
+  <p class="hdesc">Suite completa para extraer, analizar y documentar archivos IBM BPM <code style="font-size:.85em;color:var(--c)">.twx</code>. Pipeline automatizado de 3 fases con metodología v3 para migración a Appian. Integrada con GitHub Copilot CLI.</p>
+  <div class="badge-row">
+    <span class="badge bb">v1.0.0</span>
+    <span class="badge bb">Python 3.10+</span>
+    <span class="badge bg_">✓ 232 artefactos</span>
+    <span class="badge ba">IBM BPM · BAW · CP4BA</span>
+    <span class="badge bp">GitHub Copilot CLI</span>
+    <span class="badge bg_">@nttdata VS Code</span>
+    <span class="badge bb">Metodología v3</span>
+  </div>
+</header>
+
+<!-- PIPELINE -->
+<div class="sec" id="pipeline">
+  <div class="sec-label">Flujo principal</div>
+  <div class="sec-title">Pipeline de análisis — 3 fases</div>
+
+  <div class="term" style="margin-bottom:20px">
+    <div class="term-bar">
+      <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+      <span class="term-lbl">PowerShell / Terminal — Comando único</span>
+      <button class="copy-btn" onclick="copyTerm(this)">Copiar</button>
+    </div>
+    <div class="term-body" id="term-master"><span class="tm2"># Un solo comando — genera todo lo necesario para el análisis v3</span>
+
+<span class="tc2">python</span> <span class="tw">run_analysis.py</span> <span class="ta2">"ruta\al\archivo.twx"</span>
+
+<span class="tm2"># Con carpeta de salida personalizada:</span>
+<span class="tc2">python</span> <span class="tw">run_analysis.py</span> <span class="ta2">"archivo.twx"</span> <span class="tp2">--output</span> <span class="ta2">"mis_reportes"</span></div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-step ps-blue">
+      <div class="pipe-num">Fase 1 · Automática</div>
+      <div class="pipe-icon">⚙️</div>
+      <div class="pipe-title">Extracción Python</div>
+      <div class="pipe-desc">9 comandos del CLI ejecutados en secuencia. Genera JSON estructurado y Markdown de todos los artefactos del TWX.</div>
+      <ul class="pipe-items">
+        <li>analyze → resumen + conteo</li>
+        <li>entities → 54 Business Objects</li>
+        <li>services → 74 servicios clasificados</li>
+        <li>flows → diagramas Mermaid</li>
+        <li>scripts → 455 KB JavaScript</li>
+        <li>docs → Markdown completo 378 KB</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step ps-green">
+      <div class="pipe-num">Fase 2 · Automática</div>
+      <div class="pipe-icon">📦</div>
+      <div class="pipe-title">Extracción XMLs del ZIP</div>
+      <div class="pipe-desc">Descomprime el TWX y organiza los XMLs clave por prefijo numérico en subcarpetas para análisis directo.</div>
+      <ul class="pipe-items">
+        <li>01_services/ → 72 archivos</li>
+        <li>04_ucas/ → 15 UCAs</li>
+        <li>12_business_objects/ → 54 BOs</li>
+        <li>25_bpds/ → 44 procesos</li>
+        <li>64_coach_views/ → 39 pantallas</li>
+      </ul>
+    </div>
+
+    <div class="pipe-step ps-purple">
+      <div class="pipe-num">Fase 3 · Generada</div>
+      <div class="pipe-icon">🤖</div>
+      <div class="pipe-title">Prompt para Copilot</div>
+      <div class="pipe-desc">Genera <code style="color:var(--c)">COPILOT_PROMPT.md</code> con todos los datos pre-cargados. Copilot lo procesa aplicando metodología v3 y produce las 10 secciones.</div>
+      <ul class="pipe-items">
+        <li>57 KB de contexto pre-cargado</li>
+        <li>8 ciclos v3 con instrucciones</li>
+        <li>Rutas a XMLs clave referenciadas</li>
+        <li>Reglas críticas embebidas</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- OUTPUTS -->
+<div class="sec">
+  <div class="sec-label">Salida generada</div>
+  <div class="sec-title">Archivos en <code style="color:var(--c);font-size:.9em">output/&lt;nombre_twx&gt;/</code></div>
+  <div class="out-grid">
+    <div class="out-card">
+      <div class="out-file">01_analyze.json</div>
+      <div class="out-size">~0.5 KB</div>
+      <div class="out-desc">Resumen: app name, versión, 232 artefactos por tipo (GSS/HHS/IS/UCA/BO/BPD/CoachView)</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">02_entities.json</div>
+      <div class="out-size">~10 KB</div>
+      <div class="out-desc">54 Business Objects con campos, tipos, herencia y namespace</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">03_services.json</div>
+      <div class="out-size">~23 KB</div>
+      <div class="out-desc">74 servicios clasificados: 24 GSS · 23 HHS · 22 IS con pasos e inputs/outputs</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">06_flows.txt</div>
+      <div class="out-size">~8 KB</div>
+      <div class="out-desc">Diagramas Mermaid flowchart por proceso/servicio para visualizar en VS Code</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">08_scripts.txt</div>
+      <div class="out-size">~455 KB</div>
+      <div class="out-desc">Todo el JavaScript embebido extraído de servicios y BPDs con nombre de artefacto y paso</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">09_docs.md</div>
+      <div class="out-size">~378 KB</div>
+      <div class="out-desc">Documentación Markdown completa: todas las secciones unificadas en un solo archivo</div>
+    </div>
+    <div class="out-card">
+      <div class="out-file">xml_extracts/</div>
+      <div class="out-size">224 XMLs</div>
+      <div class="out-desc">XMLs organizados por prefijo: services, ucas, bpds, coach_views, business_objects</div>
+    </div>
+    <div class="out-card" style="border-color:rgba(0,174,239,.3)">
+      <div class="out-file" style="color:var(--gl)">COPILOT_PROMPT.md</div>
+      <div class="out-size" style="color:var(--gl)">~57 KB · ⭐ Principal</div>
+      <div class="out-desc">Prompt maestro con todos los datos + instrucciones v3 por ciclo. Pegar en Copilot con skill <code style="color:var(--c)">profuturo-twx</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- METODOLOGÍA V3 -->
+<div class="sec" id="metodologia">
+  <div class="sec-label">Metodología v3 · NTT DATA · 18 mayo 2026</div>
+  <div class="sec-title">Pipeline de extracción — 8 ciclos</div>
+
+  <div class="info-box" style="margin-bottom:18px">
+    <span style="font-size:1.1rem;flex-shrink:0">ℹ️</span>
+    <span>La metodología v3 es el resultado de 3 iteraciones sobre el TWX <code style="color:var(--c)">Profuturo_Redencion_Bono_AP v1.17.51</code>. Incorpora 11 correcciones del equipo que corrigen errores de v1/v2. Los ciclos deben ejecutarse en orden para garantizar la completitud de las 10 secciones de la Arquitectura de Conocimiento.</span>
+  </div>
+
+  <div class="cycles-grid">
+    <div class="cycle-card">
+      <div class="cycle-num cn-blue">C1</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Exploración de estructura TWX</div>
+        <div class="cycle-src">analyze → 01_analyze.json</div>
+        <div class="cycle-desc">Inventario de artefactos por prefijo. Identificación del BPD principal. Lectura de muestra por tipo para confirmar taxonomía.</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-amber">C2</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Constantes de entorno (tw.env.*)</div>
+        <div class="cycle-src">62.*.xml → environmentVariableSet</div>
+        <div class="cycle-desc">71 constantes por categoría y ambiente (Dev/Test/Stage/Prod). HOST_PUERTO, IDs proceso, IDs subetapa, plantillas, URLs REST.</div>
+        <div class="cycle-warn">⚠️ ID_SUBETAPA_GENERACION_ARCHIVO_RESPUESTA_81 = 8627 Dev/Test/Stage · 8628 en Prod</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-blue">C3</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Integration Services con payloads SOAP</div>
+        <div class="cycle-src">1.*.xml · processType=4</div>
+        <div class="cycle-desc">22 IS: nombre, operación WSDL, URL patrón, campos INPUT/OUTPUT (tw.local.*), fault types. Clasificación SYNC vs ASYNC.</div>
+        <div class="cycle-warn">⚠️ IS "IG Revisión UDI" = SÍNCRONO (no hay nodo UCA entre IS y siguiente paso)</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-amber">C4</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Botones HHS desde Coach Views</div>
+        <div class="cycle-src">64.*.xml → boundaryEvent / postponeAction</div>
+        <div class="cycle-desc">105 botones de 21 HHS. Cada &lt;boundaryEvent&gt; = un botón real. Los botones NO están en los HHS — están en los Coach Views.</div>
+        <div class="cycle-warn">⚠️ PostponeAction = "Cerrar tarea en Appian" (NO Posponer, NO Cancelar)</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-purple">C5</div>
+      <div class="cycle-body">
+        <div class="cycle-title">UCAs con correlación de datos</div>
+        <div class="cycle-src">4.*.xml + 25.*.xml (BPDs)</div>
+        <div class="cycle-desc">15 UCAs: schedEvent (cola BUS), linkedService, BPD donde reanuda, correlación campos BUS → tw.local.*, gateway decisión posterior.</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-green">C6</div>
+      <div class="cycle-body">
+        <div class="cycle-title">GSS en orden real por sequenceFlow</div>
+        <div class="cycle-src">1.*.xml · processType=6</div>
+        <div class="cycle-desc">24 GSS con pasos en orden correcto. Construir grafo siguiendo &lt;sequenceFlow&gt; desde startEvent hasta ExitPoint.</div>
+        <div class="cycle-warn">⚠️ NUNCA usar orden XML ni coordenadas X/Y — solo sequenceFlow</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-amber">C7</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Tabla de decisiones (gateways)</div>
+        <div class="cycle-src">25.*.xml → exclusiveGateway + conditionExpression</div>
+        <div class="cycle-desc">Variables clave: tw.local.salida (0-3), exitoso (bool), esAcreditacion, finalizarFlujo, existeNoRechazados, rechazarFolio.</div>
+      </div>
+    </div>
+    <div class="cycle-card">
+      <div class="cycle-num cn-purple">C8</div>
+      <div class="cycle-body">
+        <div class="cycle-title">Mapeo BUS/MQ → NOV_INSTANCE_MANAGEMENT</div>
+        <div class="cycle-src">UCAs + SQL + constantes</div>
+        <div class="cycle-desc">Patrón IBM: IS → BUS → IIB → GSS → InvokeUCA → BPD reanuda. Mapeo campo a campo → ACTION_OUT, STATUS_ID, RESPONSE_OUT.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAXONOMÍA -->
+<div class="sec" id="taxonomia">
+  <div class="sec-label">Estructura del TWX</div>
+  <div class="sec-title">Taxonomía de prefijos — IBM BPM</div>
+  <div class="table-wrap">
+    <table class="tax-table">
+      <thead>
+        <tr>
+          <th>Prefijo</th>
+          <th>Elemento XML raíz</th>
+          <th>Tipo de artefacto</th>
+          <th>Cantidad</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pfx">1.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;process&gt;</code></td>
+          <td>
+            <span class="type-tag tag-hhs">HHS</span>
+            <span class="type-tag tag-is">IS</span>
+            <span class="type-tag tag-gss">GSS</span>
+          </td>
+          <td><span class="count-pill">72</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Clasificar por <code style="color:var(--c)">processType</code>: 3=HHS · 4=IS · 6=GSS</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">4.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;uca&gt;</code></td>
+          <td><span class="type-tag tag-uca">UCA</span></td>
+          <td><span class="count-pill">15</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Undercover Agents — activados por cola BUS/MQ</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">7.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;webService&gt;</code></td>
+          <td><span class="type-tag" style="background:rgba(239,68,68,.08);color:var(--rl);border:1px solid rgba(239,68,68,.2)">Web Service</span></td>
+          <td><span class="count-pill">2</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">WSDLs externos del proceso</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">12.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;twClass&gt;</code></td>
+          <td><span class="type-tag tag-bo">Business Object</span></td>
+          <td><span class="count-pill">54</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Modelo de datos — campos y tipos con herencia</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">21.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;epv&gt;</code></td>
+          <td><span class="type-tag" style="background:rgba(100,116,139,.1);color:var(--mu2);border:1px solid rgba(100,116,139,.2)">EPV</span></td>
+          <td><span class="count-pill">1</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Exposed Process Variables — configuración runtime</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">25.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;bpd&gt;</code></td>
+          <td><span class="type-tag tag-bpd">BPD</span></td>
+          <td><span class="count-pill">44</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Procesos BPM — lanes, gateways, sequenceFlows</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">62.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;environmentVariableSet&gt;</code></td>
+          <td><span class="type-tag tag-is">Env Vars</span></td>
+          <td><span class="count-pill">1</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">71 constantes tw.env.* por ambiente — Ciclo 2</td>
+        </tr>
+        <tr>
+          <td><span class="pfx">64.*</span></td>
+          <td><code style="color:var(--mu2)">&lt;coachView&gt;</code></td>
+          <td><span class="type-tag tag-cv">Coach View</span></td>
+          <td><span class="count-pill">39</span></td>
+          <td style="font-size:.74rem;color:var(--mu2)">Pantallas HHS + botones reales — Ciclo 4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn-box">
+    <strong style="color:var(--al)">Corrección crítica v3:</strong> Los botones de cada HHS <strong>NO</strong> están en los archivos <code style="color:var(--c)">1.*.xml</code> (descripciones del servicio). Los botones reales viven en los archivos <code style="color:var(--c)">64.*.xml</code> como elementos <code style="color:var(--c)">&lt;boundaryEvent&gt;</code> y <code style="color:var(--c)">&lt;postponeAction&gt;</code>. Error cometido en v1 y v2 de la extracción.
+  </div>
+</div>
+
+<!-- SKILLS COPILOT CLI -->
+<div class="sec" id="skills">
+  <div class="sec-label">GitHub Copilot CLI</div>
+  <div class="sec-title">Skills instalados en <code style="color:var(--c);font-size:.88em">~/.copilot/skills/</code></div>
+
+  <div class="info-box" style="margin-bottom:18px">
+    <span style="font-size:1.1rem;flex-shrink:0">🤖</span>
+    <span>Los skills de Copilot CLI se cargan automáticamente. Usar <code style="color:var(--c)">/skills reload</code> si se añaden durante una sesión. El skill <strong>profuturo-twx</strong> contiene toda la metodología v3 y los patrones IBM→Appian.</span>
+  </div>
+
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="sk-icon">🧠</div>
+      <div>
+        <div class="sk-name">profuturo-twx</div>
+        <div class="sk-desc">Conocimiento completo de la metodología v3 de extracción. Taxonomía IBM BPM, 11 correcciones retro, patrones de migración IBM→Appian, NOV_INSTANCE_MANAGEMENT.</div>
+        <span class="sk-tag">⭐ Principal</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">🔷</div>
+      <div>
+        <div class="sk-name">twx-suite</div>
+        <div class="sk-desc">Skill maestro que orquesta los 9 ciclos de análisis. Incluye el flujo completo para migración IBM BPM → Appian.</div>
+        <span class="sk-tag">Master skill</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">🔍</div>
+      <div>
+        <div class="sk-name">twx-analyze</div>
+        <div class="sk-desc">Resumen de artefactos, conteo por tipo, identificación del BPD principal y versión del paquete TWX.</div>
+        <span class="sk-tag">analyze</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">📦</div>
+      <div>
+        <div class="sk-name">twx-entities</div>
+        <div class="sk-desc">Extracción de Business Objects, modelos de datos, campos con tipos y herencia entre clases.</div>
+        <span class="sk-tag">entities</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">⚙️</div>
+      <div>
+        <div class="sk-name">twx-services</div>
+        <div class="sk-desc">Servicios IS/GSS/HHS con pasos, inputs/outputs, dependencias y clasificación SYNC/ASYNC.</div>
+        <span class="sk-tag">services</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">🔀</div>
+      <div>
+        <div class="sk-name">twx-flows</div>
+        <div class="sk-desc">Diagramas Mermaid de procesos y servicios. Flujos en orden real por sequenceFlow (no por XML).</div>
+        <span class="sk-tag">flows</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">🔗</div>
+      <div>
+        <div class="sk-name">twx-deps</div>
+        <div class="sk-desc">Grafo de dependencias entre artefactos. Identifica componentes huérfanos y entry points.</div>
+        <span class="sk-tag">deps</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">📡</div>
+      <div>
+        <div class="sk-name">twx-endpoints</div>
+        <div class="sk-desc">URLs REST/SOAP externas, operaciones WSDL, bindings y endpoints del Integration Bus.</div>
+        <span class="sk-tag">endpoints</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">📋</div>
+      <div>
+        <div class="sk-name">twx-entries</div>
+        <div class="sk-desc">Entry points — artefactos que no son invocados por ningún otro dentro del paquete (API pública).</div>
+        <span class="sk-tag">entries</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">📝</div>
+      <div>
+        <div class="sk-name">twx-docs</div>
+        <div class="sk-desc">Documentación Markdown completa con todas las secciones unificadas y diagramas incrustados.</div>
+        <span class="sk-tag">docs</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="sk-icon">{ }</div>
+      <div>
+        <div class="sk-name">twx-scripts</div>
+        <div class="sk-desc">Extracción de todo el JavaScript embebido en servicios y BPDs con contexto de artefacto y paso.</div>
+        <span class="sk-tag">scripts</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <div class="sec-label">Agente personalizado</div>
+    <div style="font-size:.9rem;font-weight:800;color:#fff;margin-bottom:12px"><code style="color:var(--c)">~/.copilot/agents/twx-engineer.md</code></div>
+    <div class="term">
+      <div class="term-bar">
+        <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+        <span class="term-lbl">GitHub Copilot CLI — Agente TWX Engineer</span>
+        <button class="copy-btn" onclick="copyTerm(this)">Copiar</button>
+      </div>
+      <div class="term-body"><span class="tm2"># Activar el agente en Copilot CLI:</span>
+<span class="tc2">/agent</span> <span class="tw">twx-engineer</span>
+
+<span class="tm2"># Luego usar con skills:</span>
+<span class="tc2">Analiza</span> <span class="tw">este TWX con metodología v3</span>
+<span class="tc2">Extrae</span> <span class="tw">los botones HHS del archivo 64.* que está en xml_extracts/64_coach_views/</span>
+<span class="tc2">Genera</span> <span class="tw">la Sección 7 (UCAs) del reporte de Arquitectura de Conocimiento</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMANDOS -->
+<div class="sec" id="comandos">
+  <div class="sec-label">CLI Reference</div>
+  <div class="sec-title">Comandos individuales — <code style="color:var(--c);font-size:.88em">python -m ibm_twx_tools</code></div>
+
+  <div class="term" style="margin-bottom:20px">
+    <div class="term-bar">
+      <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+      <span class="term-lbl">Terminal — ibm_twx_tools · Todos los comandos</span>
+      <button class="copy-btn" onclick="copyTerm(this)">Copiar</button>
+    </div>
+    <div class="term-body"><span class="tm2"># Directorio de trabajo:</span>
+<span class="tc2">cd</span> <span class="ta2">"01_herramientas_python"</span>
+
+<span class="tm2"># Ciclo 1 — Resumen de artefactos</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">analyze</span>   <span class="ta2">"archivo.twx"</span>
+
+<span class="tm2"># Ciclo 2-3 — Entidades + Servicios</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">entities</span>  <span class="ta2">"archivo.twx"</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">services</span>  <span class="ta2">"archivo.twx"</span>
+
+<span class="tm2"># Ciclo 6 — Flujos en orden real</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">flows</span>     <span class="ta2">"archivo.twx"</span>
+
+<span class="tm2"># Ciclos varios</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">deps</span>      <span class="ta2">"archivo.twx"</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">scripts</span>   <span class="ta2">"archivo.twx"</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">endpoints</span> <span class="ta2">"archivo.twx"</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">entries</span>   <span class="ta2">"archivo.twx"</span>
+
+<span class="tm2"># Documentación completa en Markdown</span>
+<span class="tc2">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg2">docs</span>      <span class="ta2">"archivo.twx"</span> <span class="tp2">-o</span> <span class="ta2">"reporte.md"</span></div>
+  </div>
+
+  <div class="qr-grid">
+    <div class="qr"><div class="qr-cmd">analyze</div><div class="qr-desc">Resumen JSON: 232 artefactos clasificados por tipo</div></div>
+    <div class="qr"><div class="qr-cmd">entities</div><div class="qr-desc">54 Business Objects con campos, tipos y herencia</div></div>
+    <div class="qr"><div class="qr-cmd">services</div><div class="qr-desc">74 servicios: 24 GSS · 23 HHS · 22 IS clasificados</div></div>
+    <div class="qr"><div class="qr-cmd">flows</div><div class="qr-desc">Diagramas Mermaid por proceso — orden real (sequenceFlow)</div></div>
+    <div class="qr"><div class="qr-cmd">scripts</div><div class="qr-desc">455 KB de JavaScript embebido extraído</div></div>
+    <div class="qr"><div class="qr-cmd">endpoints</div><div class="qr-cmd" style="background:none;border:none">URLs REST/SOAP externos detectados</div></div>
+    <div class="qr"><div class="qr-cmd">deps</div><div class="qr-desc">Grafo Mermaid de dependencias entre artefactos</div></div>
+    <div class="qr"><div class="qr-cmd">entries</div><div class="qr-desc">Entry points — artefactos sin caller (API pública)</div></div>
+    <div class="qr"><div class="qr-cmd">docs -o out.md</div><div class="qr-desc">Documentación Markdown completa (378 KB)</div></div>
+  </div>
+</div>
+
+<!-- ESTRUCTURA DE CARPETAS -->
+<div class="sec" id="estructura">
+  <div class="sec-label">Organización</div>
+  <div class="sec-title">Estructura del proyecto</div>
+
+  <!-- Root row -->
+  <div class="proj-root-row">
+    <span style="font-size:1rem">📁</span>
+    <span class="proj-root-name">NTTDATA-IBM-TWX-Suite/</span>
+    <span class="proj-file-chip">📄 index.html<span class="pc-note">← Este panel</span></span>
+    <span class="proj-file-chip proj-new">⭐ run_analysis.py<span class="pc-note">← Pipeline completo v3</span></span>
+  </div>
+
+  <!-- Module grid 3×2 -->
+  <div class="proj-grid">
+
+    <!-- 01 Python -->
+    <div class="proj-card pc-blue">
+      <div class="proj-card-head">
+        <span class="pcn">01</span>
+        <span class="pct">herramientas_python/</span>
+        <span class="pcbadge">Python</span>
+      </div>
+      <div class="proj-card-sub">ibm_twx_tools/</div>
+      <div class="proj-file-list">
+        <div class="pfl-item"><span class="pf-name">banner.py</span><span class="pf-note">Logo Shonai NTT DATA</span></div>
+        <div class="pfl-item pf-new"><span class="pf-name">twx_parser.py</span><span class="pf-badge">v2</span><span class="pf-note">ZIP/XML · prefijos 1–64</span></div>
+        <div class="pfl-item"><span class="pf-name">entity_extractor.py</span><span class="pf-note">54 Business Objects</span></div>
+        <div class="pfl-item pf-new"><span class="pf-name">service_extractor.py</span><span class="pf-badge">v2</span><span class="pf-note">IS · GSS · HHS</span></div>
+        <div class="pfl-item"><span class="pf-name">flow_mapper.py</span><span class="pf-note">Flujos + dependencias</span></div>
+        <div class="pfl-item"><span class="pf-name">doc_generator.py</span><span class="pf-note">Markdown completo</span></div>
+        <div class="pfl-item"><span class="pf-name">cli.py</span><span class="pf-note">Entrada CLI — 9 comandos</span></div>
+      </div>
+    </div>
+
+    <!-- 02 VS Code -->
+    <div class="proj-card pc-purple">
+      <div class="proj-card-head">
+        <span class="pcn">02</span>
+        <span class="pct">extension_vscode/</span>
+        <span class="pcbadge">VS Code</span>
+      </div>
+      <div class="proj-card-sub">src/</div>
+      <div class="proj-file-list">
+        <div class="pfl-item"><span class="pf-name">extension.ts</span><span class="pf-note">Activación VS Code</span></div>
+        <div class="pfl-item"><span class="pf-name">participant.ts</span><span class="pf-note">Chat @nttdata</span></div>
+        <div class="pfl-item"><span class="pf-name">package.json</span><span class="pf-note">Manifiesto extensión</span></div>
+      </div>
+    </div>
+
+    <!-- Copilot CLI -->
+    <div class="proj-card pc-teal">
+      <div class="proj-card-head">
+        <span class="pcn">~</span>
+        <span class="pct">.copilot/</span>
+        <span class="pcbadge">CLI Skills</span>
+      </div>
+      <div class="proj-card-sub">skills/ · agents/</div>
+      <div class="proj-file-list">
+        <div class="pfl-item"><span class="pf-name pf-green">profuturo-twx/</span><span class="pf-note">Metodología v3 · 11 correcciones</span></div>
+        <div class="pfl-item"><span class="pf-name">twx-suite/ …+9</span><span class="pf-note">Skills individuales por ciclo</span></div>
+        <div class="pfl-item"><span class="pf-name">agents/twx-engineer.md</span><span class="pf-note">Agente guiado</span></div>
+        <div class="pfl-item"><span class="pf-name">copilot-instructions.md</span><span class="pf-note">Instrucciones globales</span></div>
+      </div>
+    </div>
+
+    <!-- 03 Docs -->
+    <div class="proj-card pc-green">
+      <div class="proj-card-head">
+        <span class="pcn">03</span>
+        <span class="pct">documentacion/</span>
+        <span class="pcbadge">HTML Docs</span>
+      </div>
+      <div class="proj-file-list">
+        <div class="pfl-item"><span class="pf-name">01_suite_overview.html</span><span class="pf-note">Descripción y arquitectura</span></div>
+        <div class="pfl-item"><span class="pf-name">02_guia_instalacion.html</span><span class="pf-note">Instalación paso a paso</span></div>
+        <div class="pfl-item"><span class="pf-name">03_infografia_migracion.html</span><span class="pf-note">Impacto en migración</span></div>
+      </div>
+    </div>
+
+    <!-- 04 Scripts -->
+    <div class="proj-card pc-amber">
+      <div class="proj-card-head">
+        <span class="pcn">04</span>
+        <span class="pct">scripts/</span>
+        <span class="pcbadge">Setup</span>
+      </div>
+      <div class="proj-file-list">
+        <div class="pfl-item"><span class="pf-name">instalar_windows.ps1</span><span class="pf-note">PowerShell installer</span></div>
+        <div class="pfl-item"><span class="pf-name">instalar_mac_linux.sh</span><span class="pf-note">Bash installer</span></div>
+        <div class="pfl-item"><span class="pf-name">verificar.py</span><span class="pf-note">Test funcional instalación</span></div>
+      </div>
+    </div>
+
+    <!-- 05 Samples -->
+    <div class="proj-card" style="border-top:3px solid var(--mu);border-color:var(--brd)">
+      <div class="proj-card-head">
+        <span class="pcn">05</span>
+        <span class="pct">muestras_twx/</span>
+        <span class="pcbadge">Input</span>
+      </div>
+      <div class="proj-file-list">
+        <div class="pfl-item" style="margin-top:4px"><span class="pf-note" style="font-style:italic">Coloca aquí tus archivos .twx</span></div>
+        <div class="pfl-item" style="margin-top:8px">
+          <span class="pf-name" style="font-size:.65rem;color:var(--mu)">Ejemplo:</span>
+        </div>
+        <div class="pfl-item">
+          <span class="pf-name pf-amber">Profuturo_Redencion_Bono_AP.twx</span>
+        </div>
+        <div class="pfl-item" style="margin-top:10px">
+          <span style="font-family:var(--mono);font-size:.67rem;color:var(--c);background:rgba(0,174,239,.07);border:1px solid rgba(0,174,239,.15);padding:3px 8px;border-radius:4px">
+            python run_analysis.py "archivo.twx"
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /proj-grid -->
+
+  <!-- Output — full width -->
+  <div class="proj-card pc-cyan" style="margin-top:12px">
+    <div class="proj-card-head">
+      <span class="pcn">⭐</span>
+      <span class="pct">output/{nombre_twx}/</span>
+      <span class="pcbadge pcbadge-new">Generado automáticamente por run_analysis.py</span>
+    </div>
+    <div class="pfl-out">
+      <div class="pfl-item"><span class="pf-name pf-green">01_analyze.json</span><span class="pf-note">Inventario de 232 artefactos por tipo</span></div>
+      <div class="pfl-item"><span class="pf-name pf-green">02_entities.json</span><span class="pf-note">54 Business Objects con campos y herencia</span></div>
+      <div class="pfl-item"><span class="pf-name pf-green">03_services.json</span><span class="pf-note">74 servicios clasificados IS · GSS · HHS</span></div>
+      <div class="pfl-item"><span class="pf-name">06_flows.txt</span><span class="pf-note">Diagramas Mermaid por proceso</span></div>
+      <div class="pfl-item"><span class="pf-name">08_scripts.txt</span><span class="pf-note">455 KB de JavaScript extraído</span></div>
+      <div class="pfl-item"><span class="pf-name pf-amber">09_docs.md</span><span class="pf-note">378 KB documentación Markdown completa</span></div>
+      <div class="pfl-item pfl-item-wide">
+        <span class="pf-name pf-green" style="font-size:.73rem">⭐ COPILOT_PROMPT.md</span>
+        <span class="pf-note"> — 57 KB · Prompt maestro con datos + instrucciones v3 · Pegar en Copilot con skill <code style="color:var(--c);font-size:.67rem">profuturo-twx</code></span>
+      </div>
+      <div class="pfl-item pfl-item-wide">
+        <span class="pf-name pf-folder">xml_extracts/</span>
+        <span class="pf-note"> — 224 XMLs organizados por prefijo: 01_services · 04_ucas · 12_business_objects · 25_bpds · 64_coach_views</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COPILOT VS CODE -->
+<div class="sec">
+  <div class="sec-label">VS Code</div>
+  <div class="sec-title">Extensión @nttdata — GitHub Copilot Chat</div>
+  <div class="term">
+    <div class="term-bar">
+      <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+      <span class="term-lbl">GitHub Copilot Chat · VS Code</span>
+      <button class="copy-btn" onclick="copyTerm(this)">Copiar</button>
+    </div>
+    <div class="term-body"><span class="tm2"># Sintaxis: @nttdata &lt;versión&gt; &lt;comando&gt; &lt;ruta/archivo.twx&gt;</span>
+
+<span class="tc2">@nttdata</span> <span class="ta2">v1.0</span> <span class="tp2">analyze</span>   <span class="tw">ruta/MiApp.twx</span>
+<span class="tc2">@nttdata</span> <span class="ta2">v1.0</span> <span class="tp2">flows</span>     <span class="tw">ruta/MiApp.twx</span>
+<span class="tc2">@nttdata</span> <span class="ta2">v1.0</span> <span class="tp2">docs</span>      <span class="tw">ruta/MiApp.twx</span>
+<span class="tc2">@nttdata</span>         <span class="tp2">help</span></div>
+  </div>
+</div>
+
+<!-- DOCUMENTACIÓN -->
+<div class="sec" id="docs">
+  <div class="sec-label">Documentación</div>
+  <div class="sec-title">Documentos del proyecto</div>
+  <div class="doc-grid">
+    <a class="doc-card" href="03_documentacion/01_suite_overview.html" target="_blank">
+      <div class="doc-card-top tc-blue"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">01 · Descripción</div>
+        <div class="doc-icon">🧩</div>
+        <div class="doc-title">Suite Overview</div>
+        <div class="doc-desc">Qué es la suite, arquitectura de módulos, capacidades de análisis y cómo se integra con GitHub Copilot CLI y VS Code.</div>
+        <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+    <a class="doc-card" href="03_documentacion/02_guia_instalacion.html" target="_blank">
+      <div class="doc-card-top tc-green"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">02 · Instalación</div>
+        <div class="doc-icon">⚙️</div>
+        <div class="doc-title">Guía de Instalación</div>
+        <div class="doc-desc">6 pasos para instalar en Windows, macOS o Linux. Scripts automáticos con tracker de progreso interactivo.</div>
+        <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+    <a class="doc-card" href="03_documentacion/03_infografia_migracion.html" target="_blank">
+      <div class="doc-card-top tc-amber"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">03 · Infografía</div>
+        <div class="doc-icon">📊</div>
+        <div class="doc-title">Infografía de Migración</div>
+        <div class="doc-desc">Impacto visual en proyectos legacy: KPIs, antes/después, pipeline IBM BPM → Appian, roadmap por fases.</div>
+        <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<div class="sec">
+  <div class="sec-label">Configuración</div>
+  <div class="sec-title">Scripts de instalación y verificación</div>
+  <div class="script-grid">
+    <a class="script-card" href="04_scripts/instalar_windows.ps1" download>
+      <div class="sc-icon">🪟</div>
+      <div>
+        <div class="sc-title">Instalador Windows</div>
+        <div class="sc-desc">Script PowerShell — instala dependencias, configura el entorno y verifica la instalación automáticamente.</div>
+        <div class="sc-tag">instalar_windows.ps1</div>
+      </div>
+    </a>
+    <a class="script-card" href="04_scripts/instalar_mac_linux.sh" download>
+      <div class="sc-icon">🍎 🐧</div>
+      <div>
+        <div class="sc-title">Instalador macOS / Linux</div>
+        <div class="sc-desc">Script bash equivalente. Detecta la carpeta Documentos y copia todo con permisos correctos.</div>
+        <div class="sc-tag">instalar_mac_linux.sh</div>
+      </div>
+    </a>
+    <a class="script-card" href="04_scripts/verificar.py" download>
+      <div class="sc-icon">✅</div>
+      <div>
+        <div class="sc-title">Verificador de instalación</div>
+        <div class="sc-desc">Comprueba módulos, comandos CLI, herramientas externas y hace un test funcional con TWX sintético.</div>
+        <div class="sc-tag">verificar.py</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-brand">
+    <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="44" fill="#0068B6"/>
+      <rect x="26" y="26" width="48" height="48" rx="10" fill="none" stroke="#fff" stroke-width="7"/>
+      <rect x="35" y="35" width="30" height="30" rx="5" fill="none" stroke="#fff" stroke-width="6"/>
+      <circle cx="26" cy="26" r="7" fill="#fff"/>
+    </svg>
+    <div>
+      <div style="font-weight:800;color:#fff;font-size:.88rem">NTT DATA</div>
+      <div style="font-size:.67rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em">IBM TWX Reverse Engineering Suite</div>
+    </div>
+  </div>
+  <span class="ver-pill">v1.0.0</span>
+  <div style="text-align:right">
+    <p class="author">llopezdo@emeal.nttdata.com</p>
+    <p class="f-copy">&copy; 2026 NTT DATA · IBM TWX Suite · Metodología v3 · Panel local</p>
+  </div>
+</footer>
+
+</div><!-- /page -->
+<script>
+function copyTerm(btn) {
+  const body = btn.closest('.term').querySelector('.term-body');
+  const text = body.innerText.replace(/ /g,' ').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Qué construimos? — IBM TWX Suite v1.0</title>
+<style>
+  :root {
+    --dark: #0a1628;
+    --dark2: #0f2040;
+    --blue: #1a3a6c;
+    --accent: #2563eb;
+    --teal: #0d9488;
+    --amber: #d97706;
+    --green: #16a34a;
+    --red: #dc2626;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #1e3a5f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--dark); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #0a1628 0%, #0f2a50 60%, #0d3060 100%); padding: 60px 40px; text-align: center; border-bottom: 2px solid var(--accent); position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -50%; left: -20%; width: 60%; height: 200%; background: radial-gradient(ellipse, rgba(37,99,235,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hero-label { font-size: 11px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 16px; }
+  .hero h1 { font-size: 36px; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+  .hero h1 span { color: #38bdf8; }
+  .hero p { font-size: 16px; color: var(--muted); max-width: 680px; margin: 0 auto 28px; }
+  .hero-pills { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .pill { background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.4); border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #93c5fd; }
+
+  /* LAYOUT */
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
+  .section-title { font-size: 11px; letter-spacing: 3px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; }
+  h3 { font-size: 16px; font-weight: 600; color: #7dd3fc; margin-bottom: 12px; }
+
+  /* CARDS */
+  .card { background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+  .card-accent-blue { border-top: 3px solid var(--accent); }
+  .card-accent-teal { border-top: 3px solid var(--teal); }
+  .card-accent-amber { border-top: 3px solid var(--amber); }
+  .card-accent-green { border-top: 3px solid var(--green); }
+
+  /* GRIDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* SEPARADOR */
+  .sep { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* KPI */
+  .kpi-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+  .kpi { background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; text-align: center; flex: 1; min-width: 140px; }
+  .kpi .num { font-size: 36px; font-weight: 800; color: #38bdf8; line-height: 1; }
+  .kpi .lbl { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* STEP LIST */
+  .step-list { list-style: none; }
+  .step-list li { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(30,58,95,0.5); align-items: flex-start; }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num { background: var(--accent); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .step-body strong { display: block; font-size: 13px; margin-bottom: 3px; }
+  .step-body span { font-size: 12px; color: var(--muted); }
+
+  /* CODE */
+  code { font-family: 'Cascadia Code', monospace; background: rgba(37,99,235,0.15); color: #7dd3fc; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+  pre { background: #070f1e; border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-size: 12px; font-family: 'Cascadia Code', monospace; color: #e2e8f0; overflow-x: auto; margin: 12px 0; }
+  pre .cmd { color: #38bdf8; }
+  pre .out { color: #86efac; }
+  pre .cmt { color: #475569; }
+
+  /* CORRECTION BADGES */
+  .corr-list { display: flex; flex-direction: column; gap: 10px; }
+  .corr { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); border-left: 3px solid var(--red); border-radius: 6px; padding: 10px 14px; }
+  .corr strong { color: #fca5a5; font-size: 12px; }
+  .corr p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  /* FLOW */
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .fn { background: rgba(37,99,235,0.2); border: 1px solid rgba(37,99,235,0.4); border-radius: 6px; padding: 8px 14px; font-size: 12px; }
+  .fa { color: var(--muted); font-size: 18px; font-weight: 700; }
+  .fn-teal { background: rgba(13,148,136,0.2); border-color: rgba(13,148,136,0.4); }
+  .fn-green { background: rgba(22,163,74,0.2); border-color: rgba(22,163,74,0.4); }
+  .fn-amber { background: rgba(217,119,6,0.2); border-color: rgba(217,119,6,0.4); }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: rgba(37,99,235,0.2); color: #93c5fd; padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(30,58,95,0.5); color: var(--muted); vertical-align: top; }
+  td strong { color: var(--text); }
+  tr:hover td { background: rgba(37,99,235,0.05); }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+  .b-blue { background: rgba(37,99,235,0.2); color: #93c5fd; }
+  .b-green { background: rgba(22,163,74,0.15); color: #86efac; }
+  .b-amber { background: rgba(217,119,6,0.15); color: #fcd34d; }
+  .b-teal { background: rgba(13,148,136,0.15); color: #5eead4; }
+  .b-red { background: rgba(220,38,38,0.15); color: #fca5a5; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 4px; bottom: 4px; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 24px; }
+  .tl-item::before { content: ''; position: absolute; left: -24px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--dark); }
+  .tl-item h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tl-item p { font-size: 12px; color: var(--muted); }
+
+  /* COMPARE */
+  .compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: center; }
+  .compare-side { background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .compare-side.before { border-top: 3px solid var(--red); }
+  .compare-side.after { border-top: 3px solid var(--green); }
+  .compare-arrow { padding: 0 16px; font-size: 24px; color: var(--accent); text-align: center; }
+  .compare-side h4 { font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+  .compare-side h4.r { color: #fca5a5; }
+  .compare-side h4.g { color: #86efac; }
+  .compare-side ul { list-style: none; }
+  .compare-side ul li { font-size: 12px; color: var(--muted); padding: 4px 0; border-bottom: 1px solid rgba(30,58,95,0.3); }
+  .compare-side ul li:last-child { border-bottom: none; }
+
+  /* FOOTER */
+  footer { background: #060e1a; border-top: 1px solid var(--border); padding: 24px 40px; text-align: center; color: var(--muted); font-size: 11px; margin-top: 60px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Resumen Técnico Personal</div>
+  <h1>¿Qué construimos con la<br><span>IBM TWX Reverse Engineering Suite?</span></h1>
+  <p>Una explicación completa de lo que hicimos, cómo funciona, por qué lo hicimos así y qué resuelve — en tus propias palabras.</p>
+  <div class="hero-pills">
+    <span class="pill">NTT DATA × Profuturo</span>
+    <span class="pill">IBM BPM → Análisis Técnico</span>
+    <span class="pill">Suite v1.0</span>
+    <span class="pill">GitHub Copilot CLI</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- PUNTO DE PARTIDA -->
+  <div class="section-title">El punto de partida</div>
+  <h2>¿Cuál era el problema?</h2>
+
+  <div class="compare">
+    <div class="compare-side before">
+      <h4 class="r">🔴 Antes — El proceso manual</h4>
+      <ul>
+        <li>Un archivo <code>.twx</code> es un ZIP con cientos de XMLs sin orden claro</li>
+        <li>Para entender un proceso había que abrir IBM BPM Process Designer</li>
+        <li>Navegar manualmente artefacto por artefacto (232 en Profuturo)</li>
+        <li>Documentar en Excel lo que se iba encontrando</li>
+        <li>Alta probabilidad de omitir constantes, endpoints o flujos</li>
+        <li>~16 horas por proceso analizado</li>
+      </ul>
+    </div>
+    <div class="compare-arrow">→</div>
+    <div class="compare-side after">
+      <h4 class="g">🟢 Ahora — Con la Suite</h4>
+      <ul>
+        <li>Un solo comando: <code>python run_analysis.py archivo.twx</code></li>
+        <li>Clasifica automáticamente los 232 artefactos por tipo</li>
+        <li>Extrae constantes, endpoints, payloads, flujos, pantallas</li>
+        <li>Genera un prompt de 57 KB listo para Copilot CLI</li>
+        <li>Copilot analiza con metodología v3 (11 correcciones aplicadas)</li>
+        <li>~2h 45min total — reducción del <strong>83%</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- QUÉ ES UN TWX -->
+  <div class="section-title">Lo más importante que entendimos</div>
+  <h2>¿Qué es un archivo .TWX y por qué es difícil?</h2>
+
+  <div class="grid-2">
+    <div class="card card-accent-blue">
+      <h3>Estructura interna del TWX</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Un <code>.twx</code> es simplemente un ZIP. Adentro tiene una carpeta <code>objects/</code> con cientos de archivos XML nombrados así:</p>
+      <pre><code>objects/
+  1.a3f2c1d4.xml    ← un servicio
+  12.b7e9f2a1.xml   ← un Business Object
+  25.c4d8e3b2.xml   ← un BPD (proceso)
+  64.f1a2b3c4.xml   ← una pantalla Coach View
+  62.e5f6a7b8.xml   ← variables de entorno</code></pre>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px;">El número antes del punto es el <strong>tipo de artefacto</strong>. Eso es todo lo que tienes para orientarte — no hay carpetas, no hay índice.</p>
+    </div>
+    <div class="card card-accent-teal">
+      <h3>Taxonomía que descubrimos</h3>
+      <table>
+        <tr><th>Prefijo</th><th>Tipo de artefacto</th><th>Profuturo</th></tr>
+        <tr><td><code>1.*</code></td><td>Services (IS/GSS/HHS)</td><td><span class="badge b-teal">74</span></td></tr>
+        <tr><td><code>4.*</code></td><td>UCAs (async queue)</td><td><span class="badge b-blue">15</span></td></tr>
+        <tr><td><code>12.*</code></td><td>Business Objects (BOs)</td><td><span class="badge b-amber">54</span></td></tr>
+        <tr><td><code>25.*</code></td><td>BPDs (procesos)</td><td><span class="badge b-green">44</span></td></tr>
+        <tr><td><code>62.*</code></td><td>Variables de entorno</td><td><span class="badge b-red">71</span></td></tr>
+        <tr><td><code>63.*</code></td><td>Project defaults</td><td>—</td></tr>
+        <tr><td><code>64.*</code></td><td>Coach Views (pantallas)</td><td><span class="badge b-teal">39</span></td></tr>
+      </table>
+      <p style="font-size:11px;color:var(--muted);margin-top:10px;">⚠️ El <code>META-INF/MANIFEST.MF</code> solo dice <code>Manifest-Version: 1.0</code> — no sirve de nada para clasificar artefactos.</p>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- QUÉ CONSTRUIMOS -->
+  <div class="section-title">Lo que construimos</div>
+  <h2>La Suite — 3 capas de herramientas</h2>
+
+  <div class="grid-3">
+    <div class="card card-accent-blue">
+      <h3>🐍 Capa 1 — Python</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Scripts que leen el TWX y extraen datos estructurados:</p>
+      <ul class="step-list" style="font-size:12px;">
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">twx_parser.py</strong><br><span style="color:var(--muted);">Clasifica los 232+ artefactos por prefijo. Es el "índice" del TWX.</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">service_extractor.py</strong><br><span style="color:var(--muted);">Separa IS, GSS y HHS. Extrae pasos en orden real por sequenceFlow.</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">entity_extractor.py</strong><br><span style="color:var(--muted);">Extrae Business Objects con sus campos y tipos de datos.</span></div>
+        </li>
+        <li style="padding:8px 0;">
+          <div><strong style="color:var(--text);">run_analysis.py</strong><br><span style="color:var(--muted);">Orquesta todo: 9 comandos secuenciales + genera el prompt.</span></div>
+        </li>
+      </ul>
+    </div>
+    <div class="card card-accent-teal">
+      <h3>🤖 Capa 2 — Copilot CLI</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">GitHub Copilot CLI consume el prompt generado y ejecuta los 8 ciclos de análisis:</p>
+      <ul class="step-list" style="font-size:12px;">
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">Ciclo 1 — Entidades</strong><br><span style="color:var(--muted);">BOs → estructura de datos para Appian</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">Ciclo 2 — Servicios</strong><br><span style="color:var(--muted);">IS/GSS/HHS → tipo, pasos, integraciones</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">Ciclos 3–5 — Flujos</strong><br><span style="color:var(--muted);">BPDs, gateways, correlación UCA</span></div>
+        </li>
+        <li style="padding:8px 0;">
+          <div><strong style="color:var(--text);">Ciclos 6–8 — Docs</strong><br><span style="color:var(--muted);">Constantes, pantallas, informe final HTML</span></div>
+        </li>
+      </ul>
+    </div>
+    <div class="card card-accent-amber">
+      <h3>📄 Capa 3 — Entregables</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Lo que produce la suite al final:</p>
+      <ul class="step-list" style="font-size:12px;">
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">COPILOT_PROMPT.md</strong> <span class="badge b-amber">57 KB</span><br><span style="color:var(--muted);">Prompt maestro con TODO el contexto del TWX</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">Scripts JS extraídos</strong> <span class="badge b-teal">455 KB</span><br><span style="color:var(--muted);">Etiquetados por artefacto y paso</span></div>
+        </li>
+        <li style="padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4);">
+          <div><strong style="color:var(--text);">Documentación técnica</strong> <span class="badge b-blue">378 KB</span><br><span style="color:var(--muted);">Diagramas Mermaid + Markdown por componente</span></div>
+        </li>
+        <li style="padding:8px 0;">
+          <div><strong style="color:var(--text);">JSON de entidades/servicios</strong><br><span style="color:var(--muted);">Datos estructurados listos para mapeo</span></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- LOS 9 COMANDOS -->
+  <div class="section-title">El corazón técnico</div>
+  <h2>Los 9 comandos que ejecuta run_analysis.py</h2>
+
+  <div class="card">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Cuando corres <code>python run_analysis.py Profuturo_Redencion.twx</code>, el script ejecuta estos 9 pasos en secuencia de forma automática:</p>
+    <pre><span class="cmt"># 1. Extrae y clasifica todos los artefactos del TWX</span>
+<span class="cmd">python twx_parser.py archivo.twx</span>              <span class="out">→ 232 artefactos clasificados</span>
+
+<span class="cmt"># 2. Extrae entidades (Business Objects)</span>
+<span class="cmd">python entity_extractor.py --twx archivo.twx</span>  <span class="out">→ entities.json</span>
+
+<span class="cmt"># 3. Extrae todos los servicios (IS + GSS + HHS)</span>
+<span class="cmd">python service_extractor.py --twx archivo.twx</span> <span class="out">→ services.json</span>
+
+<span class="cmt"># 4. Extrae y clasifica flujos BPD</span>
+<span class="cmd">python flow_mapper.py --twx archivo.twx</span>       <span class="out">→ flows.json</span>
+
+<span class="cmt"># 5. Extrae scripts JavaScript de cada paso</span>
+<span class="cmd">python script_extractor.py --twx archivo.twx</span>  <span class="out">→ scripts/ (455 KB)</span>
+
+<span class="cmt"># 6. Extrae variables de entorno (62.*.xml)</span>
+<span class="cmd">python env_extractor.py --twx archivo.twx</span>     <span class="out">→ env_vars.json</span>
+
+<span class="cmt"># 7. Extrae UCAs y correlaciones</span>
+<span class="cmd">python uca_extractor.py --twx archivo.twx</span>     <span class="out">→ ucas.json</span>
+
+<span class="cmt"># 8. Extrae pantallas (Coach Views 64.*.xml)</span>
+<span class="cmd">python coach_extractor.py --twx archivo.twx</span>   <span class="out">→ coaches.json</span>
+
+<span class="cmt"># 9. Genera el prompt maestro para Copilot</span>
+<span class="cmd">python prompt_builder.py</span>                      <span class="out">→ COPILOT_PROMPT.md (57 KB)</span></pre>
+  </div>
+
+  <hr class="sep">
+
+  <!-- METODOLOGÍA V3 -->
+  <div class="section-title">Lo que aprendimos en el camino</div>
+  <h2>Las 11 correcciones críticas — Metodología v3</h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:24px;">Después de analizar Profuturo con v1 y v2, el equipo detectó errores en los resultados. Estas son las 11 correcciones que aplicamos para llegar a v3:</p>
+
+  <div class="corr-list">
+    <div class="corr">
+      <strong>1. Orden de pasos — sequenceFlow, no coordenadas x/y</strong>
+      <p>En v1 usábamos las coordenadas visuales de los nodos para inferir el orden. Error: el diseñador puede mover nodos libremente. El orden real está en las etiquetas <code>&lt;sequenceFlow&gt;</code> del XML.</p>
+    </div>
+    <div class="corr">
+      <strong>2. Botones extraídos de Coach Views (64.*.xml), no de descripciones</strong>
+      <p>En v1 leíamos el texto de descripción del HHS para inferir botones. Error: las descripciones son libres y a veces están vacías. Los botones reales están en los XMLs de <code>64.*</code> como boundary events.</p>
+    </div>
+    <div class="corr">
+      <strong>3. PostponeAction = "Cerrar tarea" (no "Posponer")</strong>
+      <p>El botón PostponeAction en IBM BPM se llama "Salir" o "Posponer Tarea" en la UI, pero su comportamiento real es cerrar la tarea del usuario. El nombre engaña.</p>
+    </div>
+    <div class="corr">
+      <strong>4. IS "IG Revisión UDI" es SÍNCRONO</strong>
+      <p>En v1 fue clasificado como asíncrono (igual que los otros IS) porque también tiene un GSS de respuesta. Error: el servicio IIB se invoca de forma síncrona. El GSS existe para compatibilidad pero no hay espera UCA.</p>
+    </div>
+    <div class="corr">
+      <strong>5. Variables de entorno en 62.*.xml, NO en el MANIFEST</strong>
+      <p>El archivo <code>META-INF/MANIFEST.MF</code> solo contiene <code>Manifest-Version: 1.0</code>. Todas las constantes y variables de entorno están en los XMLs con prefijo <code>62.*</code>.</p>
+    </div>
+    <div class="corr">
+      <strong>6. ID_SUBETAPA_GEN_ARCH_RESP: 8627 (Dev/Test/Stage) vs 8628 (Producción)</strong>
+      <p>Este es el único ID que difiere entre ambientes. Todos los demás son iguales en los 4 ambientes. Este diferenciador es crítico para evitar errores en producción.</p>
+    </div>
+    <div class="corr">
+      <strong>7–11. Correcciones de estructura XML interna</strong>
+      <p>Nombre del proceso desde el primer BPD encontrado · Tipo de servicio por campo <code>processType</code> (3=HHS, 4=IS, 6=GSS) · Los BOs están en <code>12.*</code> no en carpetas nombradas · Los UCAs en <code>4.*</code> tienen el folio como clave de correlación · Los scripts JS están embebidos en nodos tipo <code>scriptTask</code>.</p>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- EL FLUJO COMPLETO -->
+  <div class="section-title">El proceso de principio a fin</div>
+  <h2>Cómo se usa la Suite en un proyecto real</h2>
+
+  <div class="card">
+    <div class="flow">
+      <div class="fn">📁 Recibes el<br><strong>.TWX</strong></div>
+      <div class="fa">→</div>
+      <div class="fn">⚙️ <code>python run_analysis.py</code><br><strong>~10 min</strong></div>
+      <div class="fa">→</div>
+      <div class="fn fn-teal">📄 COPILOT_PROMPT.md<br><strong>57 KB generado</strong></div>
+      <div class="fa">→</div>
+      <div class="fn fn-teal">🤖 Copilot CLI<br><strong>8 ciclos de análisis</strong></div>
+      <div class="fa">→</div>
+      <div class="fn fn-green">📊 Análisis técnico<br><strong>HTML final</strong></div>
+      <div class="fa">→</div>
+      <div class="fn fn-amber">✅ Entrega al<br><strong>equipo</strong></div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <table>
+        <tr><th>Fase</th><th>Qué ocurre</th><th>Manual antes</th><th>Con la Suite</th></tr>
+        <tr><td><strong>Extracción</strong></td><td>Clasificar artefactos, leer XMLs, extraer datos</td><td>~4h navegando en IBM BPM</td><td><span class="badge b-green">~10 min</span></td></tr>
+        <tr><td><strong>Análisis con Copilot</strong></td><td>8 ciclos: entidades, servicios, flujos, pantallas, constantes</td><td>N/A (no existía)</td><td><span class="badge b-blue">~2h 30min</span></td></tr>
+        <tr><td><strong>Revisión y reporte</strong></td><td>Verificar correcciones, generar HTML entregable</td><td>~4h documentando en Excel</td><td><span class="badge b-green">~15 min</span></td></tr>
+        <tr><td><strong style="color:#38bdf8;">Total</strong></td><td></td><td><strong style="color:#fca5a5;">~16 horas</strong></td><td><strong style="color:#86efac;">~2h 45min</strong></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- CASO PROFUTURO -->
+  <div class="section-title">El caso real</div>
+  <h2>Profuturo — MP Redención de Bono v3</h2>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="num">232</div><div class="lbl">Artefactos en el TWX</div></div>
+    <div class="kpi"><div class="num">9</div><div class="lbl">Comandos ejecutados</div></div>
+    <div class="kpi"><div class="num">57<span style="font-size:18px;">KB</span></div><div class="lbl">Prompt generado para Copilot</div></div>
+    <div class="kpi"><div class="num">10</div><div class="lbl">Extracciones entregadas</div></div>
+    <div class="kpi"><div class="num">83<span style="font-size:18px;">%</span></div><div class="lbl">Reducción de tiempo</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Las 10 extracciones que entregamos</h3>
+      <ul class="step-list">
+        <li><div class="step-num">1</div><div class="step-body"><strong>Constantes del sistema</strong><span>71 variables de entorno · 4 ambientes (Dev/Test/Stage/Prod)</span></div></li>
+        <li><div class="step-num">2</div><div class="step-body"><strong>Endpoints de integración</strong><span>12 Integration Services · URLs reales por ambiente</span></div></li>
+        <li><div class="step-num">3</div><div class="step-body"><strong>Payloads de las integraciones</strong><span>INPUT / OUTPUT / FAULT por cada IS</span></div></li>
+        <li><div class="step-num">4</div><div class="step-body"><strong>Respuestas, correlación y validaciones</strong><span>15 UCAs con datos mapeados y decisiones post-respuesta</span></div></li>
+        <li><div class="step-num">5</div><div class="step-body"><strong>Acciones del usuario por pantalla</strong><span>21 HHS · 105 botones extraídos de XML real</span></div></li>
+        <li><div class="step-num">6</div><div class="step-body"><strong>Tabla de decisiones</strong><span>31 gateways con condición → destino → acción</span></div></li>
+        <li><div class="step-num">7</div><div class="step-body"><strong>Grupos y perfiles</strong><span>Lanes por proceso: quién hace qué</span></div></li>
+        <li><div class="step-num">8</div><div class="step-body"><strong>Diagramas simplificados BPMN</strong><span>Flujos GSS paso a paso en orden real</span></div></li>
+        <li><div class="step-num">9</div><div class="step-body"><strong>IDs de notificación y subetapa</strong><span>48 IDs con valores por ambiente</span></div></li>
+        <li><div class="step-num">10</div><div class="step-body"><strong>Botones por pantalla</strong><span>Tipo, actividad que disparan y lane asignado</span></div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Lo que el equipo Profuturo corrigió</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Después de revisar v1 y v2 del análisis, el equipo señaló estas correcciones que incorporamos en v3:</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <h4>IG Revisión UDI → Síncrono</h4>
+          <p>Lo habíamos clasificado como asíncrono. El equipo confirmó que es síncrono.</p>
+        </div>
+        <div class="tl-item">
+          <h4>Botones de XML real, no de descripciones</h4>
+          <p>Cambiamos la fuente de extracción de texto libre a <code>64.*.xml</code>.</p>
+        </div>
+        <div class="tl-item">
+          <h4>Orden de pasos por sequenceFlow</h4>
+          <p>Eliminamos el orden por coordenadas visuales (x/y) que usábamos antes.</p>
+        </div>
+        <div class="tl-item">
+          <h4>Recomendación de migración 1:1 eliminada</h4>
+          <p>La v2 incluía sugerencias de migración que el equipo consideró prematuras para esta etapa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- DÓNDE VIVE -->
+  <div class="section-title">Dónde está todo</div>
+  <h2>Estructura del proyecto en tu máquina</h2>
+
+  <div class="grid-2">
+    <div class="card card-accent-blue">
+      <h3>📁 La Suite</h3>
+      <pre>NTTDATA-IBM-TWX-Suite/
+  ├── run_analysis.py          ← Punto de entrada
+  ├── 01_herramientas_python/
+  │   └── ibm_twx_tools/
+  │       ├── twx_parser.py    ← Clasificador de artefactos
+  │       ├── service_extractor.py
+  │       ├── entity_extractor.py
+  │       └── flow_mapper.py
+  ├── 03_documentacion/
+  │   ├── 04_propuesta_valor.html
+  │   ├── 05_roadmap_appian.html
+  │   └── 06_que_hicimos.html  ← Este archivo
+  └── ~/.copilot/skills/
+      └── profuturo-twx/
+          └── SKILL.md         ← Metodología v3 completa</pre>
+    </div>
+    <div class="card card-accent-teal">
+      <h3>🤖 El Skill de Copilot</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">En <code>~/.copilot/skills/profuturo-twx/SKILL.md</code> vive la metodología v3 completa. Cuando Copilot CLI analiza el prompt, usa este skill para aplicar las 11 correcciones automáticamente.</p>
+      <p style="font-size:12px;color:var(--muted);">Contiene:</p>
+      <ul style="font-size:12px;color:var(--muted);padding-left:16px;margin-top:8px;">
+        <li>Taxonomía de prefijos IBM BPM</li>
+        <li>Reglas de orden por sequenceFlow</li>
+        <li>Mapping processType → IS/GSS/HHS</li>
+        <li>Las 11 correcciones v3</li>
+        <li>Patrones JS → equivalente en Appian</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  IBM TWX Reverse Engineering Suite v1.0 · NTT DATA EMEAL · Resumen técnico personal · Mayo 2026
+</footer>
+
+</body>
+</html>

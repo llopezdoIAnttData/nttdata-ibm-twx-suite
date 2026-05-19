@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>NTTDATA · Infografía · Migración de Servicios Legacy IBM TWX</title>
+  <style>
+    /* ── TOKENS ─────────────────────────────── */
+    :root{
+      --b:#0077C8; --bd:#005BAC; --bdd:#003D7A;
+      --c:#00AEEF; --cd:#0097D1;
+      --g:#10B981; --gl:#34D399;
+      --a:#F59E0B; --al:#FCD34D;
+      --r:#EF4444; --rl:#FCA5A5;
+      --p:#8B5CF6; --pl:#A78BFA;
+      --bg:#060B15; --bg2:#0B1220; --bg3:#0F1829;
+      --brd:#172440; --brdh:#1E3A60;
+      --tx:#E2E8F0; --mu:#64748B; --mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--tx);font-family:var(--ui);
+         overflow-x:hidden;line-height:1.5}
+
+    /* ── CANVAS GRID ─────────────────────────── */
+    .page{
+      max-width:1080px;margin:0 auto;padding:0 0 60px;
+      background:
+        linear-gradient(rgba(0,119,200,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,119,200,.04) 1px,transparent 1px);
+      background-size:48px 48px;
+      background-color:var(--bg);
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    header{
+      position:relative;overflow:hidden;
+      padding:52px 48px 40px;
+      background:linear-gradient(135deg,#03080F 0%,#061128 60%,#09193A 100%);
+      border-bottom:2px solid var(--b);
+    }
+    header::before{
+      content:'';position:absolute;top:-120px;right:-80px;
+      width:520px;height:520px;border-radius:50%;
+      background:radial-gradient(ellipse,rgba(0,119,200,.22) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    header::after{
+      content:'';position:absolute;bottom:-60px;left:20%;
+      width:300px;height:300px;border-radius:50%;
+      background:radial-gradient(ellipse,rgba(0,174,239,.1) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .h-top{display:flex;align-items:center;justify-content:space-between;
+           gap:20px;flex-wrap:wrap;margin-bottom:32px;position:relative;z-index:1}
+    .h-brand{display:flex;align-items:center;gap:14px}
+    .shonai{width:52px;height:52px;flex-shrink:0;
+            filter:drop-shadow(0 0 18px rgba(0,174,239,.7));
+            animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{
+      0%,100%{filter:drop-shadow(0 0 12px rgba(0,174,239,.5))}
+      50%{filter:drop-shadow(0 0 28px rgba(0,174,239,.95))}}
+    .brand-txt .corp{font-size:1.7rem;font-weight:900;color:#fff;line-height:1}
+    .brand-txt .corp span{color:var(--c)}
+    .brand-txt .sub{font-size:.68rem;color:var(--mu2);letter-spacing:.14em;
+                    text-transform:uppercase;margin-top:3px}
+    .h-pill{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .pill{font-size:.68rem;padding:3px 10px;border-radius:999px;
+          font-family:var(--mono);white-space:nowrap}
+    .pill-b{background:rgba(0,119,200,.15);color:var(--c);border:1px solid rgba(0,174,239,.25)}
+    .pill-g{background:rgba(16,185,129,.12);color:var(--gl);border:1px solid rgba(16,185,129,.25)}
+
+    .h-title{position:relative;z-index:1}
+    .h-label{font-size:.68rem;font-weight:700;letter-spacing:.16em;
+             text-transform:uppercase;color:var(--c);margin-bottom:10px;
+             display:flex;align-items:center;gap:8px}
+    .h-label::before{content:'';width:22px;height:2px;background:var(--c);border-radius:1px}
+    .h-main{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;
+            color:#fff;line-height:1.15;max-width:680px}
+    .h-main em{font-style:normal;
+      background:linear-gradient(90deg,var(--b),var(--c));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text}
+    .h-desc{font-size:.95rem;color:var(--mu2);margin-top:14px;
+            max-width:620px;line-height:1.6}
+
+    /* ── SECTION WRAPPERS ───────────────────── */
+    .section{padding:44px 48px;border-bottom:1px solid var(--brd)}
+    .section:last-child{border-bottom:none}
+    .sec-label{font-size:.65rem;font-weight:700;letter-spacing:.16em;
+               text-transform:uppercase;color:var(--c);margin-bottom:10px;
+               display:flex;align-items:center;gap:8px}
+    .sec-label::before{content:'';width:18px;height:2px;background:var(--c);border-radius:1px}
+    .sec-title{font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:6px}
+    .sec-sub{font-size:.88rem;color:var(--mu2);margin-bottom:28px}
+
+    /* ── BEFORE/AFTER ───────────────────────── */
+    .ba-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch}
+    .ba-col{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+            padding:24px;display:flex;flex-direction:column;gap:14px}
+    .ba-col.before{border-color:rgba(239,68,68,.3);
+                   background:linear-gradient(135deg,rgba(239,68,68,.05),var(--bg2))}
+    .ba-col.after{border-color:rgba(16,185,129,.3);
+                  background:linear-gradient(135deg,rgba(16,185,129,.05),var(--bg2))}
+    .ba-head{font-size:.72rem;font-weight:700;letter-spacing:.1em;
+             text-transform:uppercase;display:flex;align-items:center;gap:8px}
+    .ba-head.before{color:var(--rl)} .ba-head.after{color:var(--gl)}
+    .ba-item{display:flex;align-items:flex-start;gap:10px;font-size:.84rem;
+             color:var(--mu2);line-height:1.45}
+    .ba-item .icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+    .ba-arrow{display:flex;align-items:center;justify-content:center;
+              padding:0 20px;font-size:2rem;color:var(--b)}
+
+    /* ── KPI ROW ────────────────────────────── */
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+    .kpi{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+         padding:20px 16px;text-align:center;position:relative;overflow:hidden;
+         transition:.25s}
+    .kpi::before{content:'';position:absolute;inset:0;opacity:0;transition:.25s;
+      background:linear-gradient(135deg,rgba(0,119,200,.06),transparent)}
+    .kpi:hover{border-color:var(--brdh);transform:translateY(-2px)}
+    .kpi:hover::before{opacity:1}
+    .kpi-n{font-size:2.1rem;font-weight:900;line-height:1;margin-bottom:4px}
+    .kpi-n sup{font-size:.7em;vertical-align:super}
+    .kpi-lbl{font-size:.72rem;color:var(--mu2);line-height:1.35}
+    .kn-blue{color:var(--c)} .kn-green{color:var(--gl)}
+    .kn-amber{color:var(--al)} .kn-purple{color:var(--pl)} .kn-red{color:var(--rl)}
+
+    /* ── PIPELINE FLOW ──────────────────────── */
+    .flow{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0}
+    .flow-step{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+      padding:22px 18px;min-width:155px;flex:1;position:relative;
+      display:flex;flex-direction:column;align-items:center;text-align:center;
+      gap:10px;transition:.25s;
+    }
+    .flow-step:hover{border-color:var(--brdh);transform:translateY(-2px)}
+    .flow-step::after{
+      content:'›';position:absolute;right:-18px;top:50%;transform:translateY(-50%);
+      font-size:1.8rem;color:var(--b);z-index:2;width:36px;text-align:center;
+    }
+    .flow-step:last-child::after{display:none}
+    .flow-icon{width:46px;height:46px;border-radius:12px;
+               display:flex;align-items:center;justify-content:center;
+               font-size:1.4rem}
+    .fi-blue{background:rgba(0,119,200,.15);border:1px solid rgba(0,119,200,.25)}
+    .fi-cyan{background:rgba(0,174,239,.12);border:1px solid rgba(0,174,239,.22)}
+    .fi-green{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2)}
+    .fi-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+    .fi-purple{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2)}
+    .flow-n{font-size:.65rem;font-weight:700;letter-spacing:.08em;
+            color:var(--mu);text-transform:uppercase}
+    .flow-title{font-size:.85rem;font-weight:700;color:#fff;line-height:1.25}
+    .flow-desc{font-size:.73rem;color:var(--mu2);line-height:1.4}
+    .flow-tag{font-size:.63rem;font-family:var(--mono);
+              padding:2px 7px;border-radius:4px;margin-top:4px;
+              background:rgba(0,174,239,.08);color:var(--c);
+              border:1px solid rgba(0,174,239,.15)}
+
+    /* ── CAPABILITY CARDS ───────────────────── */
+    .cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .cap{background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+         padding:22px;transition:.25s;position:relative;overflow:hidden}
+    .cap::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+    .cap.blue::before{background:linear-gradient(90deg,var(--b),var(--c))}
+    .cap.green::before{background:linear-gradient(90deg,var(--g),var(--gl))}
+    .cap.amber::before{background:linear-gradient(90deg,var(--a),var(--al))}
+    .cap.purple::before{background:linear-gradient(90deg,var(--p),var(--pl))}
+    .cap.cyan::before{background:linear-gradient(90deg,var(--cd),var(--c))}
+    .cap.red::before{background:linear-gradient(90deg,#DC2626,var(--rl))}
+    .cap:hover{border-color:var(--brdh);transform:translateY(-2px)}
+    .cap-ico{font-size:1.6rem;margin-bottom:12px}
+    .cap-title{font-size:.92rem;font-weight:700;color:#fff;margin-bottom:6px}
+    .cap-desc{font-size:.8rem;color:var(--mu2);line-height:1.5}
+    .cap-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+    .tag{font-size:.62rem;font-family:var(--mono);padding:2px 7px;
+         border-radius:4px;background:rgba(0,119,200,.08);
+         color:var(--c);border:1px solid rgba(0,119,200,.15)}
+
+    /* ── MIGRATION ROADMAP ──────────────────── */
+    .roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+             background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+             overflow:hidden}
+    .rm-phase{padding:24px 20px;border-right:1px solid var(--brd);
+              position:relative;display:flex;flex-direction:column;gap:10px}
+    .rm-phase:last-child{border-right:none}
+    .rm-phase-bar{position:absolute;top:0;left:0;right:0;height:4px}
+    .rb1{background:linear-gradient(90deg,#DC2626,var(--r))}
+    .rb2{background:linear-gradient(90deg,var(--a),var(--al))}
+    .rb3{background:linear-gradient(90deg,var(--b),var(--c))}
+    .rb4{background:linear-gradient(90deg,var(--g),var(--gl))}
+    .rm-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;
+              text-transform:uppercase;margin-top:8px}
+    .rl1{color:var(--rl)} .rl2{color:var(--al)} .rl3{color:var(--c)} .rl4{color:var(--gl)}
+    .rm-title{font-size:.88rem;font-weight:800;color:#fff;line-height:1.2}
+    .rm-time{font-size:.7rem;color:var(--mu);font-family:var(--mono)}
+    .rm-items{display:flex;flex-direction:column;gap:7px;margin-top:6px}
+    .rm-item{font-size:.75rem;color:var(--mu2);display:flex;gap:7px;align-items:flex-start;line-height:1.35}
+    .rm-item::before{content:'→';color:var(--c);flex-shrink:0;font-weight:700}
+    .rm-tool{display:inline-block;font-size:.63rem;font-family:var(--mono);
+             color:var(--c);background:rgba(0,174,239,.07);
+             border:1px solid rgba(0,174,239,.15);padding:1px 6px;
+             border-radius:3px;margin-top:6px}
+
+    /* ── OUTPUT TYPES ───────────────────────── */
+    .out-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .out-card{background:var(--bg2);border:1px solid var(--brd);border-radius:10px;
+              padding:18px 16px;text-align:center;transition:.25s}
+    .out-card:hover{border-color:var(--brdh);transform:translateY(-2px)}
+    .out-ico{font-size:1.8rem;margin-bottom:10px}
+    .out-title{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:4px}
+    .out-desc{font-size:.72rem;color:var(--mu2);line-height:1.4}
+
+    /* ── TECH STACK ─────────────────────────── */
+    .tech-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .tech-badge{display:flex;align-items:center;gap:7px;
+                background:var(--bg3);border:1px solid var(--brd);
+                border-radius:8px;padding:8px 14px;font-size:.78rem;
+                color:var(--mu2);transition:.2s}
+    .tech-badge:hover{border-color:var(--brdh);color:var(--tx)}
+    .tech-dot{width:8px;height:8px;border-radius:50%}
+    .td-b{background:var(--b)} .td-g{background:var(--g)}
+    .td-a{background:var(--a)} .td-p{background:var(--p)}
+    .td-c{background:var(--c)} .td-w{background:#CBD5E1}
+
+    /* ── QUOTE ──────────────────────────────── */
+    .quote-box{
+      background:linear-gradient(135deg,rgba(0,119,200,.08),rgba(0,174,239,.04));
+      border:1px solid rgba(0,119,200,.25);border-radius:14px;
+      padding:28px 32px;display:flex;gap:20px;align-items:flex-start;
+      margin-top:28px;
+    }
+    .quote-mark{font-size:3.5rem;line-height:.8;color:var(--b);
+                font-family:Georgia,serif;flex-shrink:0}
+    .quote-text{font-size:1.05rem;color:var(--tx);font-style:italic;
+                line-height:1.65}
+    .quote-author{font-size:.78rem;color:var(--mu2);margin-top:10px;
+                  font-style:normal}
+
+    /* ── FOOTER ─────────────────────────────── */
+    .footer{
+      background:var(--bg2);border-top:2px solid var(--b);
+      padding:28px 48px;
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    }
+    .footer-brand{display:flex;align-items:center;gap:10px}
+    .footer-copy{font-size:.75rem;color:var(--mu)}
+
+    /* ── ACCENT LINES ───────────────────────── */
+    .divider{height:1px;background:linear-gradient(90deg,transparent,var(--brdh),transparent);margin:0 48px}
+
+    /* ── PRINT / export hint ──────────────────── */
+    @media print{
+      body{background:#fff;color:#000}
+      .page{background:#fff}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+<!-- ══════════════════════ HEADER ══════════════════════════════ -->
+<header>
+  <div class="h-top">
+    <div class="h-brand">
+      <svg class="shonai" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="7"/>
+        <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="5.5"/>
+        <ellipse cx="50" cy="53" rx="10" ry="13" fill="#00AEEF"/>
+        <ellipse cx="50" cy="39" rx="7.5" ry="7.5" fill="#00AEEF"/>
+      </svg>
+      <div class="brand-txt">
+        <div class="corp">NTT<span> DATA</span></div>
+        <div class="sub">IBM Integration Services · Legacy Migration</div>
+      </div>
+    </div>
+    <div class="h-pill">
+      <span class="pill pill-b">IBM TWX Reverse Engineering Suite v1.0.0</span>
+      <span class="pill pill-g">✓ GitHub Copilot @nttdata</span>
+    </div>
+  </div>
+  <div class="h-title">
+    <div class="h-label">Infografía técnica · 2026</div>
+    <div class="h-main">Cómo la suite <em>potencia la migración</em><br>de servicios legacy IBM BPM&nbsp;/&nbsp;BAW</div>
+    <div class="h-desc">
+      Una vista completa del impacto de la herramienta de ingeniería inversa sobre archivos
+      <strong style="color:#fff">.twx</strong> en proyectos de modernización y migración de plataformas
+      IBM Integration Designer hacia arquitecturas cloud-native o microservicios.
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════ KPIs ═════════════════════════════════ -->
+<div class="section">
+  <div class="sec-label">Impacto cuantificado</div>
+  <div class="sec-title">Ganancia en proyectos de migración</div>
+  <div class="sec-sub">Reducción real de tiempos y riesgos en comparación con análisis manual de archivos TWX.</div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-n kn-green">80<sup>%</sup></div>
+      <div class="kpi-lbl">Reducción en tiempo de análisis de servicios</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n kn-blue">100<sup>%</sup></div>
+      <div class="kpi-lbl">Cobertura de artefactos en el TWX analizado</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n kn-amber">0</div>
+      <div class="kpi-lbl">Dependencias externas — solo Python stdlib</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n kn-purple">9<sup>+</sup></div>
+      <div class="kpi-lbl">Dimensiones de análisis por archivo TWX</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n kn-green">∞</div>
+      <div class="kpi-lbl">TWX analizables en lote — sin límite de tamaño</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ BEFORE / AFTER ═══════════════════════ -->
+<div class="section">
+  <div class="sec-label">El problema que resuelve</div>
+  <div class="sec-title">Sin la suite vs. Con la suite</div>
+  <div class="sec-sub">Migración de servicios IBM BPM — análisis manual contra análisis automatizado.</div>
+
+  <div class="ba-grid">
+    <!-- BEFORE -->
+    <div class="ba-col before">
+      <div class="ba-head before">❌&nbsp; Sin la suite — Proceso manual</div>
+      <div class="ba-item"><span class="icon">⏱️</span> Semanas analizando XML interno del TWX con editor de texto</div>
+      <div class="ba-item"><span class="icon">🔎</span> Búsqueda manual de servicios, BOs y dependencias entre artefactos</div>
+      <div class="ba-item"><span class="icon">📄</span> Documentación inexistente o desactualizada del servicio legacy</div>
+      <div class="ba-item"><span class="icon">⚠️</span> Alto riesgo de perder servicios ocultos o dependencias no documentadas</div>
+      <div class="ba-item"><span class="icon">🧩</span> Imposible mapear visualmente el flujo de proceso sin IBM Designer instalado</div>
+      <div class="ba-item"><span class="icon">💸</span> Alto costo de horas-hombre por cada servicio a migrar</div>
+      <div class="ba-item"><span class="icon">🤷</span> Sin integración con el entorno de desarrollo moderno (VS Code, Copilot)</div>
+    </div>
+
+    <div class="ba-arrow">⟶</div>
+
+    <!-- AFTER -->
+    <div class="ba-col after">
+      <div class="ba-head after">✅&nbsp; Con la suite — Análisis automatizado</div>
+      <div class="ba-item"><span class="icon">⚡</span> Análisis completo de un TWX en segundos desde terminal o Copilot Chat</div>
+      <div class="ba-item"><span class="icon">🗺️</span> Mapa automático de todos los servicios, BOs y dependencias en JSON + Mermaid</div>
+      <div class="ba-item"><span class="icon">📋</span> Documentación Markdown generada lista para el repositorio o Confluence</div>
+      <div class="ba-item"><span class="icon">🛡️</span> Cero riesgo de omitir artefactos — cobertura 100% del ZIP interno</div>
+      <div class="ba-item"><span class="icon">📊</span> Diagramas de flujo interactivos sin necesidad de IBM Designer</div>
+      <div class="ba-item"><span class="icon">📉</span> Reducción drástica del costo de análisis por servicio</div>
+      <div class="ba-item"><span class="icon">🤖</span> Integrado en VS Code con <strong style="color:#fff">@nttdata v1.0</strong> en GitHub Copilot Chat</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ PIPELINE ═════════════════════════════ -->
+<div class="section">
+  <div class="sec-label">Flujo de trabajo</div>
+  <div class="sec-title">Pipeline de migración con la suite</div>
+  <div class="sec-sub">Desde el archivo .twx legado hasta los artefactos migrados y documentados.</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-icon fi-blue">🗜️</div>
+      <div class="flow-n">Entrada</div>
+      <div class="flow-title">Archivo .TWX legado</div>
+      <div class="flow-desc">Exportación de IBM Integration Designer / BPM</div>
+      <div class="flow-tag">.twx = ZIP + XML IBM</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-icon fi-cyan">🔍</div>
+      <div class="flow-n">Paso 1</div>
+      <div class="flow-title">Parseo y clasificación</div>
+      <div class="flow-desc">Extracción del ZIP, detección y tipificación de artefactos por extensión</div>
+      <div class="flow-tag">twx_parser.py</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-icon fi-blue">🧠</div>
+      <div class="flow-n">Paso 2</div>
+      <div class="flow-title">Extracción de entidades</div>
+      <div class="flow-desc">Business Objects, tipos, campos, herencias y variables tipadas</div>
+      <div class="flow-tag">entity_extractor.py</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-icon fi-purple">⚙️</div>
+      <div class="flow-n">Paso 3</div>
+      <div class="flow-title">Análisis de servicios</div>
+      <div class="flow-desc">Pasos, scripts JS, SQL, endpoints REST/SOAP y bindings</div>
+      <div class="flow-tag">service_extractor.py</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-icon fi-amber">🗺️</div>
+      <div class="flow-n">Paso 4</div>
+      <div class="flow-title">Mapeo de flujos</div>
+      <div class="flow-desc">Grafo de proceso, dependencias y entry points sin IBM Designer</div>
+      <div class="flow-tag">flow_mapper.py</div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-icon fi-green">📋</div>
+      <div class="flow-n">Salida</div>
+      <div class="flow-title">Documentación lista</div>
+      <div class="flow-desc">Markdown + Mermaid + JSON estructurado para el equipo de migración</div>
+      <div class="flow-tag">doc_generator.py</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ CAPACIDADES ══════════════════════════ -->
+<div class="section">
+  <div class="sec-label">Capacidades de análisis</div>
+  <div class="sec-title">¿Qué extrae la suite de cada .TWX?</div>
+  <div class="sec-sub">9 dimensiones de ingeniería inversa aplicadas automáticamente a cada artefacto IBM.</div>
+
+  <div class="cap-grid">
+    <div class="cap blue">
+      <div class="cap-ico">🏗️</div>
+      <div class="cap-title">Business Objects y modelos</div>
+      <div class="cap-desc">Extrae cada BO con sus campos tipados, flags de lista/requerido, herencias entre tipos y namespaces IBM.</div>
+      <div class="cap-tags">
+        <span class="tag">.bo</span>
+        <span class="tag">campos</span>
+        <span class="tag">tipos</span>
+        <span class="tag">herencia</span>
+      </div>
+    </div>
+    <div class="cap cyan">
+      <div class="cap-ico">⚙️</div>
+      <div class="cap-title">Lógica de servicios</div>
+      <div class="cap-desc">Mapea cada paso del servicio: tipo (Script, Human Task, Integration, Decision), nombre, inputs, outputs y estado de error.</div>
+      <div class="cap-tags">
+        <span class="tag">.service</span>
+        <span class="tag">pasos</span>
+        <span class="tag">decisiones</span>
+      </div>
+    </div>
+    <div class="cap purple">
+      <div class="cap-ico">📜</div>
+      <div class="cap-title">Scripts embebidos</div>
+      <div class="cap-desc">Vuelca todo el código JavaScript / Groovy / server-side script contenido en pasos de servicio — listo para revisión y refactoring.</div>
+      <div class="cap-tags">
+        <span class="tag">JavaScript</span>
+        <span class="tag">tw.local</span>
+        <span class="tag">server-script</span>
+      </div>
+    </div>
+    <div class="cap amber">
+      <div class="cap-ico">🌐</div>
+      <div class="cap-title">Integraciones externas</div>
+      <div class="cap-desc">Detecta todos los endpoints REST, SOAP y HTTP referenciados. Clave para identificar servicios externos que deben actualizarse en la migración.</div>
+      <div class="cap-tags">
+        <span class="tag">REST</span>
+        <span class="tag">SOAP</span>
+        <span class="tag">WSDL</span>
+        <span class="tag">URL</span>
+      </div>
+    </div>
+    <div class="cap green">
+      <div class="cap-ico">📊</div>
+      <div class="cap-title">Diagramas de flujo</div>
+      <div class="cap-desc">Genera flowcharts Mermaid renderizables en GitHub, Confluence y VS Code — sin necesidad de IBM Designer instalado en ningún entorno.</div>
+      <div class="cap-tags">
+        <span class="tag">Mermaid</span>
+        <span class="tag">flowchart TD</span>
+        <span class="tag">GitHub</span>
+      </div>
+    </div>
+    <div class="cap red">
+      <div class="cap-ico">🕸️</div>
+      <div class="cap-title">Grafo de dependencias</div>
+      <div class="cap-desc">Mapea qué servicio llama a cuál, identifica artefactos huérfanos y entry points no documentados — esencial para planear el orden de migración.</div>
+      <div class="cap-tags">
+        <span class="tag">graph LR</span>
+        <span class="tag">llamadas</span>
+        <span class="tag">entry points</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ ROADMAP DE MIGRACIÓN ═════════════════ -->
+<div class="section">
+  <div class="sec-label">Fases del proyecto</div>
+  <div class="sec-title">Roadmap de migración habilitado por la suite</div>
+  <div class="sec-sub">Cómo se integra la herramienta en cada fase de un proyecto real de migración legacy → cloud.</div>
+
+  <div class="roadmap">
+    <!-- F1 -->
+    <div class="rm-phase">
+      <div class="rm-phase-bar rb1"></div>
+      <div class="rm-label rl1">Fase 1</div>
+      <div class="rm-title">Discovery &amp; Inventario</div>
+      <div class="rm-time">Semana 1–2</div>
+      <div class="rm-items">
+        <div class="rm-item">Recopilar todos los archivos .twx del cliente</div>
+        <div class="rm-item">Ejecutar <code style="color:var(--c);font-family:var(--mono);font-size:.7rem">analyze</code> en lote para obtener conteo de artefactos</div>
+        <div class="rm-item">Identificar entry points y procesos principales</div>
+        <div class="rm-item">Clasificar por complejidad (# pasos, # dependencias)</div>
+      </div>
+      <div class="rm-tool">nttdata-ibm-twx analyze</div>
+      <div class="rm-tool">nttdata-ibm-twx entries</div>
+    </div>
+
+    <!-- F2 -->
+    <div class="rm-phase">
+      <div class="rm-phase-bar rb2"></div>
+      <div class="rm-label rl2">Fase 2</div>
+      <div class="rm-title">Análisis profundo</div>
+      <div class="rm-time">Semana 3–6</div>
+      <div class="rm-items">
+        <div class="rm-item">Extraer Business Objects para diseñar nuevo modelo de datos</div>
+        <div class="rm-item">Mapear servicios y lógica de negocio</div>
+        <div class="rm-item">Auditar scripts JS para detectar deuda técnica</div>
+        <div class="rm-item">Catalogar integraciones externas a reemplazar</div>
+      </div>
+      <div class="rm-tool">nttdata-ibm-twx entities</div>
+      <div class="rm-tool">nttdata-ibm-twx services</div>
+      <div class="rm-tool">nttdata-ibm-twx scripts</div>
+    </div>
+
+    <!-- F3 -->
+    <div class="rm-phase">
+      <div class="rm-phase-bar rb3"></div>
+      <div class="rm-label rl3">Fase 3</div>
+      <div class="rm-title">Diseño de migración</div>
+      <div class="rm-time">Semana 7–10</div>
+      <div class="rm-items">
+        <div class="rm-item">Usar diagramas Mermaid para planear la nueva arquitectura</div>
+        <div class="rm-item">Mapear grafo de dependencias para secuenciar la migración</div>
+        <div class="rm-item">Actualizar URLs de endpoints externos</div>
+        <div class="rm-item">Validar con @nttdata desde Copilot Chat en VS Code</div>
+      </div>
+      <div class="rm-tool">nttdata-ibm-twx flows</div>
+      <div class="rm-tool">nttdata-ibm-twx deps</div>
+      <div class="rm-tool">nttdata-ibm-twx endpoints</div>
+    </div>
+
+    <!-- F4 -->
+    <div class="rm-phase">
+      <div class="rm-phase-bar rb4"></div>
+      <div class="rm-label rl4">Fase 4</div>
+      <div class="rm-title">Entrega &amp; Documentación</div>
+      <div class="rm-time">Semana 11–12</div>
+      <div class="rm-items">
+        <div class="rm-item">Generar documentación Markdown completa por proceso</div>
+        <div class="rm-item">Publicar en repositorio GitHub / Confluence del cliente</div>
+        <div class="rm-item">Trazabilidad completa legacy → moderno</div>
+        <div class="rm-item">Entregable técnico listo para el equipo de QA</div>
+      </div>
+      <div class="rm-tool">nttdata-ibm-twx docs -o wiki/</div>
+      <div class="rm-tool">@nttdata v1.0 docs</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ OUTPUTS ══════════════════════════════ -->
+<div class="section">
+  <div class="sec-label">Entregables generados</div>
+  <div class="sec-title">¿Qué produce la suite para el equipo de migración?</div>
+  <div class="sec-sub">Todos los artefactos de salida son legibles por humanos y por herramientas de IA.</div>
+
+  <div class="out-grid">
+    <div class="out-card">
+      <div class="out-ico">📦</div>
+      <div class="out-title">JSON estructurado</div>
+      <div class="out-desc">Datos de todos los artefactos en formato JSON consumible por pipelines CI/CD o herramientas de BI</div>
+    </div>
+    <div class="out-card">
+      <div class="out-ico">📋</div>
+      <div class="out-title">Markdown completo</div>
+      <div class="out-desc">Documentación técnica con tablas, secciones y código listo para GitHub, GitLab o Confluence</div>
+    </div>
+    <div class="out-card">
+      <div class="out-ico">📊</div>
+      <div class="out-title">Diagramas Mermaid</div>
+      <div class="out-desc">flowchart TD por proceso + graph LR del grafo de dependencias, renderizables en cualquier plataforma moderna</div>
+    </div>
+    <div class="out-card">
+      <div class="out-ico">📜</div>
+      <div class="out-title">Scripts extraídos</div>
+      <div class="out-desc">Todo el código JS/Groovy embebido aislado y etiquetado por artefacto — listo para refactoring o revisión de Copilot</div>
+    </div>
+  </div>
+
+  <div class="quote-box">
+    <div class="quote-mark">"</div>
+    <div>
+      <div class="quote-text">
+        Con la suite, un analista de NTT DATA puede generar en minutos un mapa completo de un proceso IBM BPM
+        que antes requería semanas de análisis manual — incluyendo todos sus servicios, Business Objects,
+        scripts embebidos, integraciones externas y diagramas de flujo — directamente desde GitHub Copilot Chat,
+        sin instalar IBM Designer.
+      </div>
+      <div class="quote-author">— NTT DATA · IBM Integration Services · Legacy Migration Practice · 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════ TECH STACK ═══════════════════════════ -->
+<div class="section" style="border-bottom:none">
+  <div class="sec-label">Stack tecnológico</div>
+  <div class="sec-title">Tecnologías que potencian la suite</div>
+  <div class="sec-sub">Combinación de herramientas que maximizan la productividad del equipo de migración.</div>
+
+  <div class="tech-row">
+    <div class="tech-badge"><div class="tech-dot td-b"></div> Python 3.10+ stdlib</div>
+    <div class="tech-badge"><div class="tech-dot td-c"></div> GitHub Copilot Chat</div>
+    <div class="tech-badge"><div class="tech-dot td-w"></div> VS Code 1.90+</div>
+    <div class="tech-badge"><div class="tech-dot td-g"></div> Mermaid Diagrams</div>
+    <div class="tech-badge"><div class="tech-dot td-a"></div> IBM BPM / BAW XML</div>
+    <div class="tech-badge"><div class="tech-dot td-p"></div> TypeScript Extension API</div>
+    <div class="tech-badge"><div class="tech-dot td-b"></div> gh CLI + Copilot CLI</div>
+    <div class="tech-badge"><div class="tech-dot td-g"></div> Markdown / Confluence</div>
+    <div class="tech-badge"><div class="tech-dot td-c"></div> GitHub / GitLab CI</div>
+    <div class="tech-badge"><div class="tech-dot td-w"></div> IBM Integration Designer</div>
+  </div>
+</div>
+
+<!-- ══════════════════════ FOOTER ════════════════════════════════ -->
+<div class="footer">
+  <div class="footer-brand">
+    <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="8"/>
+      <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="6"/>
+      <ellipse cx="50" cy="52" rx="10" ry="13" fill="#00AEEF"/>
+      <ellipse cx="50" cy="40" rx="7" ry="7" fill="#00AEEF"/>
+    </svg>
+    <div>
+      <div style="font-weight:800;color:#fff;font-size:.9rem">NTT DATA</div>
+      <div style="font-size:.68rem;color:var(--mu);letter-spacing:.08em;text-transform:uppercase">IBM TWX Reverse Engineering Suite v1.0.0</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <span class="pill pill-b">Python 3.10+</span>
+    <span class="pill pill-b">VS Code</span>
+    <span class="pill pill-g">@nttdata Copilot Chat</span>
+    <span class="pill pill-b">IBM BPM · BAW</span>
+  </div>
+  <div class="footer-copy">Infografía técnica · NTT DATA · Legacy Migration Practice · 2026</div>
+</div>
+
+</div><!-- /page -->
+</body>
+</html>

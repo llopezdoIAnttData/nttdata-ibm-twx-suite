@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills & Agente — IBM TWX Suite</title>
+<style>
+  :root {
+    --dark: #060e1a;
+    --dark2: #0a1628;
+    --dark3: #0f2040;
+    --blue: #2563eb;
+    --teal: #0d9488;
+    --amber: #d97706;
+    --green: #16a34a;
+    --purple: #7c3aed;
+    --red: #dc2626;
+    --border: #1a3050;
+    --text: #e2e8f0;
+    --muted: #7c8faa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--dark); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #060e1a 0%, #0b1f3a 50%, #0a1f40 100%); padding: 52px 40px 40px; border-bottom: 1px solid var(--border); }
+  .hero-label { font-size: 10px; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase; margin-bottom: 12px; }
+  .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+  .hero h1 span { color: #38bdf8; }
+  .hero p { color: var(--muted); font-size: 14px; max-width: 700px; margin-bottom: 20px; }
+  .hero-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { background: rgba(37,99,235,0.12); border: 1px solid rgba(37,99,235,0.3); border-radius: 20px; padding: 4px 14px; font-size: 11px; color: #93c5fd; }
+  .pill.green { background: rgba(22,163,74,0.1); border-color: rgba(22,163,74,0.3); color: #86efac; }
+  .pill.amber { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.3); color: #fcd34d; }
+
+  /* LAYOUT */
+  .container { max-width: 1200px; margin: 0 auto; padding: 36px 32px; }
+  .section-label { font-size: 10px; letter-spacing: 3px; color: #38bdf8; text-transform: uppercase; margin-bottom: 8px; }
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+  h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .sep { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-bottom: 32px; }
+  .arch-row { display: flex; align-items: center; gap: 0; margin-bottom: 0; }
+  .arch-layer { flex: 1; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .arch-layer .layer-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .arch-layer .layer-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .arch-layer .layer-desc { font-size: 11px; color: var(--muted); }
+  .arch-arrow { padding: 0 16px; font-size: 22px; color: #2563eb; flex-shrink: 0; }
+  .layer-blue .layer-label { color: #60a5fa; }
+  .layer-blue .layer-name { color: #93c5fd; }
+  .layer-blue { border-color: rgba(37,99,235,0.4); }
+  .layer-teal .layer-label { color: #2dd4bf; }
+  .layer-teal .layer-name { color: #5eead4; }
+  .layer-teal { border-color: rgba(13,148,136,0.4); }
+  .layer-green .layer-label { color: #4ade80; }
+  .layer-green .layer-name { color: #86efac; }
+  .layer-green { border-color: rgba(22,163,74,0.4); }
+  .layer-amber .layer-label { color: #fbbf24; }
+  .layer-amber .layer-name { color: #fcd34d; }
+  .layer-amber { border-color: rgba(217,119,6,0.4); }
+
+  /* SKILLS GRID */
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  /* SKILL CARD */
+  .skill-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.2s; }
+  .skill-card:hover { border-color: rgba(37,99,235,0.5); }
+  .skill-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .skill-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .skill-header-text .skill-name { font-size: 13px; font-weight: 700; font-family: 'Cascadia Code', monospace; }
+  .skill-header-text .skill-cycle { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .skill-body { padding: 0 16px 16px; }
+  .skill-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .skill-cmd { background: #040a12; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-family: 'Cascadia Code', monospace; font-size: 11px; color: #38bdf8; word-break: break-all; }
+  .skill-output { font-size: 11px; color: var(--muted); margin-top: 8px; }
+  .skill-output span { color: #86efac; }
+  .skill-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.25); border-radius: 4px; padding: 2px 8px; font-size: 10px; color: #93c5fd; }
+  .tag.teal { background: rgba(13,148,136,0.1); border-color: rgba(13,148,136,0.25); color: #5eead4; }
+  .tag.amber { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.25); color: #fcd34d; }
+  .tag.green { background: rgba(22,163,74,0.1); border-color: rgba(22,163,74,0.25); color: #86efac; }
+  .tag.purple { background: rgba(124,58,237,0.1); border-color: rgba(124,58,237,0.25); color: #c4b5fd; }
+
+  /* MASTER SKILL CARD */
+  .master-card { background: linear-gradient(135deg, #0a1628, #0f243f); border: 1px solid rgba(37,99,235,0.5); border-radius: 12px; padding: 24px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .master-card::before { content: '★ MASTER'; position: absolute; top: 14px; right: 16px; font-size: 10px; letter-spacing: 2px; color: #fbbf24; background: rgba(217,119,6,0.15); border: 1px solid rgba(217,119,6,0.3); padding: 2px 10px; border-radius: 10px; }
+  .master-card h3 { font-family: 'Cascadia Code', monospace; font-size: 16px; color: #38bdf8; margin-bottom: 6px; }
+  .master-card p { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .master-cycles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .mc { background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); border-radius: 6px; padding: 8px 12px; font-size: 11px; }
+  .mc .mc-num { color: #38bdf8; font-weight: 700; font-size: 13px; margin-right: 4px; }
+  .mc .mc-name { color: var(--text); font-weight: 600; }
+  .mc .mc-sub { color: var(--muted); font-size: 10px; display: block; margin-top: 2px; }
+
+  /* AGENT CARD */
+  .agent-card { background: linear-gradient(135deg, #0f1a2e, #1a0f2e); border: 1px solid rgba(124,58,237,0.4); border-radius: 12px; padding: 24px; }
+  .agent-card .agent-badge { display: inline-block; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.35); border-radius: 20px; padding: 4px 14px; font-size: 10px; letter-spacing: 2px; color: #c4b5fd; text-transform: uppercase; margin-bottom: 12px; }
+  .agent-card h3 { font-family: 'Cascadia Code', monospace; font-size: 16px; color: #c4b5fd; margin-bottom: 6px; }
+  .agent-card p { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .agent-phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .phase { background: rgba(124,58,237,0.06); border: 1px solid rgba(124,58,237,0.2); border-radius: 6px; padding: 10px 14px; }
+  .phase .ph-num { font-size: 10px; color: #a78bfa; font-weight: 700; margin-bottom: 4px; }
+  .phase .ph-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .phase .ph-cmd { font-size: 10px; color: var(--muted); font-family: 'Cascadia Code', monospace; }
+
+  /* PROFUTURO SKILL */
+  .profuturo-card { background: linear-gradient(135deg, #0a1a10, #0a2010); border: 1px solid rgba(22,163,74,0.4); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+  .profuturo-card .p-badge { display: inline-block; background: rgba(22,163,74,0.12); border: 1px solid rgba(22,163,74,0.3); border-radius: 20px; padding: 4px 14px; font-size: 10px; letter-spacing: 2px; color: #86efac; text-transform: uppercase; margin-bottom: 12px; }
+  .profuturo-card h3 { font-family: 'Cascadia Code', monospace; font-size: 16px; color: #86efac; margin-bottom: 6px; }
+  .profuturo-card p { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .corrections { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .corr { background: rgba(22,163,74,0.05); border: 1px solid rgba(22,163,74,0.15); border-left: 3px solid #16a34a; border-radius: 4px; padding: 8px 12px; font-size: 11px; color: var(--muted); }
+  .corr strong { color: #86efac; display: block; margin-bottom: 2px; font-size: 12px; }
+
+  /* HOW TO USE */
+  .how-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  pre { background: #030810; border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-size: 12px; font-family: 'Cascadia Code', monospace; overflow-x: auto; margin: 12px 0; }
+  .c-blue { color: #38bdf8; }
+  .c-green { color: #86efac; }
+  .c-muted { color: #475569; }
+  .c-amber { color: #fcd34d; }
+  code { font-family: 'Cascadia Code', monospace; background: rgba(37,99,235,0.12); color: #7dd3fc; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 16px; }
+  th { background: rgba(37,99,235,0.15); color: #93c5fd; padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(26,48,80,0.6); color: var(--muted); }
+  td strong { color: var(--text); }
+  tr:hover td { background: rgba(37,99,235,0.04); }
+
+  footer { background: #030810; border-top: 1px solid var(--border); padding: 20px 40px; text-align: center; color: var(--muted); font-size: 11px; margin-top: 60px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">IBM TWX Reverse Engineering Suite v1.0</div>
+  <h1>Skills, Ciclos & <span>Agente Copilot</span></h1>
+  <p>Todos los skills que componen la suite: qué hace cada uno, cómo se ejecuta, y cómo se orquestan para analizar cualquier archivo .TWX de IBM BPM.</p>
+  <div class="hero-pills">
+    <span class="pill">10 Skills activos</span>
+    <span class="pill">1 Agente especializado</span>
+    <span class="pill green">9 Ciclos de extracción</span>
+    <span class="pill amber">Metodología v3 Profuturo</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ARQUITECTURA -->
+  <div class="section-label">Cómo está construida la suite</div>
+  <h2>Arquitectura en 4 capas</h2>
+
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-layer layer-blue">
+        <div class="layer-label">Capa 1</div>
+        <div class="layer-name">📁 Archivo .TWX</div>
+        <div class="layer-desc">ZIP con XMLs de IBM BPM<br>232+ artefactos</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer layer-teal">
+        <div class="layer-label">Capa 2</div>
+        <div class="layer-name">🐍 Python CLI</div>
+        <div class="layer-desc">ibm_twx_tools<br>9 comandos de extracción</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer layer-amber">
+        <div class="layer-label">Capa 3</div>
+        <div class="layer-name">🤖 Skills Copilot</div>
+        <div class="layer-desc">10 skills + 1 agente<br>Análisis con IA</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer layer-green">
+        <div class="layer-label">Capa 4</div>
+        <div class="layer-name">📊 Entregables</div>
+        <div class="layer-desc">HTML técnico<br>Listo para el equipo</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:16px;text-align:center;">
+      Los <strong style="color:#fcd34d;">Skills</strong> son el "cerebro" de Copilot CLI — le dicen <em>qué herramientas usar</em> y <em>cómo interpretar los resultados</em> cuando le das un TWX.
+    </p>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SKILL MASTER -->
+  <div class="section-label">El skill principal</div>
+  <h2>twx-suite — Skill Maestro</h2>
+
+  <div class="master-card">
+    <h3>twx-suite</h3>
+    <p>Skill orquestador. Cuando dices "analiza este TWX" o "reverse engineer este proceso", Copilot usa este skill para decidir qué ciclos ejecutar y en qué orden. Conoce los 9 comandos y cuándo usar cada uno.</p>
+    <div class="master-cycles">
+      <div class="mc"><span class="mc-num">1</span><span class="mc-name">analyze</span><span class="mc-sub">Inventario completo de artefactos</span></div>
+      <div class="mc"><span class="mc-num">2</span><span class="mc-name">entities</span><span class="mc-sub">Business Objects y modelos de datos</span></div>
+      <div class="mc"><span class="mc-num">3</span><span class="mc-name">services</span><span class="mc-sub">Servicios IS / GSS / HHS</span></div>
+      <div class="mc"><span class="mc-num">4</span><span class="mc-name">flows</span><span class="mc-sub">Diagramas Mermaid de procesos</span></div>
+      <div class="mc"><span class="mc-num">5</span><span class="mc-name">deps</span><span class="mc-sub">Grafo de dependencias</span></div>
+      <div class="mc"><span class="mc-num">6</span><span class="mc-name">docs</span><span class="mc-sub">Documentación Markdown completa</span></div>
+      <div class="mc"><span class="mc-num">7</span><span class="mc-name">scripts</span><span class="mc-sub">Código JavaScript embebido</span></div>
+      <div class="mc"><span class="mc-num">8</span><span class="mc-name">endpoints</span><span class="mc-sub">URLs REST / SOAP externas</span></div>
+      <div class="mc"><span class="mc-num">9</span><span class="mc-name">entries</span><span class="mc-sub">Puntos de entrada (API pública)</span></div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- SKILLS INDIVIDUALES -->
+  <div class="section-label">Los 9 ciclos de extracción</div>
+  <h2>Skills individuales — uno por ciclo</h2>
+
+  <div class="skills-grid">
+
+    <!-- ANALYZE -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(37,99,235,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(37,99,235,0.15);">🔍</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#93c5fd;">twx-analyze</div>
+          <div class="skill-cycle">Ciclo 1 — Inventario</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Genera el resumen completo del TWX: nombre de la app, versión, si es toolkit o aplicación, y conteo de artefactos por tipo. <strong style="color:var(--text);">Siempre es el primer ciclo a ejecutar.</strong></div>
+        <div class="skill-cmd">python -m ibm_twx_tools analyze "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>JSON con app_name, version, total_artifacts, by_type</span></div>
+        <div class="skill-tags">
+          <span class="tag">JSON</span><span class="tag">Vista general</span><span class="tag">Primer paso</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTITIES -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(13,148,136,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(13,148,136,0.15);">📦</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#5eead4;">twx-entities</div>
+          <div class="skill-cycle">Ciclo 2 — Modelo de datos</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Extrae todos los Business Objects con sus campos, tipos de datos, herencia y relaciones. Es el modelo de datos del sistema IBM BPM.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools entities "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>JSON array de BOs con campos tipados</span></div>
+        <div class="skill-tags">
+          <span class="tag teal">JSON</span><span class="tag teal">Business Objects</span><span class="tag teal">Tipos de datos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(124,58,237,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(124,58,237,0.15);">⚙️</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#c4b5fd;">twx-services</div>
+          <div class="skill-cycle">Ciclo 3 — Servicios</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Extrae IS, GSS y HHS con sus pasos en orden sequenceFlow, inputs/outputs y dependencias. Distingue tipos por <code>processType</code> (3=HHS, 4=IS, 6=GSS).</div>
+        <div class="skill-cmd">python -m ibm_twx_tools services "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>JSON con servicios, pasos, IO, dependencias</span></div>
+        <div class="skill-tags">
+          <span class="tag purple">IS / GSS / HHS</span><span class="tag purple">sequenceFlow</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOWS -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(217,119,6,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(217,119,6,0.15);">🔀</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#fcd34d;">twx-flows</div>
+          <div class="skill-cycle">Ciclo 4 — Diagramas</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Genera diagramas Mermaid <code>flowchart TD</code> por cada proceso y servicio. Nodos diferenciados: inicio, fin, gateways, scripts, servicios externos.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools flows "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>Bloques Mermaid renderizables en Markdown/HTML</span></div>
+        <div class="skill-tags">
+          <span class="tag amber">Mermaid</span><span class="tag amber">Visualización</span><span class="tag amber">BPDs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPS -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(220,38,38,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(220,38,38,0.15);">🕸️</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#fca5a5;">twx-deps</div>
+          <div class="skill-cycle">Ciclo 5 — Dependencias</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Construye el grafo de dependencias entre artefactos (quién llama a quién). Identifica artefactos críticos, huérfanos y dependencias circulares.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools deps "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>Mermaid graph LR con relaciones caller→callee</span></div>
+        <div class="skill-tags">
+          <span class="tag" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.25);color:#fca5a5;">Grafo</span>
+          <span class="tag" style="background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.25);color:#fca5a5;">Impacto</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(22,163,74,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(22,163,74,0.15);">📄</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#86efac;">twx-docs</div>
+          <div class="skill-cycle">Ciclo 6 — Documentación</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Genera la documentación técnica completa en Markdown: resumen, BOs, servicios, scripts, endpoints, diagramas y entrypoints. Todo en un solo archivo.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools docs "archivo.twx" -o "docs.md"</div>
+        <div class="skill-output">Produce: <span>Markdown completo listo para compartir</span></div>
+        <div class="skill-tags">
+          <span class="tag green">Markdown</span><span class="tag green">Entregable</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(37,99,235,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(37,99,235,0.15);">&lt;/&gt;</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#93c5fd;">twx-scripts</div>
+          <div class="skill-cycle">Ciclo 7 — Código JS</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Extrae y etiqueta todo el JavaScript embebido en los pasos de los servicios. Muestra el artefacto, el paso y el código. En Profuturo generó 455 KB de scripts.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools scripts "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>Bloques JS por artefacto y paso (etiquetados)</span></div>
+        <div class="skill-tags">
+          <span class="tag">JavaScript</span><span class="tag">tw.local.*</span><span class="tag">455 KB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINTS -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(13,148,136,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(13,148,136,0.15);">🌐</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#5eead4;">twx-endpoints</div>
+          <div class="skill-cycle">Ciclo 8 — Integraciones externas</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Lista todas las URLs REST, SOAP/WSDL y HTTP referenciadas. Detecta URLs hardcodeadas, diferencias Dev/Prod y conexiones críticas para migración.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools endpoints "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>JSON con tipo, método y URL por servicio</span></div>
+        <div class="skill-tags">
+          <span class="tag teal">REST</span><span class="tag teal">SOAP/WSDL</span><span class="tag teal">URLs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRIES -->
+    <div class="skill-card">
+      <div class="skill-header" style="background:rgba(124,58,237,0.08);border-bottom:1px solid var(--border);">
+        <div class="skill-icon" style="background:rgba(124,58,237,0.15);">🚪</div>
+        <div class="skill-header-text">
+          <div class="skill-name" style="color:#c4b5fd;">twx-entries</div>
+          <div class="skill-cycle">Ciclo 9 — API pública</div>
+        </div>
+      </div>
+      <div class="skill-body" style="padding-top:14px;">
+        <div class="skill-desc">Identifica los puntos de entrada: artefactos que no son llamados por ningún otro. Son la API pública y los puntos de inicio del sistema IBM BPM.</div>
+        <div class="skill-cmd">python -m ibm_twx_tools entries "archivo.twx"</div>
+        <div class="skill-output">Produce: <span>JSON de artefactos sin callers (puntos de entrada)</span></div>
+        <div class="skill-tags">
+          <span class="tag purple">API pública</span><span class="tag purple">Entry points</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="sep">
+
+  <!-- SKILL PROFUTURO -->
+  <div class="section-label">Skill especializado</div>
+  <h2>profuturo-twx — Metodología v3</h2>
+
+  <div class="profuturo-card">
+    <div class="p-badge">Skill de proyecto</div>
+    <h3>profuturo-twx</h3>
+    <p>Skill específico para proyectos Profuturo. Contiene la taxonomía de prefijos IBM BPM de Profuturo, las 11 correcciones v3 de la metodología y los patrones de extracción validados con el equipo.</p>
+    <div class="corrections">
+      <div class="corr"><strong>Orden por sequenceFlow</strong>Nunca por coordenadas X/Y del diseñador visual</div>
+      <div class="corr"><strong>Botones de 64.*.xml</strong>Los Coach Views son la fuente real — no las descripciones</div>
+      <div class="corr"><strong>PostponeAction = Cerrar tarea</strong>No "Posponer" ni "Cancelar" — es cerrar la tarea del usuario</div>
+      <div class="corr"><strong>IG Revisión UDI = SÍNCRONO</strong>A pesar de tener GSS de respuesta, el IS es síncrono</div>
+      <div class="corr"><strong>Vars entorno en 62.*.xml</strong>El MANIFEST.MF solo dice Manifest-Version: 1.0 — no sirve</div>
+      <div class="corr"><strong>ID 8627 Dev ≠ 8628 Prod</strong>El único ID que difiere entre ambientes — crítico en producción</div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- EL AGENTE -->
+  <div class="section-label">El orquestador inteligente</div>
+  <h2>twx-engineer — El agente especializado</h2>
+
+  <div class="agent-card">
+    <div class="agent-badge">Agente Copilot CLI</div>
+    <h3>twx-engineer</h3>
+    <p>Es el agente de Copilot CLI que actúa como "Ingeniero IBM BPM". Cuando hablas con Copilot CLI sobre un TWX, este agente decide qué skills usar, interpreta los resultados JSON/Mermaid y te explica todo en términos de negocio y técnicos.</p>
+    <div class="agent-phases">
+      <div class="phase">
+        <div class="ph-num">FASE 1</div>
+        <div class="ph-name">Discovery</div>
+        <div class="ph-cmd">→ analyze</div>
+      </div>
+      <div class="phase">
+        <div class="ph-num">FASE 2</div>
+        <div class="ph-name">Arquitectura datos</div>
+        <div class="ph-cmd">→ entities</div>
+      </div>
+      <div class="phase">
+        <div class="ph-num">FASE 3</div>
+        <div class="ph-name">Análisis comportamiento</div>
+        <div class="ph-cmd">→ services + flows + entries</div>
+      </div>
+      <div class="phase">
+        <div class="ph-num">FASE 4</div>
+        <div class="ph-name">Mapeo integración</div>
+        <div class="ph-cmd">→ endpoints + scripts</div>
+      </div>
+      <div class="phase">
+        <div class="ph-num">FASE 5</div>
+        <div class="ph-name">Dependencias</div>
+        <div class="ph-cmd">→ deps</div>
+      </div>
+      <div class="phase">
+        <div class="ph-num">FASE 6</div>
+        <div class="ph-name">Documentación</div>
+        <div class="ph-cmd">→ docs -o archivo.md</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <!-- CÓMO SE EJECUTA -->
+  <div class="section-label">En la práctica</div>
+  <h2>¿Cómo se ejecuta todo esto?</h2>
+
+  <div class="how-card">
+    <h3 style="margin-bottom:16px;">Opción A — Ciclo completo automatizado (run_analysis.py)</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Un solo comando ejecuta los 9 ciclos en secuencia y genera el COPILOT_PROMPT.md listo para Copilot:</p>
+    <pre><span class="c-muted"># Desde la raíz del proyecto</span>
+<span class="c-blue">python run_analysis.py</span> <span class="c-amber">"C:\ruta\al\archivo.twx"</span>
+
+<span class="c-muted"># Resultado en ~10 minutos:</span>
+<span class="c-green">✓  Ciclo 1 — analyze    →  232 artefactos clasificados</span>
+<span class="c-green">✓  Ciclo 2 — entities   →  54 Business Objects extraídos</span>
+<span class="c-green">✓  Ciclo 3 — services   →  74 servicios con pasos</span>
+<span class="c-green">✓  Ciclo 4 — flows      →  44 diagramas Mermaid</span>
+<span class="c-green">✓  Ciclo 5 — deps       →  grafo de dependencias</span>
+<span class="c-green">✓  Ciclo 6 — docs       →  documentación Markdown (378 KB)</span>
+<span class="c-green">✓  Ciclo 7 — scripts    →  JavaScript extraído (455 KB)</span>
+<span class="c-green">✓  Ciclo 8 — endpoints  →  12 endpoints SOAP</span>
+<span class="c-green">✓  Ciclo 9 — entries    →  puntos de entrada identificados</span>
+<span class="c-green">✓  COPILOT_PROMPT.md generado  →  57 KB listo para Copilot CLI</span></pre>
+
+    <h3 style="margin-top:20px;margin-bottom:10px;">Opción B — Ciclo individual desde Copilot CLI</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">Puedes pedir un ciclo específico directamente en el chat:</p>
+    <pre><span class="c-muted"># Le dices a Copilot:</span>
+<span class="c-amber">"Extrae los endpoints de este TWX: C:\ruta\archivo.twx"</span>
+
+<span class="c-muted"># Copilot activa el skill twx-endpoints y ejecuta:</span>
+<span class="c-blue">python -m ibm_twx_tools endpoints</span> <span class="c-amber">"archivo.twx"</span>
+
+<span class="c-muted"># Luego interpreta el JSON y te lo presenta en tabla</span></pre>
+
+    <h3 style="margin-top:20px;margin-bottom:10px;">Tabla de correspondencia: Pregunta → Skill activado</h3>
+    <table>
+      <tr><th>Si le dices a Copilot...</th><th>Skill que activa</th><th>Comando ejecutado</th></tr>
+      <tr><td>"¿Qué hay en este TWX?"</td><td><strong>twx-analyze</strong></td><td><code>analyze</code></td></tr>
+      <tr><td>"¿Cuáles son los datos del sistema?"</td><td><strong>twx-entities</strong></td><td><code>entities</code></td></tr>
+      <tr><td>"Muéstrame los servicios"</td><td><strong>twx-services</strong></td><td><code>services</code></td></tr>
+      <tr><td>"Genera un diagrama del proceso"</td><td><strong>twx-flows</strong></td><td><code>flows</code></td></tr>
+      <tr><td>"¿Qué llama a qué?"</td><td><strong>twx-deps</strong></td><td><code>deps</code></td></tr>
+      <tr><td>"Documenta todo"</td><td><strong>twx-docs</strong></td><td><code>docs -o output.md</code></td></tr>
+      <tr><td>"Muéstrame el código JavaScript"</td><td><strong>twx-scripts</strong></td><td><code>scripts</code></td></tr>
+      <tr><td>"¿A qué URLs externas llama?"</td><td><strong>twx-endpoints</strong></td><td><code>endpoints</code></td></tr>
+      <tr><td>"¿Cuál es la API pública?"</td><td><strong>twx-entries</strong></td><td><code>entries</code></td></tr>
+      <tr><td>"Haz el análisis completo"</td><td><strong>twx-suite</strong></td><td>todos los ciclos</td></tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  IBM TWX Reverse Engineering Suite v1.0 · Skills & Agente Copilot CLI · NTT DATA EMEAL · Mayo 2026
+</footer>
+
+</body>
+</html>

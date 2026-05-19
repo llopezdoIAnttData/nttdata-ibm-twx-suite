@@ -1,0 +1,136 @@
+{
+  "name": "nttdata-ibm-twx",
+  "displayName": "NTTDATA IBM TWX Tools",
+  "description": "NTTDATA — IBM Integration Designer TWX reverse engineering tools for GitHub Copilot",
+  "version": "1.0.0",
+  "publisher": "nttdata",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Other"
+  ],
+  "keywords": [
+    "ibm",
+    "twx",
+    "bpm",
+    "reverse engineering",
+    "nttdata",
+    "copilot"
+  ],
+  "activationEvents": [
+    "onLanguage:xml",
+    "workspaceContains:**/*.twx"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "nttdata.ibm-twx",
+        "name": "nttdata",
+        "fullName": "NTTDATA IBM TWX Tools",
+        "description": "Reverse engineering tools for IBM Integration Designer .twx files. Use: @nttdata v1.0 <command>",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "analyze",
+            "description": "Full analysis summary of the TWX file"
+          },
+          {
+            "name": "entities",
+            "description": "Extract Business Objects and data models"
+          },
+          {
+            "name": "services",
+            "description": "Extract services, steps and logic"
+          },
+          {
+            "name": "flows",
+            "description": "Generate Mermaid flow diagrams"
+          },
+          {
+            "name": "deps",
+            "description": "Build dependency call graph"
+          },
+          {
+            "name": "docs",
+            "description": "Generate full Markdown documentation"
+          },
+          {
+            "name": "scripts",
+            "description": "Dump all embedded JavaScript/Groovy scripts"
+          },
+          {
+            "name": "endpoints",
+            "description": "List all external REST/SOAP endpoints"
+          },
+          {
+            "name": "entries",
+            "description": "Show entry points (uncalled artifacts)"
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "NTTDATA IBM TWX Tools",
+      "properties": {
+        "nttdata.ibm.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "Path to Python executable for running ibm_twx_tools"
+        },
+        "nttdata.ibm.toolsPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to ibm_twx_tools package directory (leave empty to auto-detect)"
+        },
+        "nttdata.ibm.defaultVersion": {
+          "type": "string",
+          "default": "1.0.0",
+          "description": "Default version tag for generated documentation"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "nttdata.ibm.analyzeFile",
+        "title": "NTTDATA: Analyze TWX File",
+        "icon": "$(search)"
+      },
+      {
+        "command": "nttdata.ibm.generateDocs",
+        "title": "NTTDATA: Generate TWX Documentation",
+        "icon": "$(notebook)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "resourceExtname == .twx",
+          "command": "nttdata.ibm.analyzeFile",
+          "group": "nttdata"
+        },
+        {
+          "when": "resourceExtname == .twx",
+          "command": "nttdata.ibm.generateDocs",
+          "group": "nttdata"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "dependencies": {
+    "@vscode/prompt-tsx": "^0.3.0-alpha"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>NTT DATA · IBM TWX Suite · ¿Por qué usar esta suite?</title>
+  <style>
+    :root{
+      --b:#0068B6;--bd:#004E8C;--c:#00AEEF;--cl:#33C0F4;
+      --g:#10B981;--gl:#34D399;
+      --a:#F59E0B;--al:#FCD34D;
+      --p:#8B5CF6;--pl:#A78BFA;
+      --r:#EF4444;--rl:#F87171;
+      --bg:#060B15;--bg2:#0B1220;--bg3:#0F1829;--bg4:#111B30;
+      --brd:#172440;--brdh:#1E3A60;
+      --tx:#E2E8F0;--mu:#64748B;--mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Consolas',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--tx);font-family:var(--ui);overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+
+    /* Grid bg */
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:
+        linear-gradient(rgba(0,104,182,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,104,182,.04) 1px,transparent 1px);
+      background-size:48px 48px;animation:bg 28s linear infinite;
+    }
+    @keyframes bg{to{background-position:48px 48px}}
+
+    .page{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px 80px}
+
+    /* ── NAV ── */
+    nav{
+      position:sticky;top:0;z-index:50;
+      background:rgba(6,11,21,.94);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--brd);
+    }
+    .nav-inner{
+      max-width:1080px;margin:0 auto;padding:0 24px;
+      display:flex;align-items:center;gap:4px;height:52px;
+    }
+    .nav-logo{display:flex;align-items:center;gap:10px;margin-right:auto;text-decoration:none}
+    .nav-logo svg{width:24px;height:24px}
+    .nav-brand{font-size:.8rem;font-weight:800;color:#fff;letter-spacing:.02em}
+    .nav-brand span{color:var(--c)}
+    .nav-link{font-size:.7rem;font-weight:600;color:var(--mu2);padding:5px 11px;
+              border-radius:6px;text-decoration:none;transition:.18s;letter-spacing:.02em}
+    .nav-link:hover{color:#fff;background:rgba(0,174,239,.1)}
+    .nav-cta{font-size:.7rem;font-weight:700;color:#fff;padding:5px 14px;
+             border-radius:6px;text-decoration:none;transition:.18s;
+             background:rgba(0,104,182,.25);border:1px solid rgba(0,174,239,.3)}
+    .nav-cta:hover{background:rgba(0,104,182,.45)}
+
+    /* ── HERO ── */
+    .hero{
+      padding:80px 0 64px;text-align:center;
+      border-bottom:1px solid var(--brd);margin-bottom:72px;
+      position:relative;overflow:hidden;
+    }
+    .hero::after{
+      content:'';position:absolute;
+      width:600px;height:600px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,104,182,.12) 0%,transparent 70%);
+      top:-100px;left:50%;transform:translateX(-50%);pointer-events:none;
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--c);background:rgba(0,174,239,.07);
+      border:1px solid rgba(0,174,239,.2);border-radius:999px;
+      padding:5px 16px;margin-bottom:28px;
+    }
+    .hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;
+      background:var(--c);animation:pulse 1.8s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+    .hero h1{
+      font-size:clamp(2rem,5vw,3.4rem);font-weight:900;color:#fff;
+      line-height:1.12;margin-bottom:20px;
+    }
+    .hero h1 em{
+      font-style:normal;
+      background:linear-gradient(120deg,var(--b),var(--c),var(--gl));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .hero-sub{
+      font-size:1.05rem;color:var(--mu2);max-width:640px;margin:0 auto 40px;line-height:1.65;
+    }
+    .hero-sub strong{color:var(--tx)}
+
+    /* big time stat */
+    .time-strip{
+      display:inline-flex;align-items:center;gap:0;
+      background:var(--bg2);border:1px solid var(--brd);border-radius:16px;
+      overflow:hidden;margin:0 auto;
+    }
+    .ts-block{padding:22px 36px;text-align:center}
+    .ts-block:not(:last-child){border-right:1px solid var(--brd)}
+    .ts-label{font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+              color:var(--mu);margin-bottom:6px}
+    .ts-val{font-size:2.4rem;font-weight:900;line-height:1}
+    .ts-val.red{color:var(--rl);text-decoration:line-through;opacity:.6}
+    .ts-val.green{color:var(--gl)}
+    .ts-arrow{padding:0 20px;font-size:2rem;color:var(--mu)}
+    .ts-pct{
+      background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(52,211,153,.08));
+      border-right:none !important;
+    }
+    .ts-pct .ts-val{
+      font-size:2.8rem;
+      background:linear-gradient(120deg,var(--g),var(--gl));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+
+    /* ── SECTIONS ── */
+    .sec{margin-bottom:72px;scroll-margin-top:60px}
+    .sec-eyebrow{
+      font-size:.63rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--c);margin-bottom:8px;display:flex;align-items:center;gap:8px;
+    }
+    .sec-eyebrow::before{content:'';width:18px;height:2px;background:var(--c);border-radius:1px}
+    .sec-title{font-size:clamp(1.3rem,3vw,1.9rem);font-weight:800;color:#fff;margin-bottom:8px}
+    .sec-desc{font-size:.9rem;color:var(--mu2);max-width:680px;line-height:1.65;margin-bottom:28px}
+
+    /* ── BEFORE / AFTER ── */
+    .ba-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch}
+    @media(max-width:700px){.ba-grid{grid-template-columns:1fr;gap:16px}.ba-vs{display:none}}
+    .ba-card{border-radius:16px;overflow:hidden}
+    .ba-head{padding:16px 22px;display:flex;align-items:center;gap:12px}
+    .ba-icon{font-size:1.5rem}
+    .ba-title{font-size:.95rem;font-weight:800}
+    .ba-body{padding:20px 22px 24px}
+    /* Before */
+    .before .ba-head{background:rgba(239,68,68,.08);border-bottom:1px solid rgba(239,68,68,.15)}
+    .before .ba-title{color:var(--rl)}
+    .before{border:1px solid rgba(239,68,68,.2)}
+    /* After */
+    .after .ba-head{background:rgba(16,185,129,.08);border-bottom:1px solid rgba(16,185,129,.15)}
+    .after .ba-title{color:var(--gl)}
+    .after{border:1px solid rgba(16,185,129,.2)}
+    /* VS divider */
+    .ba-vs{
+      display:flex;align-items:center;justify-content:center;
+      padding:0 20px;
+      font-size:1rem;font-weight:900;color:var(--mu);letter-spacing:.1em;
+    }
+    /* list items */
+    .ba-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .ba-list li{
+      font-size:.82rem;color:var(--mu2);line-height:1.4;
+      display:flex;gap:10px;align-items:flex-start;padding:10px 14px;
+      background:var(--bg3);border-radius:8px;
+    }
+    .ba-list li .ico{flex-shrink:0;font-size:1rem;margin-top:.05rem}
+    .ba-list li strong{color:var(--tx);display:block;font-size:.84rem;margin-bottom:2px}
+    .ba-time{
+      margin-top:18px;padding:12px 16px;border-radius:10px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .before .ba-time{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15)}
+    .after .ba-time{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15)}
+    .ba-time-label{font-size:.7rem;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.08em}
+    .ba-time-val{font-size:1.5rem;font-weight:900}
+    .before .ba-time-val{color:var(--rl)}
+    .after .ba-time-val{color:var(--gl)}
+    .ba-time-note{font-size:.67rem;color:var(--mu);margin-top:2px}
+
+    /* ── METRICS ROW ── */
+    .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    @media(max-width:800px){.metrics-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:460px){.metrics-grid{grid-template-columns:1fr}}
+    .metric-card{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+      padding:22px 20px;text-align:center;position:relative;overflow:hidden;
+    }
+    .metric-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;
+    }
+    .mc-b::before{background:linear-gradient(90deg,var(--b),var(--c))}
+    .mc-g::before{background:linear-gradient(90deg,var(--g),var(--gl))}
+    .mc-a::before{background:linear-gradient(90deg,var(--a),var(--al))}
+    .mc-p::before{background:linear-gradient(90deg,var(--p),var(--pl))}
+    .metric-num{
+      font-size:2.6rem;font-weight:900;line-height:1;margin-bottom:6px;
+      background:linear-gradient(135deg,#fff,var(--mu2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .mc-g .metric-num{background:linear-gradient(135deg,var(--gl),var(--g));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .mc-a .metric-num{background:linear-gradient(135deg,var(--al),var(--a));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .mc-b .metric-num{background:linear-gradient(135deg,#fff,var(--c));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .mc-p .metric-num{background:linear-gradient(135deg,var(--pl),var(--p));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .metric-label{font-size:.78rem;color:var(--mu2);font-weight:600;margin-bottom:4px}
+    .metric-note{font-size:.67rem;color:var(--mu);line-height:1.4}
+
+    /* ── PIPELINE VISUAL ── */
+    .pipeline-vis{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:16px;
+      padding:32px;position:relative;overflow:hidden;
+    }
+    .pipeline-vis::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse at 50% 0,rgba(0,104,182,.08) 0%,transparent 60%);
+    }
+    .pv-label{
+      text-align:center;font-size:.63rem;font-weight:700;letter-spacing:.14em;
+      text-transform:uppercase;color:var(--mu);margin-bottom:24px;
+    }
+    .pv-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    @media(max-width:660px){.pv-phases{grid-template-columns:1fr}}
+    .pv-phase{
+      background:var(--bg3);border:1px solid var(--brd);border-radius:12px;
+      padding:18px;text-align:center;position:relative;
+    }
+    .pv-ph-num{
+      width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:.75rem;font-weight:900;margin:0 auto 12px;
+    }
+    .pvn-blue{background:rgba(0,104,182,.2);color:var(--c);border:2px solid rgba(0,174,239,.3)}
+    .pvn-green{background:rgba(16,185,129,.15);color:var(--gl);border:2px solid rgba(52,211,153,.3)}
+    .pvn-purple{background:rgba(139,92,246,.15);color:var(--pl);border:2px solid rgba(167,139,250,.3)}
+    .pv-ph-name{font-size:.85rem;font-weight:800;color:#fff;margin-bottom:6px}
+    .pv-ph-desc{font-size:.72rem;color:var(--mu2);line-height:1.4;margin-bottom:10px}
+    .pv-ph-time{
+      display:inline-flex;align-items:center;gap:5px;
+      font-size:.67rem;font-weight:700;padding:3px 10px;border-radius:999px;
+    }
+    .pvt-blue{background:rgba(0,174,239,.08);color:var(--c);border:1px solid rgba(0,174,239,.2)}
+    .pvt-green{background:rgba(16,185,129,.08);color:var(--gl);border:1px solid rgba(52,211,153,.2)}
+    .pvt-purple{background:rgba(139,92,246,.08);color:var(--pl);border:1px solid rgba(167,139,250,.2)}
+    /* Total bar */
+    .pv-total{
+      background:linear-gradient(90deg,rgba(16,185,129,.1),rgba(52,211,153,.05));
+      border:1px solid rgba(16,185,129,.2);border-radius:10px;
+      padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    }
+    .pvt-icon{font-size:1.4rem}
+    .pvt-main{flex:1}
+    .pvt-main strong{font-size:.9rem;color:#fff;display:block;margin-bottom:2px}
+    .pvt-main span{font-size:.75rem;color:var(--mu2)}
+    .pvt-big{
+      font-size:2rem;font-weight:900;
+      background:linear-gradient(120deg,var(--g),var(--gl));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .pvt-vs{
+      font-size:.72rem;color:var(--mu);text-decoration:line-through;
+      display:block;text-align:right;margin-top:2px;
+    }
+
+    /* ── CAPABILITIES ── */
+    .cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media(max-width:760px){.cap-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:480px){.cap-grid{grid-template-columns:1fr}}
+    .cap-card{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:12px;
+      padding:20px;transition:.2s;
+    }
+    .cap-card:hover{border-color:rgba(0,174,239,.3);transform:translateY(-2px);
+      box-shadow:0 8px 32px rgba(0,0,0,.3)}
+    .cap-icon{font-size:1.8rem;margin-bottom:12px}
+    .cap-title{font-size:.9rem;font-weight:800;color:#fff;margin-bottom:6px}
+    .cap-desc{font-size:.77rem;color:var(--mu2);line-height:1.5;margin-bottom:10px}
+    .cap-tags{display:flex;flex-wrap:wrap;gap:5px}
+    .cap-tag{
+      font-family:var(--mono);font-size:.59rem;padding:2px 7px;border-radius:4px;
+      background:rgba(0,174,239,.06);color:var(--c);border:1px solid rgba(0,174,239,.15);
+    }
+
+    /* ── CICLOS TABLE ── */
+    .ciclos-table{width:100%;border-collapse:separate;border-spacing:0;
+      background:var(--bg2);border:1px solid var(--brd);border-radius:14px;overflow:hidden}
+    .ciclos-table thead tr{background:var(--bg3)}
+    .ciclos-table th{
+      padding:12px 16px;text-align:left;font-size:.65rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;color:var(--mu);
+      border-bottom:1px solid var(--brd);
+    }
+    .ciclos-table td{
+      padding:11px 16px;font-size:.79rem;color:var(--mu2);
+      border-bottom:1px solid rgba(23,36,64,.6);vertical-align:middle;
+    }
+    .ciclos-table tr:last-child td{border-bottom:none}
+    .ciclos-table tr:hover td{background:rgba(0,174,239,.03)}
+    .c-num{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:28px;height:28px;border-radius:6px;font-size:.72rem;font-weight:900;
+    }
+    .cn1{background:rgba(0,104,182,.2);color:var(--c)}
+    .cn2{background:rgba(16,185,129,.15);color:var(--gl)}
+    .cn3{background:rgba(245,158,11,.15);color:var(--al)}
+    .cn4{background:rgba(139,92,246,.15);color:var(--pl)}
+    .cn5{background:rgba(239,68,68,.15);color:var(--rl)}
+    .cn6{background:rgba(0,174,239,.12);color:var(--cl)}
+    .cn7{background:rgba(52,211,153,.12);color:#6EE7B7}
+    .cn8{background:rgba(250,204,21,.12);color:#FDE68A}
+    .c-name{color:#fff;font-weight:600}
+    .c-src{font-family:var(--mono);font-size:.69rem;color:var(--c);
+      background:rgba(0,174,239,.07);border:1px solid rgba(0,174,239,.12);
+      padding:1px 6px;border-radius:3px;white-space:nowrap}
+    .c-time{
+      font-size:.72rem;font-weight:700;color:var(--gl);
+      background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.15);
+      padding:2px 8px;border-radius:4px;white-space:nowrap;
+    }
+    .c-old{font-size:.69rem;color:var(--mu);text-decoration:line-through}
+
+    /* ── TESTIMONIAL / CASO REAL ── */
+    .case-card{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:16px;
+      padding:32px;position:relative;overflow:hidden;
+    }
+    .case-card::before{
+      content:'';position:absolute;top:-40px;right:-40px;
+      width:200px;height:200px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,104,182,.1) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .case-logo-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    .case-badge{
+      font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      padding:3px 10px;border-radius:4px;
+      background:rgba(0,174,239,.1);color:var(--c);border:1px solid rgba(0,174,239,.2);
+    }
+    .case-title{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:8px}
+    .case-desc{font-size:.86rem;color:var(--mu2);line-height:1.6;margin-bottom:20px;max-width:700px}
+    .case-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    @media(max-width:640px){.case-stats{grid-template-columns:repeat(2,1fr)}}
+    .cs-item{
+      background:var(--bg3);border:1px solid var(--brd);border-radius:10px;
+      padding:14px;text-align:center;
+    }
+    .cs-num{font-size:1.6rem;font-weight:900;color:#fff;line-height:1}
+    .cs-label{font-size:.67rem;color:var(--mu2);margin-top:4px}
+    .cs-num.cg{color:var(--gl)}
+    .cs-num.ca{color:var(--al)}
+    .cs-num.cp{color:var(--pl)}
+
+    /* ── ROI SECTION ── */
+    .roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    @media(max-width:640px){.roi-grid{grid-template-columns:1fr}}
+    .roi-card{
+      background:var(--bg2);border:1px solid var(--brd);border-radius:14px;
+      padding:24px;
+    }
+    .roi-title{font-size:.88rem;font-weight:800;color:#fff;margin-bottom:16px;
+      display:flex;align-items:center;gap:8px}
+    .roi-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+    .roi-list li{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--mu2)}
+    .roi-list li::before{content:'✓';color:var(--gl);font-weight:900;flex-shrink:0}
+    .roi-list li.x::before{content:'✗';color:var(--rl)}
+    .roi-list li strong{color:var(--tx)}
+
+    /* ── CTA ── */
+    .cta-section{
+      background:linear-gradient(135deg,rgba(0,104,182,.15),rgba(0,174,239,.08));
+      border:1px solid rgba(0,174,239,.2);border-radius:20px;
+      padding:52px 40px;text-align:center;position:relative;overflow:hidden;
+      margin-bottom:0;
+    }
+    .cta-section::before{
+      content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse at 50% 0,rgba(0,174,239,.1) 0%,transparent 60%);
+    }
+    .cta-section h2{font-size:clamp(1.4rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:12px}
+    .cta-section p{font-size:.92rem;color:var(--mu2);max-width:520px;margin:0 auto 32px;line-height:1.6}
+    .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .cta-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:.82rem;font-weight:700;padding:12px 24px;border-radius:8px;
+      text-decoration:none;transition:.2s;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--b),#0088CC);color:#fff;
+      border:1px solid rgba(0,174,239,.3);
+    }
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,104,182,.4)}
+    .btn-secondary{
+      background:rgba(255,255,255,.04);color:var(--mu2);
+      border:1px solid var(--brd);
+    }
+    .btn-secondary:hover{color:#fff;background:rgba(255,255,255,.08);border-color:var(--brdh)}
+
+    /* terminal inline */
+    .cta-term{
+      background:#070C16;border:1px solid var(--brd);border-radius:10px;
+      padding:14px 20px;font-family:var(--mono);font-size:.78rem;
+      max-width:540px;margin:0 auto 28px;text-align:left;line-height:1.9;
+    }
+    .tc2{color:var(--c)}.tg2{color:var(--gl)}.ta2{color:var(--al)}.tm2{color:var(--mu)}.tw{color:var(--tx)}
+
+    /* ── FOOTER ── */
+    footer{
+      border-top:1px solid var(--brd);padding:24px 0;margin-top:72px;
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    }
+    .f-brand{display:flex;align-items:center;gap:10px}
+    .f-brand svg{width:26px;height:26px}
+    .f-brand-text strong{font-size:.82rem;font-weight:800;color:#fff;display:block}
+    .f-brand-text span{font-size:.63rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em}
+    .f-right{text-align:right}
+    .f-author{font-size:.72rem;color:var(--mu2)}
+    .f-copy{font-size:.65rem;color:var(--mu);margin-top:2px}
+
+    /* separator */
+    .divider{
+      height:1px;background:linear-gradient(90deg,transparent,var(--brd),transparent);
+      margin:72px 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="../index.html">
+      <svg viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="8"/>
+        <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="6"/>
+        <ellipse cx="50" cy="52" rx="10" ry="13" fill="#00AEEF"/>
+        <ellipse cx="50" cy="40" rx="7" ry="7" fill="#00AEEF"/>
+      </svg>
+      <span class="nav-brand">NTT <span>DATA</span> · IBM TWX Suite</span>
+    </a>
+    <a class="nav-link" href="#problema">El problema</a>
+    <a class="nav-link" href="#antes-despues">Antes / Después</a>
+    <a class="nav-link" href="#capacidades">Capacidades</a>
+    <a class="nav-link" href="#caso-real">Caso real</a>
+    <a class="nav-cta" href="../index.html">← Panel</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge">NTT DATA · IBM TWX Reverse Engineering Suite · v1.0.0</div>
+    <h1>De <em>2 días</em> de análisis<br>a <em>menos de 3 horas</em></h1>
+    <p class="hero-sub">
+      La suite automatiza el <strong>100% de la extracción</strong> de artefactos IBM BPM,
+      pre-carga el contexto en GitHub Copilot y guía al analista por los
+      <strong>8 ciclos de la Metodología v3</strong> para generar la
+      Arquitectura de Conocimiento completa.
+    </p>
+
+    <!-- Time comparison strip -->
+    <div class="time-strip">
+      <div class="ts-block">
+        <div class="ts-label">Proceso manual</div>
+        <div class="ts-val red">~16h</div>
+        <div style="font-size:.63rem;color:var(--mu);margin-top:4px">2 días laborales</div>
+      </div>
+      <div class="ts-arrow">→</div>
+      <div class="ts-block">
+        <div class="ts-label">Fase automática</div>
+        <div class="ts-val" style="color:var(--c)">10 min</div>
+        <div style="font-size:.63rem;color:var(--mu);margin-top:4px">run_analysis.py</div>
+      </div>
+      <div class="ts-arrow">+</div>
+      <div class="ts-block">
+        <div class="ts-label">Análisis Copilot</div>
+        <div class="ts-val" style="color:var(--al)">~2.5h</div>
+        <div style="font-size:.63rem;color:var(--mu);margin-top:4px">8 ciclos guiados</div>
+      </div>
+      <div class="ts-arrow">=</div>
+      <div class="ts-block ts-pct">
+        <div class="ts-label">Reducción total</div>
+        <div class="ts-val green">−83%</div>
+        <div style="font-size:.63rem;color:var(--gl);margin-top:4px">tiempo de análisis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EL PROBLEMA ── -->
+  <div class="sec" id="problema">
+    <div class="sec-eyebrow">El reto</div>
+    <div class="sec-title">¿Por qué el análisis manual de TWX es inviable?</div>
+    <div class="sec-desc">
+      Los archivos <code style="color:var(--c);font-size:.88em">.twx</code> de IBM BPM son ZIPs con
+      cientos de XMLs anidados sin documentación de estructura. Hacer reverse engineering a mano
+      requiere conocimiento profundo del formato interno, acceso a IBM Designer y semanas de trabajo.
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
+        <div style="font-size:1.6rem;margin-bottom:10px">🔍</div>
+        <div style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:6px">Estructura opaca</div>
+        <div style="font-size:.76rem;color:var(--mu2);line-height:1.5">Los artefactos están en <code style="color:var(--c);font-size:.85em">objects/{prefijo}.{guid}.xml</code>. Sin conocer la taxonomía de prefijos numéricos (1.* a 64.*) es imposible saber qué archivo contiene qué.</div>
+      </div>
+      <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
+        <div style="font-size:1.6rem;margin-bottom:10px">⏳</div>
+        <div style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:6px">Volumen masivo</div>
+        <div style="font-size:.76rem;color:var(--mu2);line-height:1.5">Un TWX típico de producción contiene <strong style="color:var(--tx)">200+ archivos XML</strong>. Cada servicio puede tener decenas de pasos. Leer y cruzar todo de forma manual genera errores y demora días.</div>
+      </div>
+      <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:20px">
+        <div style="font-size:1.6rem;margin-bottom:10px">🐛</div>
+        <div style="font-size:.88rem;font-weight:700;color:#fff;margin-bottom:6px">Errores críticos frecuentes</div>
+        <div style="font-size:.76rem;color:var(--mu2);line-height:1.5">Sin las 11 correcciones de v3: orden de pasos incorrecto (coords X/Y vs sequenceFlow), botones del lugar equivocado, interpretación errónea de PostponeAction, IDs de entorno incorrectos en producción.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── ANTES / DESPUÉS ── -->
+  <div class="sec" id="antes-despues">
+    <div class="sec-eyebrow">Comparativa</div>
+    <div class="sec-title">Antes vs. Después de la suite</div>
+    <div class="sec-desc">Análisis de un TWX de producción con ~232 artefactos. Caso real: Profuturo Redención de Bono v1.17.51.</div>
+
+    <div class="ba-grid">
+      <!-- BEFORE -->
+      <div class="ba-card before">
+        <div class="ba-head">
+          <div class="ba-icon">😰</div>
+          <div class="ba-title">Sin la suite — Manual</div>
+        </div>
+        <div class="ba-body">
+          <ul class="ba-list">
+            <li>
+              <span class="ico">🗂️</span>
+              <div><strong>Abrir IBM Designer</strong>Navegar manualmente por 232 artefactos. Sin filtros de tipo. Sin exportación masiva.</div>
+            </li>
+            <li>
+              <span class="ico">🔎</span>
+              <div><strong>Identificar el MANIFEST</strong>IBM BPM no tiene MANIFEST útil. Los metadatos están en <code style="color:var(--rl);font-size:.82em">objects/63.*.xml</code> y el nombre real de la app solo está en los BPDs. Confusión garantizada.</div>
+            </li>
+            <li>
+              <span class="ico">📋</span>
+              <div><strong>Documentar cada servicio a mano</strong>74 servicios × ~15 pasos cada uno. Copiar nombres, tipos, inputs, outputs a Excel. Horas de trabajo repetitivo.</div>
+            </li>
+            <li>
+              <span class="ico">⚠️</span>
+              <div><strong>Orden de pasos incorrecto</strong>El XML lista nodos por posición (X/Y) no por flujo real. Sin leer <code style="color:var(--rl);font-size:.82em">sequenceFlow</code>, el orden documentado es erróneo.</div>
+            </li>
+            <li>
+              <span class="ico">🔴</span>
+              <div><strong>Variables de entorno perdidas</strong>Los valores <code style="color:var(--rl);font-size:.82em">tw.env.*</code> están en <code style="color:var(--rl);font-size:.82em">62.*.xml</code>, no donde se espera. Fácil pasarlos por alto.</div>
+            </li>
+            <li>
+              <span class="ico">📝</span>
+              <div><strong>Generación manual del reporte</strong>Escribir las 10 secciones del documento de Arquitectura de Conocimiento desde cero, cruzando múltiples fuentes a mano.</div>
+            </li>
+          </ul>
+          <div class="ba-time">
+            <div>
+              <div class="ba-time-label">Tiempo estimado</div>
+              <div class="ba-time-val">~16 horas</div>
+              <div class="ba-time-note">2 días laborales completos</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:.67rem;color:var(--mu)">Probabilidad de error</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--rl)">Alta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VS -->
+      <div class="ba-vs">VS</div>
+
+      <!-- AFTER -->
+      <div class="ba-card after">
+        <div class="ba-head">
+          <div class="ba-icon">🚀</div>
+          <div class="ba-title">Con la suite — Automatizado</div>
+        </div>
+        <div class="ba-body">
+          <ul class="ba-list">
+            <li>
+              <span class="ico">⚡</span>
+              <div><strong>1 comando — extracción completa</strong><code style="color:var(--gl);font-size:.82em">python run_analysis.py "archivo.twx"</code> — ejecuta los 9 comandos CLI en cadena. 232 artefactos clasificados en ~10 min.</div>
+            </li>
+            <li>
+              <span class="ico">🗺️</span>
+              <div><strong>Taxonomía automática</strong>El parser clasifica por prefijo numérico: 24 GSS · 23 HHS · 22 IS · 15 UCAs · 54 BOs · 44 BPDs · 39 Coach Views. Nombre de app desde el BPD principal.</div>
+            </li>
+            <li>
+              <span class="ico">📦</span>
+              <div><strong>JSON estructurado listo para Copilot</strong>8 archivos de output + 224 XMLs organizados por tipo. El <code style="color:var(--gl);font-size:.82em">COPILOT_PROMPT.md</code> (57 KB) pre-carga todo el contexto.</div>
+            </li>
+            <li>
+              <span class="ico">✅</span>
+              <div><strong>Orden real garantizado</strong>El flow_mapper lee <code style="color:var(--gl);font-size:.82em">&lt;sequenceFlow&gt;</code> explícitamente. Nunca usa coordenadas X/Y. La v3 tiene 11 correcciones validadas en producción.</div>
+            </li>
+            <li>
+              <span class="ico">🔑</span>
+              <div><strong>Variables de entorno capturadas</strong>El parser detecta <code style="color:var(--gl);font-size:.82em">62.*.xml</code> automáticamente como <em>environmentVariableSet</em>. Todos los <code style="color:var(--gl);font-size:.82em">tw.env.*</code> disponibles en el Ciclo 2.</div>
+            </li>
+            <li>
+              <span class="ico">🤖</span>
+              <div><strong>8 ciclos guiados con Copilot CLI</strong>El skill <code style="color:var(--gl);font-size:.82em">profuturo-twx</code> guía ciclo a ciclo. Las 10 secciones del reporte se generan con instrucciones precisas.</div>
+            </li>
+          </ul>
+          <div class="ba-time">
+            <div>
+              <div class="ba-time-label">Tiempo total</div>
+              <div class="ba-time-val">~2h 40min</div>
+              <div class="ba-time-note">10 min auto + ~2.5h Copilot</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:.67rem;color:var(--mu)">Probabilidad de error</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--gl)">Mínima</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── MÉTRICAS ── -->
+  <div class="sec">
+    <div class="sec-eyebrow">Números reales</div>
+    <div class="sec-title">Lo que extrae la suite de forma automática</div>
+
+    <div class="metrics-grid">
+      <div class="metric-card mc-b">
+        <div class="metric-num">232</div>
+        <div class="metric-label">Artefactos totales</div>
+        <div class="metric-note">Clasificados por tipo y prefijo XML en segundos</div>
+      </div>
+      <div class="metric-card mc-g">
+        <div class="metric-num">9</div>
+        <div class="metric-label">Comandos CLI en cadena</div>
+        <div class="metric-note">analyze · entities · services · flows · scripts · endpoints · deps · docs · entries</div>
+      </div>
+      <div class="metric-card mc-a">
+        <div class="metric-num">83%</div>
+        <div class="metric-label">Reducción de tiempo</div>
+        <div class="metric-note">De ~16h manuales a ~2h 40min con la suite</div>
+      </div>
+      <div class="metric-card mc-p">
+        <div class="metric-num">11</div>
+        <div class="metric-label">Correcciones v3</div>
+        <div class="metric-note">Errores críticos de interpretación corregidos vs versiones anteriores</div>
+      </div>
+    </div>
+
+    <!-- segunda fila de métricas -->
+    <div class="metrics-grid" style="margin-top:14px">
+      <div class="metric-card mc-g">
+        <div class="metric-num">57 KB</div>
+        <div class="metric-label">Prompt maestro</div>
+        <div class="metric-note">COPILOT_PROMPT.md pre-cargado con todos los datos del TWX</div>
+      </div>
+      <div class="metric-card mc-b">
+        <div class="metric-num">8</div>
+        <div class="metric-label">Ciclos metodológicos</div>
+        <div class="metric-note">Flujo guiado para las 10 secciones de la Arquitectura de Conocimiento</div>
+      </div>
+      <div class="metric-card mc-a">
+        <div class="metric-num">224</div>
+        <div class="metric-label">XMLs organizados</div>
+        <div class="metric-note">Extraídos y clasificados en carpetas por prefijo numérico</div>
+      </div>
+      <div class="metric-card mc-p">
+        <div class="metric-num">11</div>
+        <div class="metric-label">Skills Copilot CLI</div>
+        <div class="metric-note">profuturo-twx + 10 skills especializados por ciclo de análisis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── PIPELINE VISUAL ── -->
+  <div class="sec">
+    <div class="sec-eyebrow">Flujo de trabajo</div>
+    <div class="sec-title">3 fases de análisis en menos de 3 horas</div>
+    <div class="sec-desc">El proceso está diseñado para minimizar el esfuerzo manual y maximizar la calidad del output en cada etapa.</div>
+
+    <div class="pipeline-vis">
+      <div class="pv-label">PIPELINE COMPLETO — IBM BPM TWX → Arquitectura de Conocimiento</div>
+      <div class="pv-phases">
+        <div class="pv-phase">
+          <div class="pv-ph-num pvn-blue">1</div>
+          <div class="pv-ph-name">Extracción automática</div>
+          <div class="pv-ph-desc">
+            <code style="color:var(--c);font-size:.78em">python run_analysis.py archivo.twx</code><br><br>
+            9 comandos CLI ejecutados en cadena. ZIP descomprimido, XMLs clasificados por prefijo,
+            JSONs generados y COPILOT_PROMPT.md construido con todo el contexto.
+          </div>
+          <span class="pv-ph-time pvt-blue">⚡ ~10 minutos</span>
+        </div>
+        <div class="pv-phase">
+          <div class="pv-ph-num pvn-green">2</div>
+          <div class="pv-ph-name">Análisis con Copilot</div>
+          <div class="pv-ph-desc">
+            Pegar <code style="color:var(--gl);font-size:.78em">COPILOT_PROMPT.md</code> en
+            GitHub Copilot CLI con el skill <code style="color:var(--gl);font-size:.78em">profuturo-twx</code>.
+            Ejecutar ciclos 1–8 en orden. Copilot genera cada sección con los datos ya extraídos.
+          </div>
+          <span class="pv-ph-time pvt-green">⏱ ~2.5 horas</span>
+        </div>
+        <div class="pv-phase">
+          <div class="pv-ph-num pvn-purple">3</div>
+          <div class="pv-ph-name">Revisión y entrega</div>
+          <div class="pv-ph-desc">
+            Las 10 secciones de la Arquitectura de Conocimiento listas para revisión del analista.
+            Verificar correcciones críticas v3 (PostponeAction, sequenceFlow, IDs de producción)
+            y entregar al equipo de Appian.
+          </div>
+          <span class="pv-ph-time pvt-purple">🔍 ~15 min revisión</span>
+        </div>
+      </div>
+      <div class="pv-total">
+        <div class="pvt-icon">🏆</div>
+        <div class="pvt-main">
+          <strong>Tiempo total de análisis con la suite</strong>
+          <span>Extracción automática + 8 ciclos Copilot + revisión final</span>
+        </div>
+        <div>
+          <div class="pvt-big">~2h 45min</div>
+          <span class="pvt-vs">vs. ~16h manuales</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── CAPACIDADES ── -->
+  <div class="sec" id="capacidades">
+    <div class="sec-eyebrow">Capacidades</div>
+    <div class="sec-title">¿Qué extrae y analiza la suite?</div>
+
+    <div class="cap-grid">
+      <div class="cap-card">
+        <div class="cap-icon">🏗️</div>
+        <div class="cap-title">Inventario completo de artefactos</div>
+        <div class="cap-desc">Clasifica los 232 artefactos del TWX en 8 tipos por prefijo XML. Identifica el nombre de la aplicación desde el BPD principal, no del MANIFEST (que no contiene datos útiles en IBM BPM).</div>
+        <div class="cap-tags"><span class="cap-tag">analyze</span><span class="cap-tag">twx_parser.py</span><span class="cap-tag">01_analyze.json</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🗄️</div>
+        <div class="cap-title">Business Objects completos</div>
+        <div class="cap-desc">Extrae los 54 Business Objects con todos sus campos, tipos de dato, herencia entre clases y namespace. Base para el modelo de datos en Appian.</div>
+        <div class="cap-tags"><span class="cap-tag">entities</span><span class="cap-tag">entity_extractor.py</span><span class="cap-tag">02_entities.json</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">⚙️</div>
+        <div class="cap-title">Servicios clasificados IS / GSS / HHS</div>
+        <div class="cap-desc">Extrae los 74 servicios con sus pasos, scripts JavaScript, inputs/outputs. Distingue automáticamente Integration Services (processType=4), General System Services (6) y Human-facing Services (3).</div>
+        <div class="cap-tags"><span class="cap-tag">services</span><span class="cap-tag">service_extractor.py</span><span class="cap-tag">03_services.json</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🔀</div>
+        <div class="cap-title">Flujos con orden real</div>
+        <div class="cap-desc">Genera diagramas Mermaid flowchart usando <code style="color:var(--c);font-size:.85em">sequenceFlow</code> para el orden real de los pasos. Nunca usa coordenadas X/Y que darían orden incorrecto.</div>
+        <div class="cap-tags"><span class="cap-tag">flows</span><span class="cap-tag">flow_mapper.py</span><span class="cap-tag">06_flows.txt</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">📜</div>
+        <div class="cap-title">Scripts JavaScript embebidos</div>
+        <div class="cap-desc">Extrae los 455 KB de JavaScript embebido en servicios y BPDs, etiquetado por artefacto y paso. Base para el análisis de lógica de negocio en el Ciclo 3.</div>
+        <div class="cap-tags"><span class="cap-tag">scripts</span><span class="cap-tag">08_scripts.txt</span><span class="cap-tag">455 KB</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🌐</div>
+        <div class="cap-title">Endpoints REST / SOAP</div>
+        <div class="cap-desc">Detecta todas las URLs externas (REST y SOAP) usadas en los Integration Services. Identifica dependencias con sistemas externos que deben migrarse o adaptarse en Appian.</div>
+        <div class="cap-tags"><span class="cap-tag">endpoints</span><span class="cap-tag">07_endpoints.txt</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🔗</div>
+        <div class="cap-title">Grafo de dependencias</div>
+        <div class="cap-desc">Genera un grafo Mermaid de dependencias entre servicios, UCAs, BPDs y Business Objects. Permite identificar qué componentes son blockeantes para la migración.</div>
+        <div class="cap-tags"><span class="cap-tag">deps</span><span class="cap-tag">flow_mapper.py</span><span class="cap-tag">05_deps.txt</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">📖</div>
+        <div class="cap-title">Documentación Markdown completa</div>
+        <div class="cap-desc">378 KB de documentación Markdown unificada que describe todos los artefactos. Sirve como base de conocimiento técnico y se incluye en el prompt maestro de Copilot.</div>
+        <div class="cap-tags"><span class="cap-tag">docs</span><span class="cap-tag">09_docs.md</span><span class="cap-tag">378 KB</span></div>
+      </div>
+      <div class="cap-card">
+        <div class="cap-icon">🤖</div>
+        <div class="cap-title">Prompt maestro para Copilot CLI</div>
+        <div class="cap-desc">El script genera <code style="color:var(--c);font-size:.85em">COPILOT_PROMPT.md</code> (57 KB) con todos los datos extraídos + instrucciones v3 por ciclo. Solo hay que pegarlo en Copilot con el skill correcto.</div>
+        <div class="cap-tags"><span class="cap-tag">COPILOT_PROMPT.md</span><span class="cap-tag">profuturo-twx skill</span><span class="cap-tag">57 KB</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── 8 CICLOS ── -->
+  <div class="sec">
+    <div class="sec-eyebrow">Metodología v3</div>
+    <div class="sec-title">8 ciclos guiados · de horas a minutos cada uno</div>
+    <div class="sec-desc">Cada ciclo de la Metodología v3 tiene una fuente de datos específica, instrucciones precisas y produce una sección concreta de la Arquitectura de Conocimiento.</div>
+
+    <table class="ciclos-table">
+      <thead>
+        <tr>
+          <th>Ciclo</th>
+          <th>Sección del reporte</th>
+          <th>Fuente de datos</th>
+          <th>Con suite</th>
+          <th>Manual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="c-num cn1">C1</span></td>
+          <td class="c-name">Estructura TWX · Inventario</td>
+          <td><span class="c-src">01_analyze.json</span></td>
+          <td><span class="c-time">~10 min</span></td>
+          <td class="c-old">~1.5h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn2">C2</span></td>
+          <td class="c-name">Constantes y variables de entorno</td>
+          <td><span class="c-src">62.*.xml</span></td>
+          <td><span class="c-time">~15 min</span></td>
+          <td class="c-old">~2h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn3">C3</span></td>
+          <td class="c-name">Lógica de negocio · Scripts JS</td>
+          <td><span class="c-src">08_scripts.txt</span></td>
+          <td><span class="c-time">~20 min</span></td>
+          <td class="c-old">~3h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn4">C4</span></td>
+          <td class="c-name">Interfaz · Botones de pantallas HHS</td>
+          <td><span class="c-src">64.*.xml (Coach Views)</span></td>
+          <td><span class="c-time">~15 min</span></td>
+          <td class="c-old">~2h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn5">C5</span></td>
+          <td class="c-name">Servicios de integración · IS</td>
+          <td><span class="c-src">03_services.json</span></td>
+          <td><span class="c-time">~20 min</span></td>
+          <td class="c-old">~2.5h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn6">C6</span></td>
+          <td class="c-name">Modelo de datos · Business Objects</td>
+          <td><span class="c-src">02_entities.json</span></td>
+          <td><span class="c-time">~15 min</span></td>
+          <td class="c-old">~1.5h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn7">C7</span></td>
+          <td class="c-name">UCAs y eventos asincrónicos</td>
+          <td><span class="c-src">04.*.xml</span></td>
+          <td><span class="c-time">~10 min</span></td>
+          <td class="c-old">~1h</td>
+        </tr>
+        <tr>
+          <td><span class="c-num cn8">C8</span></td>
+          <td class="c-name">Flujos BPD · Diagrama completo</td>
+          <td><span class="c-src">06_flows.txt</span></td>
+          <td><span class="c-time">~25 min</span></td>
+          <td class="c-old">~3h</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:16px;display:flex;gap:20px;flex-wrap:wrap">
+      <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:14px 20px;flex:1;min-width:200px">
+        <div style="font-size:.65rem;color:var(--mu);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Total con suite</div>
+        <div style="font-size:1.8rem;font-weight:900;color:var(--gl)">~2h 10min</div>
+        <div style="font-size:.7rem;color:var(--mu)">solo el análisis Copilot (sin extracción)</div>
+      </div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:14px 20px;flex:1;min-width:200px">
+        <div style="font-size:.65rem;color:var(--mu);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Total manual</div>
+        <div style="font-size:1.8rem;font-weight:900;color:var(--rl)">~16h 30min</div>
+        <div style="font-size:.7rem;color:var(--mu)">sin garantías de precisión</div>
+      </div>
+      <div style="background:rgba(0,174,239,.06);border:1px solid rgba(0,174,239,.2);border-radius:10px;padding:14px 20px;flex:1;min-width:200px">
+        <div style="font-size:.65rem;color:var(--mu);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Ahorro neto</div>
+        <div style="font-size:1.8rem;font-weight:900;color:var(--c)">~14h</div>
+        <div style="font-size:.7rem;color:var(--mu)">por cada proceso analizado</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── CASO REAL ── -->
+  <div class="sec" id="caso-real">
+    <div class="sec-eyebrow">Caso real validado</div>
+    <div class="sec-title">Probado en producción: Profuturo Redención de Bono</div>
+
+    <div class="case-card">
+      <div class="case-logo-row">
+        <span class="case-badge">IBM BPM → Appian</span>
+        <span class="case-badge" style="background:rgba(16,185,129,.1);color:var(--gl);border-color:rgba(16,185,129,.25)">✓ Validado en producción</span>
+        <span class="case-badge" style="background:rgba(245,158,11,.1);color:var(--al);border-color:rgba(245,158,11,.25)">NTT DATA · EMEAL</span>
+      </div>
+      <div class="case-title">Profuturo_Redencion_Bono_AP · v1.17.51</div>
+      <div class="case-desc">
+        TWX de producción de 24.2 MB que implementa el flujo completo de Redención de Bono
+        para Profuturo, incluyendo integración con sistemas UDI, generación de archivos de respuesta
+        y gestión de tareas humanas. La suite procesó el archivo completo, generó los 8 outputs
+        y construyó el prompt maestro de 57 KB — listo para análisis en Copilot.
+      </div>
+      <div class="case-stats">
+        <div class="cs-item">
+          <div class="cs-num">232</div>
+          <div class="cs-label">Artefactos totales extraídos</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num cg">9/9</div>
+          <div class="cs-label">Comandos CLI exitosos</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num ca">57 KB</div>
+          <div class="cs-label">Prompt maestro generado</div>
+        </div>
+        <div class="cs-item">
+          <div class="cs-num cp">11</div>
+          <div class="cs-label">Correcciones v3 aplicadas</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:.62rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Servicios</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--c)">24 GSS</div>
+          <div style="font-size:.67rem;color:var(--mu)">General System</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:.62rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Servicios</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--gl)">23 HHS</div>
+          <div style="font-size:.67rem;color:var(--mu)">Human-facing</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:.62rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Servicios</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--al)">22 IS</div>
+          <div style="font-size:.67rem;color:var(--mu)">Integration</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--brd);border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:.62rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Objetos</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--pl)">54 BO</div>
+          <div style="font-size:.67rem;color:var(--mu)">Business Objects</div>
+        </div>
+      </div>
+
+      <!-- Correcciones críticas v3 -->
+      <div style="margin-top:20px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:10px;padding:18px">
+        <div style="font-size:.72rem;font-weight:700;color:var(--al);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+          ⚠️ Correcciones críticas que solo tiene la Metodología v3
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span>Orden de pasos siempre por <code style="color:var(--c);font-size:.85em">sequenceFlow</code>, nunca por coordenadas X/Y</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span>Botones de HHS tomados de <code style="color:var(--c);font-size:.85em">64.*.xml</code> (Coach Views), no de descripciones</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span><code style="color:var(--c);font-size:.85em">PostponeAction</code> = "Cerrar tarea en Appian" — NO Posponer, NO Cancelar</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span>IS "IG Revisión UDI" = SÍNCRONO — no hay nodo UCA entre IS y siguiente paso</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span>Variables de entorno en <code style="color:var(--c);font-size:.85em">62.*.xml</code>, no en manifest (que es vacío)</span>
+          </div>
+          <div style="font-size:.74rem;color:var(--mu2);display:flex;gap:6px;align-items:flex-start">
+            <span style="color:var(--gl);flex-shrink:0">✓</span>
+            <span>ID <code style="color:var(--c);font-size:.85em">8627</code> Dev/Test/Stage · <code style="color:var(--rl);font-size:.85em">8628</code> en Producción</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── ROI ── -->
+  <div class="sec">
+    <div class="sec-eyebrow">ROI y justificación</div>
+    <div class="sec-title">Impacto real del proyecto de migración</div>
+
+    <div class="roi-grid">
+      <div class="roi-card">
+        <div class="roi-title">✅ Con la Suite NTT DATA</div>
+        <ul class="roi-list">
+          <li><strong>Análisis reproducible</strong> — mismo resultado en cada ejecución</li>
+          <li><strong>Sin dependencia de IBM Designer</strong> — corre en cualquier máquina con Python</li>
+          <li><strong>Escalable a múltiples TWX</strong> — mismo proceso para cada proceso IBM BPM</li>
+          <li><strong>Metodología documentada</strong> — el skill profuturo-twx es reutilizable</li>
+          <li><strong>11 correcciones v3 siempre aplicadas</strong> — no depende de la memoria del analista</li>
+          <li><strong>Integración nativa con Copilot CLI</strong> — workflow moderno y auditable</li>
+          <li><strong>Output estructurado (JSON + MD)</strong> — integrable con otras herramientas</li>
+          <li><strong>Onboarding nuevo analista en horas</strong> — instrucciones paso a paso en el skill</li>
+        </ul>
+      </div>
+      <div class="roi-card" style="background:rgba(239,68,68,.03);border-color:rgba(239,68,68,.15)">
+        <div class="roi-title" style="color:var(--rl)">✗ Sin la Suite — Manual</div>
+        <ul class="roi-list">
+          <li class="x"><strong>16+ horas por proceso</strong> — inviable para proyectos con decenas de TWX</li>
+          <li class="x"><strong>Requiere IBM Designer instalado</strong> — licencia, versión, acceso al servidor BPM</li>
+          <li class="x"><strong>Errores de interpretación frecuentes</strong> — orden incorrecto, botones equivocados</li>
+          <li class="x"><strong>No reproducible</strong> — cada analista documenta diferente</li>
+          <li class="x"><strong>Correcciones v3 no aplicadas</strong> — el analista no sabe qué no sabe</li>
+          <li class="x"><strong>Sin historial</strong> — si el analista se va, el conocimiento se va con él</li>
+          <li class="x"><strong>Output no estructurado</strong> — documentos Word/Excel difíciles de procesar</li>
+          <li class="x"><strong>Onboarding lento</strong> — semanas para que un nuevo analista sea productivo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── CTA ── -->
+  <div class="sec cta-section">
+    <h2>Empieza en <em style="font-style:normal;color:var(--gl)">1 comando</em></h2>
+    <p>Tienes el TWX, tienes Python y tienes GitHub Copilot CLI. La suite está lista.</p>
+
+    <div class="cta-term">
+<span class="tm2"># 1. Ir al directorio del proyecto</span>
+<span class="tc2">cd</span> <span class="tw">"~/Documents/NTTDATA-IBM-TWX-Suite"</span>
+
+<span class="tm2"># 2. Copiar tu TWX a la carpeta de muestras</span>
+<span class="tc2">cp</span> <span class="tw">"MiApp.twx"</span> <span class="ta2">05_muestras_twx/</span>
+
+<span class="tm2"># 3. Ejecutar el pipeline completo</span>
+<span class="tc2">python</span> <span class="tg2">run_analysis.py</span> <span class="ta2">"05_muestras_twx/MiApp.twx"</span>
+
+<span class="tm2"># 4. Abrir COPILOT_PROMPT.md en Copilot CLI con skill profuturo-twx</span></div>
+
+    <div class="cta-btns">
+      <a class="cta-btn btn-primary" href="../index.html">← Volver al Panel principal</a>
+      <a class="cta-btn btn-secondary" href="01_suite_overview.html">Ver documentación técnica</a>
+      <a class="cta-btn btn-secondary" href="02_guia_instalacion.html">Guía de instalación</a>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- FOOTER -->
+<footer style="max-width:1080px;margin:0 auto;padding:24px 24px;border-top:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+  <div class="f-brand">
+    <svg width="26" height="26" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="46" stroke="#0077C8" stroke-width="8"/>
+      <circle cx="50" cy="50" r="27" stroke="#00AEEF" stroke-width="6"/>
+      <ellipse cx="50" cy="52" rx="10" ry="13" fill="#00AEEF"/>
+      <ellipse cx="50" cy="40" rx="7" ry="7" fill="#00AEEF"/>
+    </svg>
+    <div class="f-brand-text">
+      <strong>NTT DATA · IBM TWX Reverse Engineering Suite</strong>
+      <span>IBM Integration Services · Legacy Migration · EMEAL</span>
+    </div>
+  </div>
+  <div class="f-right">
+    <div class="f-author">llopezdo@emeal.nttdata.com</div>
+    <div class="f-copy">v1.0.0 · Metodología v3 · © 2026 NTT DATA</div>
+  </div>
+</footer>
+
+</body>
+</html>

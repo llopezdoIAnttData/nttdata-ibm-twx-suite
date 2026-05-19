@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 #  NTTDATA IBM TWX Suite — Instalador desde GitHub
 #  Uso:
 #    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser

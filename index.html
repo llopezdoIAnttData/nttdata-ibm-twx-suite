@@ -311,11 +311,13 @@
       <span class="nav-logo-text">NTT<span> DATA</span> · IBM TWX Suite</span>
     </a>
     <a class="nav-link" href="#pipeline">Flujo</a>
+    <a class="nav-link" href="#agentic">Agéntico</a>
     <a class="nav-link" href="#metodologia">Metodología v3</a>
     <a class="nav-link" href="#taxonomia">Taxonomía</a>
     <a class="nav-link" href="#skills">Skills</a>
     <a class="nav-link" href="#comandos">Comandos</a>
     <a class="nav-link" href="#docs">Docs</a>
+    <a class="nav-link" href="https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite" target="_blank" style="color:var(--c);border:1px solid rgba(0,174,239,.3);margin-left:8px">GitHub ↗</a>
   </div>
 </nav>
 
@@ -345,6 +347,7 @@
     <span class="badge bp">GitHub Copilot CLI</span>
     <span class="badge bg_">@nttdata VS Code</span>
     <span class="badge bb">Metodología v3</span>
+    <a class="badge" href="https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite" target="_blank" style="background:rgba(0,174,239,.15);color:var(--c);border:1px solid rgba(0,174,239,.3);text-decoration:none;cursor:pointer">⭐ GitHub Repo ↗</a>
   </div>
 </header>
 
@@ -356,11 +359,17 @@
   <div class="term" style="margin-bottom:20px">
     <div class="term-bar">
       <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
-      <span class="term-lbl">PowerShell / Terminal — Comando único</span>
+      <span class="term-lbl">PowerShell / Terminal — Modo Interactivo (Agéntico)</span>
       <button class="copy-btn" onclick="copyTerm(this)">Copiar</button>
     </div>
-    <div class="term-body" id="term-master"><span class="tm2"># Un solo comando — genera todo lo necesario para el análisis v3</span>
+    <div class="term-body" id="term-master"><span class="tm2"># Modo interactivo — la IA pregunta la ruta del archivo .TWX</span>
 
+<span class="tc2">python</span> <span class="tw">run_analysis.py</span>
+
+<span class="tm2"># → Muestra banner NTT DATA y solicita la ruta:</span>
+<span class="tm2">#   📁 Ruta del archivo .TWX: _</span>
+
+<span class="tm2"># Modo directo (sin prompt):</span>
 <span class="tc2">python</span> <span class="tw">run_analysis.py</span> <span class="ta2">"ruta\al\archivo.twx"</span>
 
 <span class="tm2"># Con carpeta de salida personalizada:</span>
@@ -457,6 +466,84 @@
       <div class="out-size" style="color:var(--gl)">~57 KB · ⭐ Principal</div>
       <div class="out-desc">Prompt maestro con todos los datos + instrucciones v3 por ciclo. Pegar en Copilot con skill <code style="color:var(--c)">profuturo-twx</code></div>
     </div>
+  </div>
+</div>
+
+<!-- FLUJO AGÉNTICO -->
+<div class="sec" id="agentic">
+  <div class="sec-label">Modo Agéntico · Interactivo</div>
+  <div class="sec-title">Procesamiento con sub-agentes Copilot</div>
+
+  <div class="info-box" style="margin-bottom:24px">
+    <span style="font-size:1.1rem;flex-shrink:0">🤖</span>
+    <span>Al ejecutar <code style="color:var(--c)">python run_analysis.py</code> sin argumentos, la suite entra en modo interactivo: muestra el banner NTT DATA, solicita la ruta del archivo y despliega el procesamiento agéntico paso a paso con etiquetas de sub-agente en cada fase.</span>
+  </div>
+
+  <div class="term" style="margin-bottom:24px">
+    <div class="term-bar">
+      <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+      <span class="term-lbl">Terminal — Ejecución agéntica interactiva</span>
+    </div>
+    <div class="term-body"><span class="tm2"># Paso 1: iniciar modo agéntico</span>
+<span class="tc2">python</span> <span class="tw">run_analysis.py</span>
+
+<span class="tm2">══════════════════════════════════════════════════════════════</span>
+  <span class="tc2">██╗   ██╗████████╗████████╗    ██████╗  █████╗ ████████╗ █████╗</span>
+  <span class="tc2">███╗  ██║╚══██╔══╝╚══██╔══╝    ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗</span>
+  <span class="tc2">██╔██╗██║   ██║      ██║       ██║  ██║███████║   ██║   ███████║</span>
+  <span class="tc2">██║ ╚███║   ██║      ██║       ██████╔╝██║  ██║   ██║   ██║  ██║</span>
+<span class="tm2">══════════════════════════════════════════════════════════════</span>
+  <span class="tw">IBM TWX Reverse Engineering Suite</span>  <span class="tp2">v1.0.0</span>
+  <span class="tm2">NTT DATA EMEAL · Migración IBM BPM → Appian</span>
+
+  <span class="tw">▸ Agente de Extracción TWX listo</span>
+  <span class="tm2">  Este proceso ejecutará 9 ciclos de análisis + extracción XML</span>
+
+  <span class="ta2">📁 Ruta del archivo .TWX:</span> <span class="tw">Profuturo_Redencion_Bono_AP.twx</span>
+
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+  <span class="tc2">  FASE 1  Extracción automática — 9 Ciclos</span>
+  <span class="tm2">  sub-agente: twx-suite / ciclos 1-9</span>
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 1 · Resumen de artefactos    [twx-analyze]</span>    <span class="tm2">→ 01_analyze.json  (12.4 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 2 · Business Objects         [twx-entities]</span>   <span class="tm2">→ 02_entities.json (8.1 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 3 · Servicios IS/GSS/HHS     [twx-services]</span>   <span class="tm2">→ 03_services.json (23.2 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 4 · Endpoints externos        [twx-endpoints]</span>  <span class="tm2">→ 04_endpoints.json (4.7 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 5 · Entry points / UCAs       [twx-entries]</span>    <span class="tm2">→ 05_entries.json  (3.2 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 6 · Flujos Mermaid            [twx-flows]</span>      <span class="tm2">→ 06_flows.txt     (8.1 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 7 · Grafo dependencias        [twx-deps]</span>       <span class="tm2">→ 07_deps.txt      (5.9 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 8 · Scripts embebidos         [twx-scripts]</span>    <span class="tm2">→ 08_scripts.txt   (455 KB)</span>
+    <span class="tg2">✓</span>  <span class="tw">Ciclo 9 · Documentación Markdown    [twx-docs]</span>       <span class="tm2">→ 09_docs.md       (378 KB)</span>
+
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+  <span class="tc2">  FASE 2  Extracción de XMLs del ZIP</span>
+  <span class="tm2">  sub-agente: twx-xml-extractor</span>
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+
+    <span class="tg2">✓</span>  manifest.xml
+    <span class="tg2">✓</span>  01_services       <span class="tm2">→  72 archivos</span>
+    <span class="tg2">✓</span>  04_ucas           <span class="tm2">→  15 archivos</span>
+    <span class="tg2">✓</span>  12_business_obj   <span class="tm2">→  54 archivos</span>
+    <span class="tg2">✓</span>  25_bpds           <span class="tm2">→  44 archivos</span>
+    <span class="tg2">✓</span>  64_coach_views    <span class="tm2">→  39 archivos</span>
+
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+  <span class="tc2">  FASE 3  Generando COPILOT_PROMPT.md — Metodología v3</span>
+  <span class="tm2">  sub-agente: profuturo-twx / twx-engineer</span>
+  <span class="tm2">  ──────────────────────────────────────────────────────────</span>
+
+    <span class="tg2">✓</span>  <span class="tw">COPILOT_PROMPT.md generado</span>            <span class="tm2">(57.3 KB)</span>
+
+  <span class="tg2">══════════════════════════════════════════════════════════════</span>
+  <span class="tg2">  ✓  Análisis completado</span>
+  <span class="tm2">     Ciclos ejecutados : 9/9</span>
+  <span class="tm2">     XMLs extraídos    : 225</span>
+
+  <span class="ta2">▸  Siguiente paso:</span>
+     <span class="tm2">1. Abre COPILOT_PROMPT.md en tu editor</span>
+     <span class="tm2">2. Activa el skill profuturo-twx en Copilot CLI</span>
+     <span class="tm2">3. Pega el contenido del prompt y presiona Enter</span></div>
   </div>
 </div>
 
@@ -992,6 +1079,36 @@
         <div class="doc-title">Infografía de Migración</div>
         <div class="doc-desc">Impacto visual en proyectos legacy: KPIs, antes/después, pipeline IBM BPM → Appian, roadmap por fases.</div>
         <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+    <a class="doc-card" href="03_documentacion/06_que_hicimos.html" target="_blank">
+      <div class="doc-card-top" style="background:linear-gradient(90deg,#8B5CF6,#A78BFA)"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">06 · Briefing</div>
+        <div class="doc-icon">🧠</div>
+        <div class="doc-title">¿Qué hicimos?</div>
+        <div class="doc-desc">Resumen personal del proyecto: el problema, la solución, las 3 capas de la suite, el caso Profuturo y los 9 ciclos de análisis.</div>
+        <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+    <a class="doc-card" href="03_documentacion/07_skills_guia.html" target="_blank">
+      <div class="doc-card-top" style="background:linear-gradient(90deg,#00AEEF,#10B981)"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">07 · Skills</div>
+        <div class="doc-icon">🤖</div>
+        <div class="doc-title">Guía de Skills &amp; Agente</div>
+        <div class="doc-desc">Guía visual de los 10 skills Copilot + agente maestro. Arquitectura, diagrama de capas, instrucciones de instalación y ejecución.</div>
+        <div class="doc-open">Abrir ↗</div>
+      </div>
+    </a>
+    <a class="doc-card" href="https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite" target="_blank">
+      <div class="doc-card-top" style="background:linear-gradient(90deg,#334155,#64748B)"></div>
+      <div class="doc-card-body">
+        <div class="doc-num">GitHub</div>
+        <div class="doc-icon">⭐</div>
+        <div class="doc-title">Repositorio GitHub</div>
+        <div class="doc-desc">Código fuente completo, README, CONTRIBUTING, issue templates, CHANGELOG. Todo el proyecto bajo licencia MIT.</div>
+        <div class="doc-open">Ver en GitHub ↗</div>
       </div>
     </a>
   </div>

@@ -10,14 +10,19 @@ Uso directo:
     python run_analysis.py <archivo.twx> [--output carpeta]
 
 Genera en la carpeta de salida:
-    01_analyze.json       Resumen de artefactos
-    02_entities.json      Business Objects
-    03_services.json      Servicios (IS / GSS / HHS)
-    04_endpoints.json     Endpoints externos
-    05_entries.json       Entry points
-    06_flows.txt          Diagramas Mermaid de flujos
-    07_deps.txt           Grafo de dependencias
-    08_scripts.txt        Scripts JavaScript embebidos
+    01_analyze.json               Resumen de artefactos
+    02_entities.json              Business Objects
+    03_services.json              Servicios (IS / GSS / HHS)
+    04_endpoints.json             Endpoints externos
+    05_entries.json               Entry points
+    06_flows.txt                  Diagramas Mermaid de flujos
+    07_deps.txt                   Grafo de dependencias
+    08_scripts.txt                Scripts JavaScript embebidos
+    09_docs.md                    Documentación Markdown completa
+    xml_extracts/                 XMLs clave extraídos del ZIP
+    COPILOT_PROMPT.md             Prompt listo para Copilot (metodología v3)
+    <nombre>_ExtraccionTecnica.html  ← Reporte HTML navegable completo
+"""
     09_docs.md            Documentación Markdown completa
     xml_extracts/         XMLs clave extraídos del ZIP
     COPILOT_PROMPT.md     Prompt listo para Copilot (metodología v3)
@@ -552,6 +557,20 @@ def main():
     size_kb = prompt_file.stat().st_size / 1024
     _ok(f"{'COPILOT_PROMPT.md generado':40s} {_DM}({size_kb:.1f} KB){_RS}")
 
+    # ── FASE 4: Generar reporte HTML navegable ────────────────────────────────
+    phase_header(4, "Generando reporte HTML navegable", "html-report-generator")
+
+    try:
+        sys.path.insert(0, str(TOOLS_DIR))
+        from ibm_twx_tools.html_report import generate_report
+        with Spinner("Construyendo HTML con 9 secciones técnicas"):
+            report_path = generate_report(out_dir, twx_name)
+        size_kb_html = report_path.stat().st_size / 1024
+        _ok(f"{report_path.name:40s} {_DM}({size_kb_html:.1f} KB){_RS}")
+    except Exception as exc:
+        _warn(f"HTML no generado: {exc}")
+        report_path = None
+
     # ── Resumen final ─────────────────────────────────────────────────────────
     successful = sum(1 for v in results.values() if v and v.exists())
     total      = len(commands)
@@ -561,11 +580,13 @@ def main():
     print(f"  {_S}     Ciclos ejecutados : {_RS}{_BD}{successful}/{total}{_RS}")
     print(f"  {_S}     XMLs extraídos    : {_RS}{_BD}{sum(xml_counts.values())}{_RS}")
     print(f"  {_S}     Carpeta de salida : {_RS}{out_dir}")
+    if report_path and report_path.exists():
+        print(f"  {_G}     Reporte HTML      : {_RS}{_BD}{report_path.name}{_RS}")
     print(f"  {_B}{_BD}{'═' * 62}{_RS}\n")
     print(f"  {_Y}{_BD}▸  Siguiente paso:{_RS}")
-    print(f"     1. Abre {_BD}COPILOT_PROMPT.md{_RS} en tu editor")
-    print(f"     2. Activa el skill {_B}{_BD}profuturo-twx{_RS} en Copilot CLI")
-    print(f"     3. Pega el contenido del prompt y presiona Enter\n")
+    if report_path and report_path.exists():
+        print(f"     → Abre el reporte HTML: {_BD}{report_path}{_RS}")
+    print(f"     → O usa {_B}{_BD}profuturo-twx{_RS} con el COPILOT_PROMPT.md para análisis profundo\n")
 
 
 if __name__ == "__main__":

@@ -58,6 +58,10 @@ Imprime **exactamente** este bloque en la respuesta (sin modificarlo):
 ║  ─────────────────────────────────────────────────────────  ║
 ║  [13] profuturo-twx        — Metodología v3 Profuturo       ║
 ║                                                              ║
+║  MANTENIMIENTO                                               ║
+║  ─────────────────────────────────────────────────────────  ║
+║  [14] nttdata-update       — Actualizar skills desde GitHub  ║
+║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 
   👉  Escribe el número o el nombre del skill a ejecutar.
@@ -86,6 +90,7 @@ correspondiente según esta tabla:
 | 11     | `twx-docs`             |
 | 12     | `twx-multi-entities`   |
 | 13     | `profuturo-twx`        |
+| 14     | `nttdata-update`       |
 
 Si el usuario escribe `todos`, muestra esta descripción expandida:
 
@@ -104,6 +109,7 @@ Si el usuario escribe `todos`, muestra esta descripción expandida:
 | 11 | **twx-docs** | Genera documentación Markdown completa del TWX. |
 | 12 | **twx-multi-entities** | Analiza N ficheros .twx a la vez. Encuentra BOs compartidos, clusters semánticos y genera HTML unificado con análisis IA y score de reutilización. |
 | 13 | **profuturo-twx** | Migración IBM BPM → Appian con las 11 correcciones validadas del equipo Profuturo. |
+| 14 | **nttdata-update** | Descarga la última versión del repo de GitHub e instala todos los skills y agentes en `~/.copilot/`. Un solo comando para tener todo actualizado. |
 
 ---
 

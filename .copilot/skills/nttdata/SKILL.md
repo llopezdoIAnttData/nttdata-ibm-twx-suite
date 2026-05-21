@@ -10,19 +10,30 @@ allowed-tools: shell
 
 # 🔷 NTT DATA — Skills Launcher
 
-Cuando este skill se activa, muestra el siguiente menú en pantalla y
-espera a que el usuario elija una opción para ejecutarla.
+Cuando este skill se activa, muestra el banner y el menú en pantalla,
+luego espera a que el usuario elija una opción para ejecutarla.
 
 ---
 
-## PASO 1 — Mostrar el menú
+## PASO 1 — Mostrar el banner y el menú
 
 Imprime **exactamente** este bloque en la respuesta (sin modificarlo):
 
 ```
+  ●
+   ╭──────╮   ███╗  ██╗ ████████╗████████╗  ██████╗  █████╗ ████████╗ █████╗
+  ╱ ╭────╮ ╲  ████╗ ██║ ╚══██╔══╝╚══██╔══╝  ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗
+ │  │    │  │ ██╔████╗██║   ██║      ██║    ██║  ██║███████║   ██║   ███████║
+ │  ╰────╯  │ ██║╚═██╗██║   ██║      ██║    ██║  ██║██╔══██║   ██║   ██╔══██║
+  ╲         ╱  ██║  ╚████║   ██║      ██║    ██████╔╝██║  ██║   ██║   ██║  ██║
+   ╰──────╯   ╚═╝   ╚═══╝   ╚═╝      ╚═╝    ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝
+  IBM TWX Reverse Engineering Suite  v1.1.0  ·  NTT DATA  ·  llopezdo@emeal.nttdata.com
+```
+
+```
 ╔══════════════════════════════════════════════════════════════╗
 ║           🔷  NTT DATA  —  Skills Launcher                  ║
-║          IBM TWX Reverse Engineering Suite v1.0.0           ║
+║          IBM TWX Reverse Engineering Suite v1.1.0           ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
 ║  ANÁLISIS TWX (archivo único)                                ║
@@ -73,7 +84,7 @@ correspondiente según esta tabla:
 | 9      | `twx-scripts`          |
 | 10     | `twx-entries`          |
 | 11     | `twx-docs`             |
-| 12     | `twx-multi-entities`  |
+| 12     | `twx-multi-entities`   |
 | 13     | `profuturo-twx`        |
 
 Si el usuario escribe `todos`, muestra esta descripción expandida:
@@ -91,7 +102,7 @@ Si el usuario escribe `todos`, muestra esta descripción expandida:
 | 9 | **twx-scripts** | Quieres ver todo el código JavaScript/Groovy embebido. |
 | 10 | **twx-entries** | Necesitas identificar los artefactos que nadie llama (API pública / UCAs). |
 | 11 | **twx-docs** | Genera documentación Markdown completa del TWX. |
-| 12 | **twx-multi-entities** | Analiza N ficheros .twx a la vez. Encuentra BOs compartidos, clusters estructurales y genera un HTML unificado con el patrón del modelo de datos y oportunidades de reutilización. |
+| 12 | **twx-multi-entities** | Analiza N ficheros .twx a la vez. Encuentra BOs compartidos, clusters semánticos y genera HTML unificado con análisis IA y score de reutilización. |
 | 13 | **profuturo-twx** | Migración IBM BPM → Appian con las 11 correcciones validadas del equipo Profuturo. |
 
 ---
@@ -101,3 +112,4 @@ Si el usuario escribe `todos`, muestra esta descripción expandida:
 - Herramienta base: `python -m ibm_twx_tools` en
   `C:\Users\llopezdo\OneDrive - NTT DATA EMEAL\Documentos\NTTDATAIBMTWXSuite\NTTDATA-IBM-TWX-Suite\01_herramientas_python`
 - Requiere Python 3.9+ con `ibm_twx_tools` instalado (`pip install -e .`).
+

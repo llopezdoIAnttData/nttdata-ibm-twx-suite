@@ -1,0 +1,63 @@
+name: CI — Python lint & skill validation
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  python-lint:
+    name: Python syntax & style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install flake8
+          pip install -e 01_herramientas_python/
+
+      - name: Lint with flake8
+        run: |
+          # Errores críticos: sintaxis, nombres no definidos, imports circulares
+          flake8 01_herramientas_python/ibm_twx_tools/ \
+            --count --select=E9,F63,F7,F82 \
+            --show-source --statistics
+          # Advertencias de estilo (no bloquean el pipeline)
+          flake8 01_herramientas_python/ibm_twx_tools/ \
+            --count --max-line-length=120 \
+            --statistics --exit-zero
+
+      - name: Verify CLI entry point
+        run: python -m ibm_twx_tools --help
+
+  skills-validation:
+    name: Skills structure validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all skills have SKILL.md
+        run: |
+          missing=0
+          for skill_dir in .copilot/skills/*/; do
+            skill_name=$(basename "$skill_dir")
+            if [ ! -f "$skill_dir/SKILL.md" ] && [ ! -f "$skill_dir/skill.md" ]; then
+              echo "❌ Missing SKILL.md in: $skill_dir"
+              missing=$((missing + 1))
+            else
+              echo "✅ $skill_name"
+            fi
+          done
+          if [ $missing -gt 0 ]; then
+            echo "::error::$missing skill(s) missing SKILL.md"
+            exit 1
+          fi
+          echo "All skills have SKILL.md ✓"

@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Pregunta de uso / metodología
+    url: https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite/discussions
+    about: Para preguntas generales sobre IBM BPM, TWX o migración a Appian — usa Discussions.
+  - name: 🔒 Reportar vulnerabilidad de seguridad
+    url: https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite/security/advisories/new
+    about: Reportar un problema de seguridad de forma privada (no abras un issue público).
+  - name: 📖 Documentación / README
+    url: https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite#readme
+    about: Consulta el README antes de abrir un issue — puede que ya esté documentado.

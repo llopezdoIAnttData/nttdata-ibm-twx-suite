@@ -30,10 +30,33 @@ versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] — 2025-07-14
+
+### Added
+- **`nttdata` skill** — Menú launcher unificado. Muestra todos los skills disponibles y permite invocarlos por número o nombre. Punto de entrada recomendado para nuevos usuarios.
+- **`twx-multi-entities` skill** — Análisis cruzado agentic de N ficheros `.twx`. Detecta Business Objects compartidos, clusters semánticos y genera reporte HTML standalone con análisis IA y score de reutilización.
+- **`analyze-Twx-Extract` skill** — Pipeline end-to-end: extrae XMLs del TWX, ejecuta 9 ciclos de análisis y genera un reporte HTML navegable en un solo comando.
+- **`dashboard-corporate-design` skill** — Genera dashboards HTML standalone con marca NTT DATA a partir de datos estructurados.
+- **`SECURITY.md`** — Política de seguridad y proceso de reporte de vulnerabilidades.
+- **`CODE_OF_CONDUCT.md`** — Código de conducta Contributor Covenant v2.1.
+- **`SUPPORT.md`** — Canales de soporte y tiempos de respuesta.
+- **`.github/CODEOWNERS`** — Asignación automática de reviewers por área del repo.
+- **`.github/workflows/ci.yml`** — CI en GitHub Actions: lint Python (flake8) + validación de estructura de skills.
+- **`.github/ISSUE_TEMPLATE/config.yml`** — Menú de selección de template con links a Discussions y Security Advisories.
+- **`requirements.txt`** — Dependencias Python explícitas.
+- `README.md` reescrito en español con tabla de shortcuts de skills, estructura actualizada y sección de análisis multi-TWX.
+- `index.html` actualizado con tabla de referencia rápida de todos los skills y 4 nuevas cards.
+
+### Fixed
+- URL de repositorio incorrecta en `CONTRIBUTING.md` (`llopezdo` → `llopezdoIAnttData`)
+- URL de release en `CHANGELOG.md` (`llopezdo` → `llopezdoIAnttData`)
+
 ## [Unreleased]
 
-- Web UI for uploading TWX and viewing results in browser
-- Parallel execution of analysis cycles
-- Diff mode to compare two TWX versions
+- Web UI para subir TWX y ver resultados en el navegador
+- Ejecución paralela de ciclos de análisis
+- Modo diff para comparar dos versiones de un TWX
+- Soporte para IBM BAW 22.x (namespace `baw/20.0`)
 
-[1.0.0]: https://github.com/llopezdo/nttdata-ibm-twx-suite/releases/tag/v1.0.0
+[1.1.0]: https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite/releases/tag/v1.0.0

@@ -1,0 +1,23 @@
+# CODEOWNERS — NTTDATA IBM TWX Suite
+# Cada línea asigna un reviewer automático para rutas específicas del repo.
+# Formato: <patrón>  <@usuario o @org/equipo>
+
+# Maintainer principal — revisa cualquier cambio
+*                                   @llopezdoIAnttData
+
+# CLI Python — requiere revisión del equipo de herramientas
+/01_herramientas_python/            @llopezdoIAnttData
+
+# Skills de Copilot — requieren revisión para mantener calidad
+/.copilot/skills/                   @llopezdoIAnttData
+
+# Metodología Profuturo v3 — cambios críticos, revisión obligatoria
+/.copilot/skills/profuturo-twx/     @llopezdoIAnttData
+
+# Documentación
+/03_documentacion/                  @llopezdoIAnttData
+/README.md                          @llopezdoIAnttData
+/CHANGELOG.md                       @llopezdoIAnttData
+
+# CI/CD y configuración de GitHub
+/.github/                           @llopezdoIAnttData

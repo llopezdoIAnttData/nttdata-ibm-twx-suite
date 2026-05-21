@@ -44,7 +44,7 @@ tolerated.
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/llopezdo/nttdata-ibm-twx-suite.git
+git clone https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite.git
 cd nttdata-ibm-twx-suite
 
 # 2. Install in editable mode

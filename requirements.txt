@@ -1,0 +1,12 @@
+# NTTDATA IBM TWX Suite — Python dependencies
+# Instalar con: pip install -r requirements.txt
+# O en modo editable: pip install -e 01_herramientas_python/
+
+# Runtime
+lxml>=4.9.0          # XML parsing de archivos TWX
+click>=8.1.0         # CLI framework para ibm_twx_tools
+colorama>=0.4.6      # Colores ANSI multiplataforma (Windows compat)
+
+# Desarrollo / testing
+pytest>=7.4.0        # Test runner
+flake8>=6.1.0        # Linter Python

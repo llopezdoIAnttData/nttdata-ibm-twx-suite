@@ -720,16 +720,131 @@
 
   <div class="info-box" style="margin-bottom:18px">
     <span style="font-size:1.1rem;flex-shrink:0">🤖</span>
-    <span>Los skills de Copilot CLI se cargan automáticamente. Usar <code style="color:var(--c)">/skills reload</code> si se añaden durante una sesión. El skill <strong>profuturo-twx</strong> contiene toda la metodología v3 y los patrones IBM→Appian.</span>
+    <span>Los skills se cargan automáticamente en Copilot CLI y en el chat de GitHub Copilot. Para invocar cualquier skill escribe su nombre como comando: <code style="color:var(--c)">Use the skill tool to invoke the "nttdata" skill</code> — o simplemente escribe el nombre en el chat. Usa <code style="color:var(--c)">/skills reload</code> si los añades durante una sesión activa.</span>
   </div>
 
+  <!-- TABLA DE SHORTCUTS -->
+  <div style="background:var(--bg2);border:1px solid var(--brd);border-radius:12px;overflow:hidden;margin-bottom:28px">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px">
+      <span style="font-size:1rem">⌨️</span>
+      <span style="font-size:.88rem;font-weight:800;color:#fff">Cómo invocar cada skill — Referencia rápida</span>
+      <span style="font-size:.7rem;color:var(--mu2);margin-left:auto">Copia el comando y pégalo en tu chat de Copilot o Copilot CLI</span>
+    </div>
+    <table class="tax-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Skill</th>
+          <th>Cuándo usarlo</th>
+          <th>Comando a escribir en el chat</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--mu2)">0</td>
+          <td><code style="color:var(--c);font-weight:700">nttdata</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Punto de entrada principal. Muestra el menú de todos los skills disponibles y te permite elegir qué ejecutar.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/nttdata</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">1</td>
+          <td><code style="color:var(--c);font-weight:700">analyze-Twx-Extract</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Pipeline completo end-to-end: extrae XMLs del TWX, ejecuta los 9 ciclos de análisis y genera un reporte HTML navegable. Es el punto de entrada recomendado para un análisis completo.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/analyze-Twx-Extract</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">2</td>
+          <td><code style="color:var(--c);font-weight:700">twx-suite</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Skill maestro que orquesta todos los ciclos de análisis. Decide qué ciclos ejecutar según la pregunta del usuario. Ideal para análisis guiados de migración IBM BPM → Appian.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-suite</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">3</td>
+          <td><code style="color:var(--c);font-weight:700">twx-analyze</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Resumen rápido en JSON: cuántos artefactos hay y de qué tipo (servicios IS/GSS/HHS, BOs, BPDs, Coach Views…). Primera exploración de un TWX desconocido.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-analyze</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">4</td>
+          <td><code style="color:var(--c);font-weight:700">twx-entities</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Extrae el modelo de datos completo: Business Objects, campos, tipos de dato y herencia. Usar cuando necesitas entender la estructura de datos de un proceso.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-entities</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">5</td>
+          <td><code style="color:var(--c);font-weight:700">twx-services</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Lista todos los servicios (IS, GSS, HHS) con sus pasos internos, inputs/outputs y lógica. Usar para entender qué hace cada servicio antes de migrarlo a Appian.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-services</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">6</td>
+          <td><code style="color:var(--c);font-weight:700">twx-flows</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Genera diagramas Mermaid de flujo para cada proceso y servicio. Visualiza el orden real de los pasos usando sequenceFlow. Útil para revisiones de lógica de negocio.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-flows</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">7</td>
+          <td><code style="color:var(--c);font-weight:700">twx-deps</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Construye el grafo de llamadas entre artefactos: quién llama a quién. Permite análisis de impacto y detección de componentes huérfanos.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-deps</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">8</td>
+          <td><code style="color:var(--c);font-weight:700">twx-endpoints</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Lista todas las URLs REST, HTTP y SOAP externas referenciadas en el TWX. Útil para mapear las integraciones con sistemas externos antes de migrar.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-endpoints</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">9</td>
+          <td><code style="color:var(--c);font-weight:700">twx-scripts</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Extrae todo el JavaScript y Groovy embebido en servicios y BPDs. Ver el código real de cada paso para entender transformaciones y validaciones.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-scripts</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">10</td>
+          <td><code style="color:var(--c);font-weight:700">twx-entries</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Identifica los entry points: artefactos que ningún otro invoca. Representan la API pública o los puntos de arranque del proceso (UCAs, BPDs raíz).</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-entries</code></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">11</td>
+          <td><code style="color:var(--c);font-weight:700">twx-docs</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)">Genera documentación Markdown completa del TWX: BOs, servicios, flujos, scripts, endpoints y dependencias en un solo documento. Ideal para entregar documentación técnica al cliente.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--gl);background:rgba(16,185,129,.07);padding:3px 8px;border-radius:4px">/twx-docs</code></td>
+        </tr>
+        <tr style="background:rgba(139,92,246,.05)">
+          <td style="color:var(--mu2)">12</td>
+          <td><code style="color:var(--pl);font-weight:700">twx-multi-entities</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)"><strong style="color:var(--pl)">Análisis cruzado de N ficheros TWX.</strong> Compara modelos de datos entre múltiples proyectos IBM BPM, detecta BOs compartidos, clusters semánticos y genera un reporte HTML con recomendaciones de toolkit. Requiere 2+ ficheros TWX.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--pl);background:rgba(139,92,246,.08);padding:3px 8px;border-radius:4px">/twx-multi-entities</code></td>
+        </tr>
+        <tr style="background:rgba(245,158,11,.04)">
+          <td style="color:var(--mu2)">13</td>
+          <td><code style="color:var(--al);font-weight:700">profuturo-twx</code></td>
+          <td style="font-size:.76rem;color:var(--mu2)"><strong style="color:var(--al)">Específico Profuturo.</strong> Contiene toda la metodología v3 de migración IBM BPM → Appian con las 11 correcciones validadas, patrones NOV_INSTANCE_MANAGEMENT, reglas de botones en Coach Views y flujo de reimplementación en Appian.</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--al);background:rgba(245,158,11,.07);padding:3px 8px;border-radius:4px">/profuturo-twx</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CARDS DE SKILLS -->
+  <div class="sec-label" style="margin-bottom:12px">Detalle de cada skill</div>
   <div class="skills-grid">
-    <div class="skill-card">
+    <div class="skill-card" style="border-color:rgba(0,174,239,.3)">
+      <div class="sk-icon">🔷</div>
+      <div>
+        <div class="sk-name">nttdata</div>
+        <div class="sk-desc">Menú launcher del IBM TWX Suite. Muestra todos los skills disponibles y permite invocarlos por número o nombre. Punto de entrada recomendado si no sabes qué skill usar.</div>
+        <span class="sk-tag" style="color:var(--c);border-color:rgba(0,174,239,.3)">🏠 Launcher</span>
+      </div>
+    </div>
+    <div class="skill-card" style="border-color:rgba(0,174,239,.3)">
       <div class="sk-icon">🧠</div>
       <div>
         <div class="sk-name">profuturo-twx</div>
-        <div class="sk-desc">Conocimiento completo de la metodología v3 de extracción. Taxonomía IBM BPM, 11 correcciones retro, patrones de migración IBM→Appian, NOV_INSTANCE_MANAGEMENT.</div>
-        <span class="sk-tag">⭐ Principal</span>
+        <div class="sk-desc">Conocimiento completo de la metodología v3. Taxonomía IBM BPM, 11 correcciones retro, patrones IBM→Appian, NOV_INSTANCE_MANAGEMENT, reglas de botones en Coach Views.</div>
+        <span class="sk-tag">⭐ Principal Profuturo</span>
       </div>
     </div>
     <div class="skill-card">
@@ -740,12 +855,20 @@
         <span class="sk-tag">Master skill</span>
       </div>
     </div>
+    <div class="skill-card" style="border-color:rgba(139,92,246,.3)">
+      <div class="sk-icon">🌐</div>
+      <div>
+        <div class="sk-name">twx-multi-entities</div>
+        <div class="sk-desc">Análisis cruzado de N ficheros TWX. Detecta BOs compartidos, clusters semánticos y oportunidades de toolkit. Genera reporte HTML completo con análisis IA. Requiere 2+ ficheros TWX.</div>
+        <span class="sk-tag" style="color:var(--pl);border-color:rgba(139,92,246,.3)">Multi-TWX · IA</span>
+      </div>
+    </div>
     <div class="skill-card">
       <div class="sk-icon">🔍</div>
       <div>
         <div class="sk-name">twx-analyze</div>
         <div class="sk-desc">Resumen de artefactos, conteo por tipo, identificación del BPD principal y versión del paquete TWX.</div>
-        <span class="sk-tag">analyze</span>
+        <span class="sk-tag">Ciclo 1</span>
       </div>
     </div>
     <div class="skill-card">
@@ -753,7 +876,7 @@
       <div>
         <div class="sk-name">twx-entities</div>
         <div class="sk-desc">Extracción de Business Objects, modelos de datos, campos con tipos y herencia entre clases.</div>
-        <span class="sk-tag">entities</span>
+        <span class="sk-tag">Ciclo 2</span>
       </div>
     </div>
     <div class="skill-card">
@@ -761,7 +884,7 @@
       <div>
         <div class="sk-name">twx-services</div>
         <div class="sk-desc">Servicios IS/GSS/HHS con pasos, inputs/outputs, dependencias y clasificación SYNC/ASYNC.</div>
-        <span class="sk-tag">services</span>
+        <span class="sk-tag">Ciclo 3</span>
       </div>
     </div>
     <div class="skill-card">
@@ -769,7 +892,7 @@
       <div>
         <div class="sk-name">twx-flows</div>
         <div class="sk-desc">Diagramas Mermaid de procesos y servicios. Flujos en orden real por sequenceFlow (no por XML).</div>
-        <span class="sk-tag">flows</span>
+        <span class="sk-tag">Ciclo 4</span>
       </div>
     </div>
     <div class="skill-card">
@@ -777,7 +900,7 @@
       <div>
         <div class="sk-name">twx-deps</div>
         <div class="sk-desc">Grafo de dependencias entre artefactos. Identifica componentes huérfanos y entry points.</div>
-        <span class="sk-tag">deps</span>
+        <span class="sk-tag">Ciclo 5</span>
       </div>
     </div>
     <div class="skill-card">
@@ -785,7 +908,7 @@
       <div>
         <div class="sk-name">twx-endpoints</div>
         <div class="sk-desc">URLs REST/SOAP externas, operaciones WSDL, bindings y endpoints del Integration Bus.</div>
-        <span class="sk-tag">endpoints</span>
+        <span class="sk-tag">Ciclo 6</span>
       </div>
     </div>
     <div class="skill-card">
@@ -793,7 +916,7 @@
       <div>
         <div class="sk-name">twx-entries</div>
         <div class="sk-desc">Entry points — artefactos que no son invocados por ningún otro dentro del paquete (API pública).</div>
-        <span class="sk-tag">entries</span>
+        <span class="sk-tag">Ciclo 7</span>
       </div>
     </div>
     <div class="skill-card">
@@ -801,7 +924,7 @@
       <div>
         <div class="sk-name">twx-docs</div>
         <div class="sk-desc">Documentación Markdown completa con todas las secciones unificadas y diagramas incrustados.</div>
-        <span class="sk-tag">docs</span>
+        <span class="sk-tag">Ciclo 8</span>
       </div>
     </div>
     <div class="skill-card">
@@ -809,10 +932,11 @@
       <div>
         <div class="sk-name">twx-scripts</div>
         <div class="sk-desc">Extracción de todo el JavaScript embebido en servicios y BPDs con contexto de artefacto y paso.</div>
-        <span class="sk-tag">scripts</span>
+        <span class="sk-tag">Ciclo 9</span>
       </div>
     </div>
   </div>
+
 
   <div style="margin-top:20px">
     <div class="sec-label">Agente personalizado</div>

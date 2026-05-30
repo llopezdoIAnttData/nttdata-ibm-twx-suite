@@ -112,13 +112,15 @@ class EntityExtractor:
         for el in root.iter():
             local = el.tag.split("}")[-1]
             if local in ("field", "attribute", "property", "Parameter", "element"):
-                field_name = el.get("name") or el.get("id", "")
+                # IBM BPM TWX stores field names as child <name> text, not as XML attributes
+                field_name = el.get("name") or el.get("id") or self._child_text(el, "name") or ""
                 if not field_name:
                     continue
                 field_type = (
                     el.get("type")
                     or el.get("typeRef")
                     or el.get("dataType")
+                    or self._child_text(el, "typeName")  # IBM BPM annotation format
                     or "String"
                 )
                 bo_field = BOField(

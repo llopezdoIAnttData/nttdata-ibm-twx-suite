@@ -57,6 +57,10 @@ Imprime **exactamente** este bloque en la respuesta (sin modificarlo):
 ║  MIGRACIÓN IBM BPM → APPIAN                                  ║
 ║  ─────────────────────────────────────────────────────────  ║
 ║  [13] profuturo-twx        — Metodología v3 Profuturo       ║
+║  [15] twx-full-pipeline    — 🚀 Pipeline Multi-Agente       ║
+║         Pasa tus archivos .twx legado IBM y genera todo:    ║
+║         análisis profundo + paquetes Appian listos para     ║
+║         importar. 9 agentes · reporte HTML maestro.         ║
 ║                                                              ║
 ║  MANTENIMIENTO                                               ║
 ║  ─────────────────────────────────────────────────────────  ║
@@ -91,6 +95,7 @@ correspondiente según esta tabla:
 | 12     | `twx-multi-entities`   |
 | 13     | `profuturo-twx`        |
 | 14     | `nttdata-update`       |
+| 15     | `twx-full-pipeline`    |
 
 Si el usuario escribe `todos`, muestra esta descripción expandida:
 
@@ -110,6 +115,7 @@ Si el usuario escribe `todos`, muestra esta descripción expandida:
 | 12 | **twx-multi-entities** | Analiza N ficheros .twx a la vez. Encuentra BOs compartidos, clusters semánticos y genera HTML unificado con análisis IA y score de reutilización. |
 | 13 | **profuturo-twx** | Migración IBM BPM → Appian con las 11 correcciones validadas del equipo Profuturo. |
 | 14 | **nttdata-update** | Descarga la última versión del repo de GitHub e instala todos los skills y agentes en `~/.copilot/`. Un solo comando para tener todo actualizado. |
+| 15 | **twx-full-pipeline** | 🚀 Pipeline Multi-Agente IBM BPM → Appian. Le preguntas dónde están tus `.twx` legado y ejecuta los 9 agentes automáticamente: Discovery, Entities, Services, IS-Params, BPD-Vars, Cross-Model, F3/Async, Appian Generator y Reporte Maestro HTML. |
 
 ---
 

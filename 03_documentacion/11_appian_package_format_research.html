@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appian Package Format — Investigación Técnica</title>
+<style>
+  :root {
+    --ntt-blue: #003087;
+    --ntt-red: #E4002B;
+    --appian-blue: #1B5CA8;
+    --appian-light: #E8F0FB;
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #f0883e;
+    --cyan: #39d3f5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  header {
+    background: linear-gradient(135deg, var(--ntt-blue) 0%, #0056d2 50%, var(--appian-blue) 100%);
+    padding: 32px 40px;
+    border-bottom: 3px solid var(--ntt-red);
+  }
+  header h1 { font-size: 1.8rem; font-weight: 700; }
+  header p { color: rgba(255,255,255,0.8); margin-top: 6px; font-size: 0.9rem; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .badge-green { background: #1a3a2a; color: var(--green); border: 1px solid #2ea043; }
+  .badge-blue { background: #1a2a3a; color: var(--cyan); border: 1px solid #388bfd; }
+  .badge-yellow { background: #3a2a10; color: var(--yellow); border: 1px solid #d29922; }
+  .badge-red { background: #3a1a1a; color: var(--red); border: 1px solid #f85149; }
+  
+  nav {
+    background: var(--surface);
+    padding: 12px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    color: var(--cyan);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  nav a:hover { background: var(--surface2); border-color: var(--cyan); }
+  
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
+  
+  section { margin-bottom: 40px; }
+  h2 {
+    font-size: 1.2rem;
+    color: var(--cyan);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  h3 {
+    font-size: 1rem;
+    color: var(--yellow);
+    margin: 16px 0 8px 0;
+  }
+  h4 { color: var(--orange); margin: 12px 0 6px 0; }
+  p { margin-bottom: 10px; color: var(--muted); }
+  strong { color: var(--text); }
+  
+  .info-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--cyan);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .info-box.warning { border-left-color: var(--yellow); }
+  .info-box.success { border-left-color: var(--green); }
+  .info-box.danger { border-left-color: var(--red); }
+  .info-box p { margin: 0; }
+  
+  code {
+    background: #1a2030;
+    color: #79c0ff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.85em;
+  }
+  pre {
+    background: #0a0e15;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 12px 0;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+  pre .kw { color: #ff7b72; }
+  pre .tag { color: #7ee787; }
+  pre .attr { color: #79c0ff; }
+  pre .str { color: #a5d6ff; }
+  pre .comment { color: #6e7681; font-style: italic; }
+  pre .val { color: #ffa657; }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--cyan);
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-weight: 600;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--surface2); }
+  
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 12px 0;
+  }
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .card h4 { margin-top: 0; }
+  
+  .zip-tree {
+    background: #0a0e15;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+  .zip-tree .dir { color: var(--cyan); }
+  .zip-tree .file-xml { color: var(--green); }
+  .zip-tree .file-xsd { color: var(--purple); }
+  .zip-tree .file-manifest { color: var(--yellow); }
+  
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+  }
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    text-align: center;
+    font-size: 0.8rem;
+    min-width: 120px;
+  }
+  .flow-arrow { color: var(--cyan); font-size: 1.2rem; }
+  
+  .complexity-low { color: var(--green); font-weight: 600; }
+  .complexity-med { color: var(--yellow); font-weight: 600; }
+  .complexity-high { color: var(--red); font-weight: 600; }
+  
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔷 Appian Package Format — Investigación Técnica</h1>
+  <p>NTT DATA · Profuturo Migration Suite · IBM BPM → Appian Automation</p>
+  <p style="margin-top:8px">
+    <span class="badge badge-green">✓ Completado</span>
+    <span class="badge badge-blue">Appian v26.4</span>
+    <span class="badge badge-yellow">23 Mayo 2025</span>
+    <span class="badge badge-blue">llopezdo@emeal.nttdata.com</span>
+  </p>
+</header>
+
+<nav>
+  <a href="#estructura">📦 Estructura ZIP</a>
+  <a href="#manifest">📋 Manifest XML</a>
+  <a href="#objetos">🧩 Objetos XML</a>
+  <a href="#cdt">📐 CDT / XSD</a>
+  <a href="#api">🔌 Deployment API</a>
+  <a href="#mapeo">🗺️ Mapeo IBM→Appian</a>
+  <a href="#workflow">⚙️ Workflow Automático</a>
+  <a href="#prioridad">🎯 Plan de Acción</a>
+</nav>
+
+<main>
+
+  <!-- ═══════════════════ ESTRUCTURA ZIP ═══════════════════ -->
+  <section id="estructura">
+    <h2>📦 Estructura de un Paquete de Importación (.zip)</h2>
+    
+    <p>Cuando exportas una aplicación o paquete en Appian, obtienes un <strong>ZIP</strong> con esta estructura:</p>
+    
+    <div class="zip-tree">
+      <span class="dir">📦 my-application.zip</span><br>
+      &nbsp;&nbsp;├── <span class="file-manifest">appian-package.xml</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← MANIFEST (lista todos los objetos)</span><br>
+      &nbsp;&nbsp;├── <span class="file-xml">ProcessModel-UUID1.xml</span><br>
+      &nbsp;&nbsp;├── <span class="file-xml">Interface-UUID2.xml</span><br>
+      &nbsp;&nbsp;├── <span class="file-xml">Rule-UUID3.xml</span><br>
+      &nbsp;&nbsp;├── <span class="file-xml">Constant-UUID4.xml</span><br>
+      &nbsp;&nbsp;├── <span class="file-xsd">DataType-UUID5.xsd</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← CDTs como XSD</span><br>
+      &nbsp;&nbsp;├── <span class="file-xml">ConnectedSystem-UUID6.xml</span><br>
+      &nbsp;&nbsp;└── <span class="file-xml">Group-UUID7.xml</span>
+    </div>
+    
+    <div class="info-box warning" style="margin-top:12px">
+      <p>⚠️ <strong>IMPORTANTE:</strong> Appian usa <strong>UUIDs</strong> (no nombres) para identificar objetos entre entornos. Si un UUID ya existe en el destino, el objeto se <strong>actualiza</strong>. Si es nuevo, se <strong>crea</strong>. Nunca modifiques los XML manualmente — usar el generator que vamos a construir.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ MANIFEST ═══════════════════ -->
+  <section id="manifest">
+    <h2>📋 Estructura del Manifest (appian-package.xml)</h2>
+    
+    <pre><span class="comment">&lt;!-- appian-package.xml — MANIFEST del paquete --&gt;</span>
+<span class="tag">&lt;package&gt;</span>
+  <span class="tag">&lt;name&gt;</span><span class="str">Profuturo-Redencion-Bono</span><span class="tag">&lt;/name&gt;</span>
+  <span class="tag">&lt;description&gt;</span><span class="str">Migración IBM BPM → Appian: Redención de Bono</span><span class="tag">&lt;/description&gt;</span>
+  <span class="tag">&lt;version&gt;</span><span class="str">1.0.0</span><span class="tag">&lt;/version&gt;</span>
+  <span class="tag">&lt;exportedBy&gt;</span><span class="str">llopezdo</span><span class="tag">&lt;/exportedBy&gt;</span>
+  <span class="tag">&lt;exportDate&gt;</span><span class="str">2025-05-23T10:00:00.000Z</span><span class="tag">&lt;/exportDate&gt;</span>
+  
+  <span class="tag">&lt;objects&gt;</span>
+    <span class="comment">&lt;!-- Un &lt;object&gt; por cada artefacto incluido en el paquete --&gt;</span>
+    <span class="tag">&lt;object&gt;</span>
+      <span class="tag">&lt;uuid&gt;</span><span class="str">a1b2c3d4-e5f6-7890-abcd-ef1234567890</span><span class="tag">&lt;/uuid&gt;</span>
+      <span class="tag">&lt;type&gt;</span><span class="str">Rule</span><span class="tag">&lt;/type&gt;</span>   <span class="comment">&lt;!-- Expression Rule --&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">rb_CalcularMontoRedencion</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;filename&gt;</span><span class="str">Rule-a1b2c3d4.xml</span><span class="tag">&lt;/filename&gt;</span>
+    <span class="tag">&lt;/object&gt;</span>
+    <span class="tag">&lt;object&gt;</span>
+      <span class="tag">&lt;uuid&gt;</span><span class="str">b2c3d4e5-f6a7-8901-bcde-f12345678901</span><span class="tag">&lt;/uuid&gt;</span>
+      <span class="tag">&lt;type&gt;</span><span class="str">DataType</span><span class="tag">&lt;/type&gt;</span>  <span class="comment">&lt;!-- CDT = Custom Data Type --&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">SolicitudRedencion</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;filename&gt;</span><span class="str">DataType-b2c3d4e5.xsd</span><span class="tag">&lt;/filename&gt;</span>
+    <span class="tag">&lt;/object&gt;</span>
+    <span class="tag">&lt;object&gt;</span>
+      <span class="tag">&lt;uuid&gt;</span><span class="str">c3d4e5f6-a7b8-9012-cdef-123456789012</span><span class="tag">&lt;/uuid&gt;</span>
+      <span class="tag">&lt;type&gt;</span><span class="str">Constant</span><span class="tag">&lt;/type&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">RB_MAX_MONTO</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;filename&gt;</span><span class="str">Constant-c3d4e5f6.xml</span><span class="tag">&lt;/filename&gt;</span>
+    <span class="tag">&lt;/object&gt;</span>
+    <span class="tag">&lt;object&gt;</span>
+      <span class="tag">&lt;uuid&gt;</span><span class="str">d4e5f6a7-b8c9-0123-defa-234567890123</span><span class="tag">&lt;/uuid&gt;</span>
+      <span class="tag">&lt;type&gt;</span><span class="str">ProcessModel</span><span class="tag">&lt;/type&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">RB_ProcesoRedencion</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;filename&gt;</span><span class="str">ProcessModel-d4e5f6a7.xml</span><span class="tag">&lt;/filename&gt;</span>
+    <span class="tag">&lt;/object&gt;</span>
+  <span class="tag">&lt;/objects&gt;</span>
+<span class="tag">&lt;/package&gt;</span></pre>
+  </section>
+
+  <!-- ═══════════════════ OBJETOS XML ═══════════════════ -->
+  <section id="objetos">
+    <h2>🧩 Estructura XML por Tipo de Objeto</h2>
+    
+    <h3>1. Constant (Constante)</h3>
+    <pre><span class="tag">&lt;appian-object&gt;</span>
+  <span class="tag">&lt;constant&gt;</span>
+    <span class="tag">&lt;uuid&gt;</span><span class="str">c3d4e5f6-a7b8-9012-cdef-123456789012</span><span class="tag">&lt;/uuid&gt;</span>
+    <span class="tag">&lt;name&gt;</span><span class="str">RB_MAX_MONTO</span><span class="tag">&lt;/name&gt;</span>
+    <span class="tag">&lt;description&gt;</span><span class="str">Monto máximo para redención de bono</span><span class="tag">&lt;/description&gt;</span>
+    <span class="tag">&lt;dataType&gt;</span><span class="str">Number (Decimal)</span><span class="tag">&lt;/dataType&gt;</span>
+    <span class="tag">&lt;value&gt;</span><span class="str">999999.99</span><span class="tag">&lt;/value&gt;</span>
+  <span class="tag">&lt;/constant&gt;</span>
+<span class="tag">&lt;/appian-object&gt;</span></pre>
+
+    <h3>2. Expression Rule (Regla de Expresión)</h3>
+    <pre><span class="tag">&lt;appian-object&gt;</span>
+  <span class="tag">&lt;expressionRule&gt;</span>
+    <span class="tag">&lt;uuid&gt;</span><span class="str">a1b2c3d4-e5f6-7890-abcd-ef1234567890</span><span class="tag">&lt;/uuid&gt;</span>
+    <span class="tag">&lt;name&gt;</span><span class="str">rb_CalcularMontoRedencion</span><span class="tag">&lt;/name&gt;</span>
+    <span class="tag">&lt;description&gt;</span><span class="str">Calcula el monto de redención según el tipo de bono</span><span class="tag">&lt;/description&gt;</span>
+    <span class="tag">&lt;ruleInput&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">tipoBono</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;dataType&gt;</span><span class="str">Text</span><span class="tag">&lt;/dataType&gt;</span>
+    <span class="tag">&lt;/ruleInput&gt;</span>
+    <span class="tag">&lt;ruleInput&gt;</span>
+      <span class="tag">&lt;name&gt;</span><span class="str">monto</span><span class="tag">&lt;/name&gt;</span>
+      <span class="tag">&lt;dataType&gt;</span><span class="str">Number (Decimal)</span><span class="tag">&lt;/dataType&gt;</span>
+    <span class="tag">&lt;/ruleInput&gt;</span>
+    <span class="tag">&lt;definition&gt;</span>
+      <span class="str">&lt;![CDATA[
+        if(ri!tipoBono = "PREMIUM",
+          ri!monto * 1.15,
+          ri!monto
+        )
+      ]]&gt;</span>
+    <span class="tag">&lt;/definition&gt;</span>
+  <span class="tag">&lt;/expressionRule&gt;</span>
+<span class="tag">&lt;/appian-object&gt;</span></pre>
+
+    <h3>3. Process Model (Proceso)</h3>
+    <p>El Process Model usa <strong>BPMN embebido</strong>. Es el objeto más complejo — requiere LLM para traducir de BPD de IBM.</p>
+    <pre><span class="tag">&lt;appian-object&gt;</span>
+  <span class="tag">&lt;processModel&gt;</span>
+    <span class="tag">&lt;uuid&gt;</span><span class="str">d4e5f6a7-b8c9-0123-defa-234567890123</span><span class="tag">&lt;/uuid&gt;</span>
+    <span class="tag">&lt;name&gt;</span><span class="str">RB_ProcesoRedencion</span><span class="tag">&lt;/name&gt;</span>
+    <span class="tag">&lt;description&gt;</span><span class="str">Proceso principal de redención de bono Profuturo</span><span class="tag">&lt;/description&gt;</span>
+    <span class="tag">&lt;processVariables&gt;</span>
+      <span class="tag">&lt;variable&gt;</span>
+        <span class="tag">&lt;name&gt;</span><span class="str">solicitud</span><span class="tag">&lt;/name&gt;</span>
+        <span class="tag">&lt;dataType&gt;</span><span class="str">SolicitudRedencion</span><span class="tag">&lt;/dataType&gt;</span>  <span class="comment">&lt;!-- Referencia al CDT --&gt;</span>
+      <span class="tag">&lt;/variable&gt;</span>
+    <span class="tag">&lt;/processVariables&gt;</span>
+    <span class="tag">&lt;nodes&gt;</span>
+      <span class="comment">&lt;!-- Nodos BPMN: startEvent, userTask, serviceTask, exclusiveGateway, endEvent --&gt;</span>
+      <span class="tag">&lt;startEvent id=</span><span class="str">"start1"</span><span class="tag"> name=</span><span class="str">"Inicio"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;userTask id=</span><span class="str">"task1"</span><span class="tag"> name=</span><span class="str">"Validar Solicitud"</span> <span class="attr">assignedTo</span>=<span class="str">"&lt;grupo_aprobadores&gt;"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;serviceTask id=</span><span class="str">"svc1"</span><span class="tag"> name=</span><span class="str">"Llamar API Core"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;endEvent id=</span><span class="str">"end1"</span><span class="tag"> name=</span><span class="str">"Fin"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;/nodes&gt;</span>
+    <span class="tag">&lt;sequenceFlows&gt;</span>
+      <span class="tag">&lt;flow from=</span><span class="str">"start1"</span><span class="tag"> to=</span><span class="str">"task1"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;flow from=</span><span class="str">"task1"</span><span class="tag"> to=</span><span class="str">"svc1"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;flow from=</span><span class="str">"svc1"</span><span class="tag"> to=</span><span class="str">"end1"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;/sequenceFlows&gt;</span>
+  <span class="tag">&lt;/processModel&gt;</span>
+<span class="tag">&lt;/appian-object&gt;</span></pre>
+  </section>
+
+  <!-- ═══════════════════ CDT / XSD ═══════════════════ -->
+  <section id="cdt">
+    <h2>📐 CDT (Custom Data Types) — Formato XSD</h2>
+    
+    <p>Los Custom Data Types de Appian se definen como <strong>archivos XSD (XML Schema Definition)</strong>. Este es el equivalente directo a los <strong>Business Objects de IBM BPM</strong>.</p>
+    
+    <h3>Reglas clave de Appian XSD:</h3>
+    <ul style="color:var(--muted); margin-left:20px; margin-bottom:12px">
+      <li style="margin-bottom:4px">Debe tener un <code>targetNamespace</code> definido (ej: <code>urn:com:profuturo:types</code>)</li>
+      <li style="margin-bottom:4px">No puede usar el namespace reservado <code>http://www.appian.com/ae/types/*</code></li>
+      <li style="margin-bottom:4px">Nombres de campos ≤ 27 caracteres para mapeo directo a BD</li>
+      <li style="margin-bottom:4px">Nombres son <strong>case-sensitive</strong></li>
+      <li style="margin-bottom:4px">Tipos soportados: xs:string, xs:int, xs:decimal, xs:boolean, xs:date, xs:dateTime, xs:long + custom types</li>
+    </ul>
+    
+    <pre><span class="comment">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="tag">&lt;xs:schema</span>
+  <span class="attr">xmlns:xs</span>=<span class="str">"http://www.w3.org/2001/XMLSchema"</span>
+  <span class="attr">targetNamespace</span>=<span class="str">"urn:com:profuturo:types"</span>
+  <span class="attr">xmlns:tns</span>=<span class="str">"urn:com:profuturo:types"</span>
+  <span class="attr">elementFormDefault</span>=<span class="str">"qualified"</span><span class="tag">&gt;</span>
+
+  <span class="comment">&lt;!-- CDT: SolicitudRedencion (IBM BO → Appian CDT) --&gt;</span>
+  <span class="tag">&lt;xs:complexType</span> <span class="attr">name</span>=<span class="str">"SolicitudRedencion"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;xs:annotation&gt;</span>
+      <span class="tag">&lt;xs:documentation&gt;</span>Solicitud de redención de bono Profuturo<span class="tag">&lt;/xs:documentation&gt;</span>
+      <span class="tag">&lt;xs:appinfo</span> <span class="attr">source</span>=<span class="str">"appian.jpa"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;jpa:Table</span> <span class="attr">name</span>=<span class="str">"T_SOLICITUD_REDENCION"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;/xs:appinfo&gt;</span>
+    <span class="tag">&lt;/xs:annotation&gt;</span>
+    <span class="tag">&lt;xs:sequence&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"id"</span> <span class="attr">type</span>=<span class="str">"xs:long"</span> <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;xs:annotation&gt;</span>
+          <span class="tag">&lt;xs:appinfo</span> <span class="attr">source</span>=<span class="str">"appian.jpa"</span><span class="tag">&gt;</span>
+            <span class="tag">&lt;jpa:Id/&gt;</span>
+            <span class="tag">&lt;jpa:GeneratedValue</span> <span class="attr">strategy</span>=<span class="str">"IDENTITY"</span><span class="tag">/&gt;</span>
+          <span class="tag">&lt;/xs:appinfo&gt;</span>
+        <span class="tag">&lt;/xs:annotation&gt;</span>
+      <span class="tag">&lt;/xs:element&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"numSolicitud"</span>   <span class="attr">type</span>=<span class="str">"xs:string"</span>   <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"nss"</span>             <span class="attr">type</span>=<span class="str">"xs:string"</span>   <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"nombreAfiliado"</span>  <span class="attr">type</span>=<span class="str">"xs:string"</span>   <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"monto"</span>          <span class="attr">type</span>=<span class="str">"xs:decimal"</span>  <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"fechaSolicitud"</span> <span class="attr">type</span>=<span class="str">"xs:dateTime"</span> <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"status"</span>         <span class="attr">type</span>=<span class="str">"xs:string"</span>   <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="comment">&lt;!-- Campo anidado: referencia a otro CDT --&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"detalleBono"</span>    <span class="attr">type</span>=<span class="str">"tns:DetalleBono"</span> <span class="attr">minOccurs</span>=<span class="str">"0"</span><span class="tag">/&gt;</span>
+      <span class="comment">&lt;!-- Campo lista/array --&gt;</span>
+      <span class="tag">&lt;xs:element</span> <span class="attr">name</span>=<span class="str">"documentos"</span>    <span class="attr">type</span>=<span class="str">"tns:Documento"</span>   <span class="attr">minOccurs</span>=<span class="str">"0"</span> <span class="attr">maxOccurs</span>=<span class="str">"unbounded"</span><span class="tag">/&gt;</span>
+    <span class="tag">&lt;/xs:sequence&gt;</span>
+  <span class="tag">&lt;/xs:complexType&gt;</span>
+
+<span class="tag">&lt;/xs:schema&gt;</span></pre>
+
+    <div class="info-box success">
+      <p>✅ <strong>IBM BO → Appian CDT es el mapeo MÁS DIRECTO.</strong> La estructura es casi 1:1: los atributos del BO IBM se convierten en <code>&lt;xs:element&gt;</code>. Lo haremos primero en el <code>appian_generator</code>.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ API ═══════════════════ -->
+  <section id="api">
+    <h2>🔌 Appian Deployment REST API v2</h2>
+    
+    <p>Appian v23.3+ expone una <strong>API REST completa</strong> para automatizar el pipeline CI/CD:</p>
+    
+    <table>
+      <tr>
+        <th>Endpoint</th>
+        <th>Método</th>
+        <th>Acción</th>
+      </tr>
+      <tr>
+        <td><code>POST /suite/deployment-management/v2/deployments</code></td>
+        <td>POST (Action-Type: export)</td>
+        <td>Exportar paquete/app desde Appian</td>
+      </tr>
+      <tr>
+        <td><code>POST /suite/deployment-management/v2/inspections</code></td>
+        <td>POST</td>
+        <td>Inspeccionar paquete antes de importar</td>
+      </tr>
+      <tr>
+        <td><code>POST /suite/deployment-management/v2/deployments</code></td>
+        <td>POST (Action-Type: import)</td>
+        <td><strong>Importar ZIP de objetos</strong></td>
+      </tr>
+      <tr>
+        <td><code>GET /suite/deployment-management/v2/deployments/{uuid}</code></td>
+        <td>GET</td>
+        <td>Consultar estado del deployment</td>
+      </tr>
+      <tr>
+        <td><code>GET /suite/deployment-management/v2/deployments/{uuid}/log</code></td>
+        <td>GET</td>
+        <td>Obtener log detallado</td>
+      </tr>
+    </table>
+    
+    <h3>Ejemplo de llamada de importación (curl):</h3>
+    <pre><span class="comment"># Importar paquete ZIP a Appian via REST API</span>
+curl -X POST \
+  <span class="str">"https://profuturo.appiancloud.com/suite/deployment-management/v2/deployments"</span> \
+  -H <span class="str">"appian-api-key: &lt;API_KEY_SERVICE_ACCOUNT&gt;"</span> \
+  -H <span class="str">"Action-Type: import"</span> \
+  -F <span class="str">"package=@/output/Profuturo-RedencionBono-v1.zip"</span> \
+  -F <span class="str">"importCustomizationFile=@/config/icf_prod.properties"</span></pre>
+
+    <h3>Flujo de autenticación:</h3>
+    <ul style="color:var(--muted); margin-left:20px">
+      <li style="margin-bottom:4px">Crear <strong>Service Account</strong> en Admin Console → API Keys</li>
+      <li style="margin-bottom:4px">Generar <strong>API Key</strong> vinculada al Service Account</li>
+      <li style="margin-bottom:4px">Header: <code>appian-api-key: &lt;key&gt;</code></li>
+      <li style="margin-bottom:4px">Alternativo: OAuth 2.0 token</li>
+    </ul>
+
+    <div class="info-box warning">
+      <p>⚠️ Appian <strong>NO permite crear objetos individuales via REST</strong> (process models, rules, constants). El único mecanismo programático es importar un ZIP completo. Por eso el generador debe producir un ZIP válido.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ MAPEO IBM→APPIAN ═══════════════════ -->
+  <section id="mapeo">
+    <h2>🗺️ Tabla de Mapeo IBM BPM → Appian</h2>
+    
+    <table>
+      <tr>
+        <th>Artefacto IBM BPM</th>
+        <th>Extensión .twx</th>
+        <th>Equivalente Appian</th>
+        <th>Formato de destino</th>
+        <th>Complejidad</th>
+      </tr>
+      <tr>
+        <td>Business Object (BO)</td>
+        <td><code>.bo</code></td>
+        <td>Custom Data Type (CDT)</td>
+        <td>XSD file</td>
+        <td><span class="complexity-low">BAJA</span></td>
+      </tr>
+      <tr>
+        <td>Variable / Constant</td>
+        <td><code>.twx</code> (XML vars)</td>
+        <td>Constant</td>
+        <td>Constant XML</td>
+        <td><span class="complexity-low">BAJA</span></td>
+      </tr>
+      <tr>
+        <td>Service (IS)</td>
+        <td><code>.service</code></td>
+        <td>Expression Rule</td>
+        <td>Expression Rule XML</td>
+        <td><span class="complexity-med">MEDIA</span></td>
+      </tr>
+      <tr>
+        <td>Integration Service</td>
+        <td><code>.integr</code></td>
+        <td>Integration Object / Connected System</td>
+        <td>Integration XML</td>
+        <td><span class="complexity-med">MEDIA</span></td>
+      </tr>
+      <tr>
+        <td>Business Process (BPD)</td>
+        <td><code>.bpd</code></td>
+        <td>Process Model</td>
+        <td>Process Model XML (BPMN)</td>
+        <td><span class="complexity-high">ALTA</span></td>
+      </tr>
+      <tr>
+        <td>Human Task (Coach)</td>
+        <td><code>.htm</code></td>
+        <td>Interface / Form</td>
+        <td>Interface XML (SAIL)</td>
+        <td><span class="complexity-high">ALTA</span></td>
+      </tr>
+      <tr>
+        <td>Decision (Business Rule)</td>
+        <td><code>.decision</code></td>
+        <td>Expression Rule / Decision Table</td>
+        <td>Rule XML</td>
+        <td><span class="complexity-med">MEDIA</span></td>
+      </tr>
+      <tr>
+        <td>Event Subprocess</td>
+        <td><code>.epa</code></td>
+        <td>Process Model (subprocess)</td>
+        <td>Process Model XML</td>
+        <td><span class="complexity-high">ALTA</span></td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════ WORKFLOW ═══════════════════ -->
+  <section id="workflow">
+    <h2>⚙️ Workflow de Automatización IBM → Appian</h2>
+    
+    <div class="flow-diagram">
+      <div class="flow-step">📦 <strong>.twx</strong><br>IBM BPM</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🔍 <strong>ibm_twx_tools</strong><br>Extract XMLs</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🤖 <strong>LLM Mapping</strong><br>Translate logic</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">⚙️ <strong>appian_generator</strong><br>Build objects</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">📦 <strong>app.zip</strong><br>Appian Package</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🚀 <strong>Deploy API</strong><br>Import to Appian</div>
+    </div>
+    
+    <div class="grid-2">
+      <div class="card">
+        <h4>📥 Módulo: ibm_twx_tools (EXISTENTE)</h4>
+        <ul style="color:var(--muted); margin-left:16px; font-size:0.85rem">
+          <li>Parser de .twx → XML</li>
+          <li>Extractor de BOs, servicios, flujos</li>
+          <li>Generador de reportes HTML</li>
+          <li>Análisis multi-TWX</li>
+        </ul>
+        <p style="margin-top:8px"><span class="badge badge-green">✓ Listo</span></p>
+      </div>
+      <div class="card">
+        <h4>📤 Módulo: appian_generator (A CONSTRUIR)</h4>
+        <ul style="color:var(--muted); margin-left:16px; font-size:0.85rem">
+          <li>BO → XSD (CDT builder)</li>
+          <li>Variables → Constants XML</li>
+          <li>Services → Expression Rules XML</li>
+          <li>BPDs → Process Models XML (LLM)</li>
+          <li>Manifest builder (appian-package.xml)</li>
+          <li>ZIP packager</li>
+          <li>Deployment API client</li>
+        </ul>
+        <p style="margin-top:8px"><span class="badge badge-yellow">🔨 En desarrollo</span></p>
+      </div>
+    </div>
+    
+    <h3>Estructura propuesta del módulo appian_generator:</h3>
+    <div class="zip-tree">
+      <span class="dir">01_herramientas_python/</span><br>
+      &nbsp;&nbsp;<span class="dir">ibm_twx_tools/</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← módulo existente</span><br>
+      &nbsp;&nbsp;<span class="dir">appian_generator/</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← nuevo módulo</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">__init__.py</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">bo_to_cdt.py</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← BO → XSD (LOW complexity, first)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">vars_to_constants.py</span>&nbsp;<span style="color:var(--muted)">← Variables → Constants XML</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">services_to_rules.py</span>&nbsp;<span style="color:var(--muted)">← IS → Expression Rules</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">bpd_to_process.py</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← BPD → Process Model (LLM)</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">manifest_builder.py</span>&nbsp;<span style="color:var(--muted)">← appian-package.xml generator</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">zip_packager.py</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← Creates the final .zip</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file-xml">deploy_client.py</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← REST API deployment client</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file-xml">uuid_registry.py</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted)">← Manages UUID consistency</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PLAN DE ACCIÓN ═══════════════════ -->
+  <section id="prioridad">
+    <h2>🎯 Plan de Acción — Próximos Pasos</h2>
+    
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Tarea</th>
+        <th>Prioridad</th>
+        <th>Responsable</th>
+        <th>Depende de</th>
+      </tr>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Obtener Appian export ZIP de migración ya realizada<br><small style="color:var(--muted)">Para reversa y patrones reales</small></td>
+        <td><span class="badge badge-red">🔴 CRÍTICO</span></td>
+        <td>Carlos / Giovanni</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Analizar la estructura real del ZIP de Appian<br><small style="color:var(--muted)">Descomprimir, catalogar XMLs, validar schemas</small></td>
+        <td><span class="badge badge-red">🔴 CRÍTICO</span></td>
+        <td>Carlos / Copilot</td>
+        <td>#1</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Construir <code>bo_to_cdt.py</code><br><small style="color:var(--muted)">IBM BO → Appian CDT XSD</small></td>
+        <td><span class="badge badge-yellow">🟡 ALTA</span></td>
+        <td>Pavel / Copilot</td>
+        <td>#2</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Construir <code>vars_to_constants.py</code><br><small style="color:var(--muted)">Variables IBM → Constants Appian</small></td>
+        <td><span class="badge badge-yellow">🟡 ALTA</span></td>
+        <td>Pavel / Copilot</td>
+        <td>#2</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Obtener API Key de Appian para Service Account<br><small style="color:var(--muted)">Admin Console → API Keys</small></td>
+        <td><span class="badge badge-yellow">🟡 ALTA</span></td>
+        <td>Carlos</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>Test de importación: CDTs + Constants básicos<br><small style="color:var(--muted)">Primer ZIP de prueba con objetos simples</small></td>
+        <td><span class="badge badge-blue">🔵 MEDIA</span></td>
+        <td>Carlos + Pavel</td>
+        <td>#3, #4, #5</td>
+      </tr>
+      <tr>
+        <td><strong>7</strong></td>
+        <td>Construir <code>services_to_rules.py</code> con LLM<br><small style="color:var(--muted)">JS logic → Appian Expression Language</small></td>
+        <td><span class="badge badge-blue">🔵 MEDIA</span></td>
+        <td>Pavel / Copilot</td>
+        <td>#6</td>
+      </tr>
+      <tr>
+        <td><strong>8</strong></td>
+        <td>Construir <code>bpd_to_process.py</code> con LLM<br><small style="color:var(--muted)">BPD BPMN → Appian Process Model</small></td>
+        <td><span class="badge badge-blue">🔵 BAJA</span></td>
+        <td>Carlos + Pavel</td>
+        <td>#6</td>
+      </tr>
+    </table>
+    
+    <div class="info-box success" style="margin-top:16px">
+      <p>✅ <strong>LO QUE YA TENEMOS:</strong> ibm_twx_tools funcional, 16 skills operativos, 2 personas capacitadas (Carlos + Pavel), documentación completa, plan arquitectural detallado.</p>
+    </div>
+    <div class="info-box" style="margin-top:8px">
+      <p>🎯 <strong>LO QUE NECESITAMOS PARA EMPEZAR:</strong><br>
+      1. <strong>Appian export ZIP</strong> de una migración completa ya realizada (Giovanni o Carlos deben proveer)<br>
+      2. <strong>Versión de Appian</strong> que usa Profuturo (revisar Admin Console → About)<br>
+      3. <strong>API Key de Service Account</strong> para el deployment automatizado
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  🔷 NTT DATA · IBM TWX Reverse Engineering Suite v1.1.0 · llopezdo@emeal.nttdata.com<br>
+  Investigación completada: 23 Mayo 2025 · Appian v26.4 Documentation Research · Fase 1 completada
+</footer>
+
+</body>
+</html>

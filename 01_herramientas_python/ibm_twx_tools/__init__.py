@@ -8,7 +8,7 @@ Author: llopezdo@emeal.nttdata.com
 Suite for reverse engineering IBM Integration Designer / IBM BPM .twx files.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __corporate__ = "NTTDATA"
 __author__ = "llopezdo@emeal.nttdata.com"
 __product__ = "IBM TWX Reverse Engineering Suite"
@@ -19,10 +19,13 @@ from .service_extractor import ServiceExtractor
 from .flow_mapper import FlowMapper
 from .doc_generator import DocGenerator
 
+from .cross_model_analyzer import CrossModelAnalyzer
+
 __all__ = [
     "TWXParser",
     "EntityExtractor",
     "ServiceExtractor",
     "FlowMapper",
     "DocGenerator",
+    "CrossModelAnalyzer",
 ]

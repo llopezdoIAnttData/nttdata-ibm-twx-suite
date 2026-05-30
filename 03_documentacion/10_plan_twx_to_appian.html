@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NTT DATA · Plan Automatización IBM BPM → Appian</title>
+  <style>
+    :root{
+      --blue:#0077C8;--blue-d:#005BAC;--blue-dd:#003D7A;
+      --cyan:#00AEEF;--green:#10B981;--amber:#F59E0B;
+      --red:#EF4444;--purple:#A78BFA;--pink:#F472B6;
+      --appian:#E8001C;--appian-l:#FF3347;
+      --bg:#080D18;--bg2:#0D1529;--bg3:#111827;
+      --brd:#1A2E4A;--brd-hi:#1E4070;
+      --txt:#E2E8F0;--mu:#64748B;--mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Courier New',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;--r:10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--txt);font-family:var(--ui);line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--blue-d);border-radius:3px}
+
+    nav{position:sticky;top:0;z-index:99;background:rgba(8,13,24,.93);
+        backdrop-filter:blur(16px);border-bottom:1px solid var(--brd)}
+    .nav-in{display:flex;align-items:center;justify-content:space-between;
+            max-width:1060px;margin:0 auto;padding:10px 24px;gap:12px}
+    .nav-brand{font-weight:800;font-size:.88rem;color:#fff;display:flex;align-items:center;gap:8px}
+    .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+    .nav-links a{color:var(--mu2);font-size:.74rem;padding:4px 10px;border-radius:6px;text-decoration:none;transition:.15s}
+    .nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+    .hero{background:linear-gradient(150deg,#001428 0%,#000A1A 50%,#080D18 100%);
+          border-bottom:1px solid var(--brd);padding:52px 24px 44px;position:relative;overflow:hidden}
+    .hero::after{content:'';position:absolute;top:-80px;right:-80px;width:420px;height:420px;
+                 border-radius:50%;background:radial-gradient(circle,rgba(232,0,28,.07) 0%,transparent 65%);pointer-events:none}
+    .hero-in{max-width:1060px;margin:0 auto;position:relative;z-index:1}
+    .hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+    .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:20px;
+         font-size:.7rem;font-weight:700;letter-spacing:.05em}
+    .tag-blue{background:rgba(0,174,239,.12);color:var(--cyan);border:1px solid rgba(0,174,239,.3)}
+    .tag-red{background:rgba(232,0,28,.1);color:#FF6B7A;border:1px solid rgba(232,0,28,.3)}
+    .tag-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+    .tag-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+    .hero h1{font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:12px}
+    .hero h1 .ibm{color:var(--cyan)}
+    .hero h1 .arr{color:var(--mu);margin:0 10px}
+    .hero h1 .app{color:var(--appian-l)}
+    .hero-sub{font-size:.93rem;color:var(--mu2);max-width:700px;line-height:1.7;margin-bottom:28px}
+
+    .bridge-visual{display:flex;align-items:center;gap:0;background:var(--bg2);
+                   border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin-bottom:0}
+    .bv-side{flex:1;padding:20px 24px;text-align:center}
+    .bv-side.left{background:rgba(0,119,200,.06);border-right:1px solid var(--brd)}
+    .bv-side.right{background:rgba(232,0,28,.05);border-left:1px solid var(--brd)}
+    .bv-center{padding:16px 20px;display:flex;flex-direction:column;align-items:center;
+               justify-content:center;gap:6px;min-width:120px}
+    .bv-label{font-size:.68rem;font-weight:800;letter-spacing:.08em;color:var(--mu2);margin-bottom:6px}
+    .bv-title{font-size:1rem;font-weight:900;color:#fff}
+    .bv-sub{font-size:.72rem;color:var(--mu2);margin-top:3px}
+    .bv-arrow{font-size:1.8rem;color:var(--mu)}
+    .bv-badge{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 9px;
+              border-radius:4px;margin-top:6px}
+
+    .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+    .sec{padding:44px 0 16px}
+    .sec-label{font-size:.68rem;font-weight:800;letter-spacing:.12em;color:var(--cyan);
+               text-transform:uppercase;margin-bottom:7px}
+    .sec-title{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:22px}
+
+    /* FASES */
+    .fases{display:flex;flex-direction:column;gap:16px}
+    .fase{display:grid;grid-template-columns:200px 1fr;gap:0;
+          background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;
+          transition:.15s}
+    .fase:hover{border-color:var(--brd-hi)}
+    .fase-num{padding:24px 20px;display:flex;flex-direction:column;align-items:center;
+              justify-content:center;text-align:center;gap:6px;border-right:1px solid var(--brd)}
+    .fase-num .fn{font-size:2.2rem;font-weight:900;line-height:1}
+    .fase-num .fl{font-size:.68rem;font-weight:800;letter-spacing:.1em;color:var(--mu2);margin-top:4px}
+    .fase-num .fd{font-size:.7rem;color:var(--mu);margin-top:2px}
+    .fase-body{padding:22px 24px}
+    .fase-title{font-weight:800;font-size:1rem;color:#fff;margin-bottom:6px}
+    .fase-desc{font-size:.82rem;color:var(--mu2);margin-bottom:14px;line-height:1.6}
+    .fase-tasks{display:flex;flex-direction:column;gap:6px}
+    .ft{display:flex;align-items:flex-start;gap:8px;font-size:.79rem;color:var(--mu2)}
+    .ft-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+    .fase-out{display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+              font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:6px;
+              background:rgba(16,185,129,.08);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+
+    .f1{border-color:rgba(0,174,239,.3)} .f1 .fase-num{background:rgba(0,174,239,.06)} .f1 .fn{color:var(--cyan)}
+    .f2{border-color:rgba(167,139,250,.3)} .f2 .fase-num{background:rgba(167,139,250,.06)} .f2 .fn{color:var(--purple)}
+    .f3{border-color:rgba(245,158,11,.3)} .f3 .fase-num{background:rgba(245,158,11,.06)} .f3 .fn{color:var(--amber)}
+    .f4{border-color:rgba(16,185,129,.3)} .f4 .fase-num{background:rgba(16,185,129,.06)} .f4 .fn{color:var(--green)}
+    .f5{border-color:rgba(232,0,28,.3)} .f5 .fase-num{background:rgba(232,0,28,.05)} .f5 .fn{color:var(--appian-l)}
+
+    /* MAPPING TABLE */
+    .map-table{width:100%;border-collapse:collapse;margin:16px 0}
+    .map-table th{text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);
+                  letter-spacing:.06em;padding:8px 14px;border-bottom:1px solid var(--brd)}
+    .map-table td{padding:10px 14px;border-bottom:1px solid rgba(26,46,74,.5);
+                  font-size:.81rem;color:var(--mu2);vertical-align:middle}
+    .map-table tr:last-child td{border-bottom:none}
+    .comp{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;
+          padding:2px 8px;border-radius:4px;white-space:nowrap}
+    .c-low{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+    .c-med{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+    .c-hi{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+
+    /* ARQUITECTURA */
+    .arch{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);
+          padding:22px;font-family:var(--mono);font-size:.78rem;color:#94A3B8;
+          line-height:1.8;overflow-x:auto;margin:16px 0}
+    .arch .ac{color:var(--cyan)} .arch .ag{color:var(--green)}
+    .arch .aa{color:var(--amber)} .arch .ap{color:var(--purple)}
+    .arch .ar{color:#FF6B7A} .arch .am{color:var(--mu)}
+
+    /* NECESITAMOS */
+    .need-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .need-card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:18px}
+    .need-card .ni{font-size:1.4rem;margin-bottom:8px}
+    .need-card .nt{font-weight:800;font-size:.9rem;color:#fff;margin-bottom:5px}
+    .need-card .nd{font-size:.79rem;color:var(--mu2);line-height:1.5}
+    .need-card.have{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.04)}
+    .need-card.need{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.04)}
+
+    /* SESION INFO */
+    .session-box{background:linear-gradient(135deg,rgba(0,119,200,.08),rgba(0,174,239,.04));
+                 border:1px solid rgba(0,174,239,.3);border-radius:var(--r);padding:22px;margin-top:20px}
+    .session-box .sb-title{font-weight:800;color:var(--cyan);margin-bottom:14px;font-size:.95rem}
+    .path-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:.8rem}
+    .path-row code{font-family:var(--mono);font-size:.75rem;color:var(--cyan);
+                   background:rgba(0,174,239,.08);padding:3px 8px;border-radius:4px;word-break:break-all}
+    .path-row .pl{color:var(--mu2);flex-shrink:0;font-weight:700;min-width:80px}
+
+    .info{display:flex;gap:10px;padding:12px 16px;border-radius:8px;border:1px solid;
+          margin:12px 0;font-size:.81rem}
+    .info-amber{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);color:var(--mu2)}
+    .info-green{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3);color:var(--mu2)}
+
+    footer{background:var(--bg2);border-top:1px solid var(--brd);
+           padding:26px 24px;text-align:center;font-size:.76rem;color:var(--mu);margin-top:40px}
+    footer strong{color:var(--mu2)}
+
+    @media(max-width:640px){
+      .fase{grid-template-columns:1fr}
+      .fase-num{border-right:none;border-bottom:1px solid var(--brd);flex-direction:row;gap:12px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="nav-brand">● NTT DATA · Plan IBM BPM → Appian</div>
+    <div class="nav-links">
+      <a href="#vision">Visión</a>
+      <a href="#mapeo">Mapeo</a>
+      <a href="#arquitectura">Arquitectura</a>
+      <a href="#fases">Fases</a>
+      <a href="#necesitamos">Necesitamos</a>
+      <a href="#sesion">Sesión guardada</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-in">
+    <div class="hero-tags">
+      <span class="tag tag-blue">🤖 Automatización IA</span>
+      <span class="tag tag-red">🔴 Appian</span>
+      <span class="tag tag-amber">⚡ En planificación — Mayo 2026</span>
+      <span class="tag tag-green">✅ Análisis inverso listo</span>
+    </div>
+    <h1>
+      <span class="ibm">IBM BPM</span>
+      <span class="arr">→</span>
+      <span class="app">Appian</span>
+      <br>Migración automatizada con IA
+    </h1>
+    <p class="hero-sub">
+      Usando el análisis inverso que ya construimos (ibm_twx_tools + 16 skills),
+      vamos a construir el puente de ida: generar automáticamente paquetes importables
+      en Appian a partir de cualquier archivo .twx de IBM BPM.
+    </p>
+
+    <div class="bridge-visual">
+      <div class="bv-side left">
+        <div class="bv-label">ORIGEN</div>
+        <div class="bv-title">IBM BPM / BAW</div>
+        <div class="bv-sub">.twx — ZIP de artefactos XML</div>
+        <span class="bv-badge" style="background:rgba(0,174,239,.12);color:var(--cyan);border:1px solid rgba(0,174,239,.3)">✅ Extracción lista</span>
+      </div>
+      <div class="bv-center">
+        <div style="font-size:.65rem;color:var(--mu2);font-weight:700;letter-spacing:.08em">PUENTE IA</div>
+        <div class="bv-arrow">⚡</div>
+        <div style="font-size:.68rem;color:var(--cyan);font-weight:700">ibm_twx_tools</div>
+        <div style="font-size:.65rem;color:var(--mu)">+</div>
+        <div style="font-size:.68rem;color:var(--appian-l);font-weight:700">appian_generator</div>
+      </div>
+      <div class="bv-side right">
+        <div class="bv-label">DESTINO</div>
+        <div class="bv-title">Appian</div>
+        <div class="bv-sub">.zip — Application Package</div>
+        <span class="bv-badge" style="background:rgba(232,0,28,.1);color:#FF6B7A;border:1px solid rgba(232,0,28,.3)">🔨 Por construir</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- MAPEO -->
+  <div class="sec" id="mapeo">
+    <div class="sec-label">Mapeo de artefactos</div>
+    <div class="sec-title">IBM BPM → Appian — Tabla de equivalencias</div>
+
+    <table class="map-table">
+      <thead>
+        <tr>
+          <th>Artefacto IBM BPM</th>
+          <th>Archivo origen</th>
+          <th>Equivalente en Appian</th>
+          <th>Complejidad</th>
+          <th>Estrategia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#fff;font-weight:700">Business Object</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">12.*.xml</code></td>
+          <td style="color:var(--appian-l)">Record Type</td>
+          <td><span class="comp c-low">🟢 Baja</span></td>
+          <td>Mapeo directo campo a campo</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Variable de entorno</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">62.*.xml</code></td>
+          <td style="color:var(--appian-l)">Constant</td>
+          <td><span class="comp c-low">🟢 Baja</span></td>
+          <td>Mapeo directo nombre + valor</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Endpoint REST / SOAP</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">1.*.xml</code></td>
+          <td style="color:var(--appian-l)">Integration Object</td>
+          <td><span class="comp c-med">🟡 Media</span></td>
+          <td>URL + operaciones → Connected System</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Servicio IS (SYNC)</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">1.*.xml</code></td>
+          <td style="color:var(--appian-l)">Expression Rule</td>
+          <td><span class="comp c-med">🟡 Media</span></td>
+          <td>LLM convierte lógica JS → Appian Expression</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Script JavaScript</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">1.*.xml</code></td>
+          <td style="color:var(--appian-l)">Expression Rule</td>
+          <td><span class="comp c-hi">🔴 Alta</span></td>
+          <td>LLM traduce JS → Appian Expression Language</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">UCA (Undercover Agent)</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">4.*.xml</code></td>
+          <td style="color:var(--appian-l)">Process Model (iniciado por evento)</td>
+          <td><span class="comp c-med">🟡 Media</span></td>
+          <td>Cola BUS/MQ → Event Listener en Appian</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">BPD (proceso completo)</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">25.*.xml</code></td>
+          <td style="color:var(--appian-l)">Process Model</td>
+          <td><span class="comp c-hi">🔴 Alta</span></td>
+          <td>LLM reimagina el flujo en paradigma Appian</td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Coach View / HHS</td>
+          <td><code style="font-family:var(--mono);font-size:.72rem;color:var(--cyan)">64.*.xml</code></td>
+          <td style="color:var(--appian-l)">Interface (SAIL)</td>
+          <td><span class="comp c-hi">🔴 Alta</span></td>
+          <td>LLM genera SAIL equivalente + botones mapeados</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info info-amber">
+      <span style="flex-shrink:0">⚠️</span>
+      <span><strong>Los artefactos de complejidad 🟢 Baja se generan automáticamente 1:1.</strong> Los de 🔴 Alta requieren intervención del LLM para "reimaginar" en el paradigma Appian — no es traducción directa, es reingeniería asistida por IA.</span>
+    </div>
+  </div>
+
+  <!-- ARQUITECTURA -->
+  <div class="sec" id="arquitectura">
+    <div class="sec-label">Arquitectura técnica</div>
+    <div class="sec-title">El puente: nuevos módulos a construir</div>
+
+    <div class="arch">
+<span class="am">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="am">│</span>  <span class="ac">IBM TWX FILE (.twx)</span>                                              <span class="am">│</span>
+<span class="am">│</span>     └─▶ <span class="ac">ibm_twx_tools</span>  <span class="am">(ya existe ✅)</span>                            <span class="am">│</span>
+<span class="am">│</span>           └─▶ <span class="ag">JSON canónico</span>  {bos, services, flows, endpoints...}  <span class="am">│</span>
+<span class="am">└─────────────────────────────────────────────────────────────────┘</span>
+                              <span class="am">↓</span>
+<span class="am">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="am">│</span>  <span class="aa">appian_generator</span>  <span class="am">(por construir 🔨)</span>                            <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="aa">record_type_builder.py</span>     <span class="am">← BOs → Record Types XML</span>           <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="aa">constant_builder.py</span>        <span class="am">← Variables → Constants XML</span>         <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="aa">integration_builder.py</span>     <span class="am">← Endpoints → Integration XML</span>       <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="ap">expression_rule_builder.py</span>  <span class="am">← Scripts JS → Appian Expression</span>   <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="ap">process_model_builder.py</span>    <span class="am">← BPDs → Process Models XML</span>        <span class="am">│</span>
+<span class="am">│</span>   ├─ <span class="ap">interface_builder.py</span>        <span class="am">← Coach Views → SAIL Interfaces</span>    <span class="am">│</span>
+<span class="am">│</span>   └─ <span class="ag">package_assembler.py</span>        <span class="am">← Empaqueta todo en .zip Appian</span>    <span class="am">│</span>
+<span class="am">└─────────────────────────────────────────────────────────────────┘</span>
+                              <span class="am">↓</span>
+<span class="am">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="am">│</span>  <span class="ar">MiProceso_AppianPackage.zip</span>                                      <span class="am">│</span>
+<span class="am">│</span>   ├─ application.xml                                             <span class="am">│</span>
+<span class="am">│</span>   ├─ package-dependencies.xml                                   <span class="am">│</span>
+<span class="am">│</span>   ├─ recordTypes / RecordType_Cliente.xml ...                   <span class="am">│</span>
+<span class="am">│</span>   ├─ constants / Constant_UrlServicio.xml ...                   <span class="am">│</span>
+<span class="am">│</span>   ├─ integrations / Integration_ServicioXYZ.xml ...             <span class="am">│</span>
+<span class="am">│</span>   ├─ expressionRules / Rule_ValidarCliente.xml ...              <span class="am">│</span>
+<span class="am">│</span>   └─ processModels / Process_RedencionBono.xml ...              <span class="am">│</span>
+<span class="am">└─────────────────────────────────────────────────────────────────┘</span>
+                              <span class="am">↓</span>
+             <span class="ag">Appian Designer → Import Application Package</span>
+    </div>
+
+    <div class="info info-green">
+      <span style="flex-shrink:0">💡</span>
+      <span><strong>Nuevo skill Copilot CLI:</strong> <code style="color:var(--cyan)">/twx-to-appian</code> — orquesta todo el pipeline: extrae el TWX con ibm_twx_tools, genera el .zip con appian_generator, y opcionalmente lo sube via Appian Import API.</span>
+    </div>
+  </div>
+
+  <!-- FASES -->
+  <div class="sec" id="fases">
+    <div class="sec-label">Plan de ejecución</div>
+    <div class="sec-title">5 fases para llegar a la automatización completa</div>
+
+    <div class="fases">
+
+      <div class="fase f1">
+        <div class="fase-num">
+          <div class="fn">F1</div>
+          <div class="fl">INGENIERÍA INVERSA</div>
+          <div class="fd">1 sesión</div>
+        </div>
+        <div class="fase-body">
+          <div class="fase-title">Entender el formato Appian</div>
+          <div class="fase-desc">Analizar el .zip de exportación de Appian para descubrir el schema XML exacto de cada tipo de objeto. Sin esto no podemos generar nada compatible.</div>
+          <div class="fase-tasks">
+            <div class="ft"><div class="ft-dot" style="background:var(--cyan)"></div>Descomprimir el .zip de exportación de Appian</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--cyan)"></div>Catalogar la estructura de carpetas y archivos</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--cyan)"></div>Extraer el schema XML de Record Type, Process Model, Interface, Integration, Constant</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--cyan)"></div>Leer documentación en docs.appian.com para campos obligatorios</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--cyan)"></div>Identificar la versión de Appian del entorno Profuturo</div>
+          </div>
+          <div class="fase-out">📦 Entregable: mapping_schema.json — schemas XML de cada objeto Appian</div>
+        </div>
+      </div>
+
+      <div class="fase f2">
+        <div class="fase-num">
+          <div class="fn">F2</div>
+          <div class="fl">TABLAS DE MAPEO</div>
+          <div class="fd">1-2 sesiones</div>
+        </div>
+        <div class="fase-body">
+          <div class="fase-title">Reglas de transformación IBM → Appian</div>
+          <div class="fase-desc">Con el schema de Appian conocido, definir las reglas exactas de cómo cada campo IBM se convierte en su equivalente Appian. Los casos complejos (JS → Expression Language) los resuelve el LLM.</div>
+          <div class="fase-tasks">
+            <div class="ft"><div class="ft-dot" style="background:var(--purple)"></div>Mapeo completo BO → Record Type (campo a campo)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--purple)"></div>Mapeo Variables de entorno → Constants</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--purple)"></div>Mapeo Endpoints → Integration Objects / Connected Systems</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--purple)"></div>Reglas LLM para traducción de scripts JavaScript → Appian Expression Language</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--purple)"></div>Reglas LLM para reimplementación de flujos BPD → Process Model Appian</div>
+          </div>
+          <div class="fase-out">📦 Entregable: mapping_rules.json — reglas de transformación completas</div>
+        </div>
+      </div>
+
+      <div class="fase f3">
+        <div class="fase-num">
+          <div class="fn">F3</div>
+          <div class="fl">CONSTRUCCIÓN</div>
+          <div class="fd">3-5 sesiones</div>
+        </div>
+        <div class="fase-body">
+          <div class="fase-title">Módulo appian_generator</div>
+          <div class="fase-desc">Construir los builders Python para cada tipo de objeto, empezando por los de baja complejidad (BOs, Constants) y terminando con los de alta complejidad (Process Models, Interfaces).</div>
+          <div class="fase-tasks">
+            <div class="ft"><div class="ft-dot" style="background:var(--amber)"></div>Sprint 1: record_type_builder.py + constant_builder.py (BOs y variables)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--amber)"></div>Sprint 2: integration_builder.py (endpoints REST/SOAP)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--amber)"></div>Sprint 3: expression_rule_builder.py (scripts → Expression Language con LLM)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--amber)"></div>Sprint 4: process_model_builder.py (BPDs → Process Models)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--amber)"></div>Sprint 5: interface_builder.py + package_assembler.py</div>
+          </div>
+          <div class="fase-out">📦 Entregable: módulo appian_generator funcional</div>
+        </div>
+      </div>
+
+      <div class="fase f4">
+        <div class="fase-num">
+          <div class="fn">F4</div>
+          <div class="fl">INTEGRACIÓN CLI</div>
+          <div class="fd">1 sesión</div>
+        </div>
+        <div class="fase-body">
+          <div class="fase-title">Skill /twx-to-appian en Copilot CLI</div>
+          <div class="fase-desc">Integrar el generador como un nuevo skill del suite NTT DATA. Un solo comando hace el pipeline completo: .twx → análisis → .zip Appian.</div>
+          <div class="fase-tasks">
+            <div class="ft"><div class="ft-dot" style="background:var(--green)"></div>Crear SKILL.md para twx-to-appian con instrucciones agentic</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--green)"></div>Integrar en el menú /nttdata (opción 15)</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--green)"></div>Agregar comando al CLI de ibm_twx_tools: python -m ibm_twx_tools to-appian</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--green)"></div>Pushear al repositorio GitHub</div>
+          </div>
+          <div class="fase-out">📦 Entregable: skill /twx-to-appian publicado en GitHub</div>
+        </div>
+      </div>
+
+      <div class="fase f5">
+        <div class="fase-num">
+          <div class="fn">F5</div>
+          <div class="fl">VALIDACIÓN</div>
+          <div class="fd">1-2 sesiones</div>
+        </div>
+        <div class="fase-body">
+          <div class="fase-title">Import real en consola Appian — Redención de Bono</div>
+          <div class="fase-desc">Prueba end-to-end: generar el paquete desde el TWX de Redención de Bono e importarlo en la consola Appian real. Iterar hasta importación limpia.</div>
+          <div class="fase-tasks">
+            <div class="ft"><div class="ft-dot" style="background:var(--appian-l)"></div>Correr /twx-to-appian sobre Profuturo_RedencionBono.twx</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--appian-l)"></div>Import del .zip generado en consola Appian</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--appian-l)"></div>Revisar errores de validación y corregir schemas</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--appian-l)"></div>Validar Record Types, Constants e Integrations en Appian Designer</div>
+            <div class="ft"><div class="ft-dot" style="background:var(--appian-l)"></div>Documentar ajustes necesarios para los demás procesos</div>
+          </div>
+          <div class="fase-out">📦 Entregable: primer proceso Profuturo importado automáticamente en Appian ✅</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NECESITAMOS -->
+  <div class="sec" id="necesitamos">
+    <div class="sec-label">Para arrancar</div>
+    <div class="sec-title">Qué tenemos y qué necesitamos</div>
+
+    <div class="need-grid">
+      <div class="need-card have">
+        <div class="ni">✅</div>
+        <div class="nt">ibm_twx_tools (extracción)</div>
+        <div class="nd">Suite Python completa. Extrae BOs, servicios, flujos, UCAs, endpoints, scripts de cualquier .twx.</div>
+      </div>
+      <div class="need-card have">
+        <div class="ni">✅</div>
+        <div class="nt">JSON canónico de 10 procesos</div>
+        <div class="nd">Ya tenemos el analyze + entities de los 10 TWX de Profuturo. Base de datos lista.</div>
+      </div>
+      <div class="need-card have">
+        <div class="ni">✅</div>
+        <div class="nt">16 Skills Copilot CLI</div>
+        <div class="nd">Suite de análisis completa. El nuevo skill /twx-to-appian se integrará aquí.</div>
+      </div>
+      <div class="need-card have">
+        <div class="ni">✅</div>
+        <div class="nt">Acceso a consola Appian</div>
+        <div class="nd">Para validar los paquetes generados e investigar la API de importación.</div>
+      </div>
+      <div class="need-card need">
+        <div class="ni">⏳</div>
+        <div class="nt">.zip de exportación de Appian</div>
+        <div class="nd">Un paquete exportado de Appian para hacer ingeniería inversa del schema XML. <strong style="color:#fff">Necesario para Fase 1.</strong></div>
+      </div>
+      <div class="need-card need">
+        <div class="ni">⏳</div>
+        <div class="nt">Versión de Appian del entorno</div>
+        <div class="nd">El schema XML puede variar entre versiones. Necesitamos saber qué versión usa Profuturo.</div>
+      </div>
+      <div class="need-card need">
+        <div class="ni">⏳</div>
+        <div class="nt">Appian Import API (opcional)</div>
+        <div class="nd">Para automatizar el upload del .zip desde el CLI. Si no está disponible, el import se hace manual desde el Designer.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESIÓN GUARDADA -->
+  <div class="sec" id="sesion">
+    <div class="sec-label">Continuación de sesión</div>
+    <div class="sec-title">Dónde continuar esta conversación</div>
+
+    <div class="session-box">
+      <div class="sb-title">📁 Archivos de esta planificación</div>
+      <div class="path-row">
+        <span class="pl">Este HTML</span>
+        <code>OneDrive · NTT DATA EMEAL\Documentos\NTTDATAIBMTWXSuite\NTTDATA-IBM-TWX-Suite\03_documentacion\10_plan_twx_to_appian.html</code>
+      </div>
+      <div class="path-row">
+        <span class="pl">Contexto MD</span>
+        <code>OneDrive · NTT DATA EMEAL\Documentos\NTTDATAIBMTWXSuite\NTTDATA-IBM-TWX-Suite\03_documentacion\10_plan_twx_to_appian_contexto.md</code>
+      </div>
+      <div class="path-row">
+        <span class="pl">Suite Python</span>
+        <code>OneDrive · NTT DATA EMEAL\Documentos\NTTDATAIBMTWXSuite\NTTDATA-IBM-TWX-Suite\01_herramientas_python\</code>
+      </div>
+      <div class="path-row">
+        <span class="pl">Repo GitHub</span>
+        <code>https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite</code>
+      </div>
+    </div>
+
+    <div class="info info-amber" style="margin-top:16px">
+      <span style="flex-shrink:0">💬</span>
+      <span><strong>Para continuar:</strong> Abre una nueva sesión de Copilot CLI y escribe: <br><code style="color:var(--cyan)">"Continuemos el plan twx-to-appian. Tengo el .zip de exportación de Appian listo."</code><br>Copilot encontrará el contexto automáticamente en el historial de sesiones.</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Luis Héctor López Domínguez</strong> · NTT DATA EMEAL · llopezdo@emeal.nttdata.com<br>
+  IBM TWX → Appian Automation Plan · Mayo 2026 · v1.0<br>
+  <span style="font-size:.7rem">Documento interno · No distribuir fuera del equipo de proyecto</span>
+</footer>
+
+</body>
+</html>

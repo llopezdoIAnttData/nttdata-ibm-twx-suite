@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NTT DATA · Onboarding — Carlos &amp; Pavel · IBM TWX Suite</title>
+  <style>
+    :root{
+      --blue:#0077C8;--blue-d:#005BAC;--blue-dd:#003D7A;
+      --cyan:#00AEEF;--green:#10B981;--amber:#F59E0B;
+      --red:#EF4444;--purple:#A78BFA;--pink:#F472B6;
+      --bg:#080D18;--bg2:#0D1529;--bg3:#111827;--bg4:#0A1020;
+      --brd:#1A2E4A;--brd-hi:#1E4070;
+      --txt:#E2E8F0;--mu:#64748B;--mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Courier New',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+      --r:10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--txt);font-family:var(--ui);line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--blue-d);border-radius:3px}
+
+    /* nav */
+    nav{position:sticky;top:0;z-index:99;background:rgba(8,13,24,.93);
+        backdrop-filter:blur(16px);border-bottom:1px solid var(--brd)}
+    .nav-in{display:flex;align-items:center;justify-content:space-between;
+            max-width:960px;margin:0 auto;padding:10px 20px;gap:12px}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:.9rem;color:#fff}
+    .nav-brand span{color:var(--cyan)}
+    .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+    .nav-links a{color:var(--mu2);font-size:.78rem;padding:4px 10px;border-radius:6px;
+                 text-decoration:none;transition:.15s}
+    .nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+    /* hero */
+    .hero{background:linear-gradient(160deg,#001A42 0%,#000D22 60%,#080D18 100%);
+          border-bottom:1px solid var(--brd);padding:52px 20px 44px}
+    .hero-in{max-width:960px;margin:0 auto}
+    .hero-tag{display:inline-block;background:rgba(0,174,239,.12);color:var(--cyan);
+              border:1px solid rgba(0,174,239,.3);border-radius:20px;
+              font-size:.72rem;font-weight:700;padding:3px 12px;letter-spacing:.06em;margin-bottom:16px}
+    .hero h1{font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:900;color:#fff;line-height:1.2;margin-bottom:10px}
+    .hero h1 span{color:var(--cyan)}
+    .hero-sub{font-size:.95rem;color:var(--mu2);max-width:620px;margin-bottom:28px}
+    .hero-names{display:flex;gap:12px;flex-wrap:wrap}
+    .name-card{background:rgba(0,119,200,.1);border:1px solid rgba(0,119,200,.3);
+               border-radius:10px;padding:12px 18px;display:flex;align-items:center;gap:10px}
+    .name-card .avatar{width:38px;height:38px;border-radius:50%;
+                       background:linear-gradient(135deg,var(--blue),var(--cyan));
+                       display:flex;align-items:center;justify-content:center;
+                       font-weight:900;font-size:.95rem;color:#fff;flex-shrink:0}
+    .name-card .info{display:flex;flex-direction:column}
+    .name-card .name{font-weight:700;font-size:.88rem;color:#fff}
+    .name-card .role{font-size:.72rem;color:var(--cyan)}
+
+    /* wrap */
+    .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+    .sec{padding:40px 0 20px}
+    .sec-label{font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--cyan);
+               text-transform:uppercase;margin-bottom:8px}
+    .sec-title{font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:20px}
+
+    /* role cards */
+    .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px}
+    @media(max-width:640px){.role-grid{grid-template-columns:1fr}}
+    .role-card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:22px}
+    .role-card.carlos{border-color:rgba(0,174,239,.4);background:rgba(0,174,239,.04)}
+    .role-card.pavel{border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.04)}
+    .role-card .rc-name{font-weight:800;font-size:1rem;color:#fff;margin-bottom:2px}
+    .role-card .rc-role{font-size:.75rem;color:var(--mu2);margin-bottom:14px}
+    .role-card ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+    .role-card ul li{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;color:var(--mu2)}
+    .role-card ul li::before{content:'→';color:var(--cyan);font-weight:700;flex-shrink:0;margin-top:1px}
+    .role-card.pavel ul li::before{color:var(--purple)}
+
+    /* flujo */
+    .flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin:20px 0}
+    .flow-step{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;
+               padding:14px 18px;min-width:150px;text-align:center}
+    .flow-step .fs-num{font-size:.7rem;font-weight:800;color:var(--cyan);letter-spacing:.08em;margin-bottom:4px}
+    .flow-step .fs-title{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:3px}
+    .flow-step .fs-who{font-size:.7rem;color:var(--mu2)}
+    .flow-step .fs-who span.carlos{color:var(--cyan)}
+    .flow-step .fs-who span.pavel{color:var(--purple)}
+    .flow-arrow{font-size:1.2rem;color:var(--mu);padding:0 6px;flex-shrink:0}
+
+    /* skills table */
+    .skills-table{width:100%;border-collapse:collapse;margin-bottom:8px}
+    .skills-table th{text-align:left;font-size:.72rem;font-weight:800;color:var(--mu2);
+                     letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--brd)}
+    .skills-table td{padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);
+                     font-size:.82rem;color:var(--mu2);vertical-align:top}
+    .skills-table tr:last-child td{border-bottom:none}
+    .skills-table .cmd{font-family:var(--mono);font-size:.75rem;color:var(--green);
+                       background:rgba(16,185,129,.08);padding:2px 8px;border-radius:4px;
+                       white-space:nowrap}
+    .skills-table .who{display:inline-block;font-size:.68rem;font-weight:700;
+                       padding:2px 7px;border-radius:4px;white-space:nowrap}
+    .who-carlos{background:rgba(0,174,239,.12);color:var(--cyan);border:1px solid rgba(0,174,239,.3)}
+    .who-pavel{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+    .who-both{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+
+    /* steps */
+    .steps{display:flex;flex-direction:column;gap:12px;margin:16px 0}
+    .step{display:flex;gap:14px;align-items:flex-start}
+    .step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-d);
+              display:flex;align-items:center;justify-content:center;
+              font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0;margin-top:2px}
+    .step-body{flex:1}
+    .step-body .st-title{font-weight:700;font-size:.88rem;color:#fff;margin-bottom:3px}
+    .step-body .st-desc{font-size:.8rem;color:var(--mu2)}
+
+    /* terminal */
+    .term{background:#020810;border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;margin:12px 0}
+    .term-bar{background:var(--bg3);border-bottom:1px solid var(--brd);
+              padding:8px 14px;display:flex;align-items:center;gap:6px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dr{background:#EF4444}.dy{background:#F59E0B}.dg{background:#10B981}
+    .term-lbl{font-size:.72rem;color:var(--mu2);margin-left:4px;flex:1}
+    .term-body{padding:16px 18px;font-family:var(--mono);font-size:.78rem;
+               line-height:1.75;color:#94A3B8;overflow-x:auto}
+    .tc{color:var(--cyan)}.tg{color:var(--green)}.ta{color:var(--amber)}
+    .tw{color:#fff}.tm{color:var(--mu)}.tp{color:var(--purple)}
+
+    /* info boxes */
+    .info{display:flex;gap:10px;padding:12px 16px;border-radius:8px;
+          border:1px solid;margin:14px 0;font-size:.82rem}
+    .info-blue{background:rgba(0,119,200,.08);border-color:rgba(0,119,200,.3);color:var(--mu2)}
+    .info-green{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.3);color:var(--mu2)}
+    .info-amber{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.3);color:var(--mu2)}
+    .info strong{color:#fff}
+
+    /* checklist */
+    .checklist{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+    .chk{display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--mu2)}
+    .chk-box{width:20px;height:20px;border:2px solid var(--brd);border-radius:4px;
+             display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .chk-box.done{background:var(--green);border-color:var(--green);color:#fff;font-size:.65rem}
+
+    /* footer */
+    footer{background:var(--bg2);border-top:1px solid var(--brd);
+           padding:24px 20px;text-align:center;font-size:.75rem;color:var(--mu);margin-top:40px}
+    footer strong{color:var(--mu2)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="nav-brand">
+      <span style="color:var(--cyan)">●</span> NTT DATA <span>IBM TWX Suite</span>
+    </div>
+    <div class="nav-links">
+      <a href="#roles">Roles</a>
+      <a href="#flujo">Flujo</a>
+      <a href="#skills">Skills</a>
+      <a href="#instalacion">Instalación</a>
+      <a href="#primeros-pasos">Primer día</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-in">
+    <div class="hero-tag">ONBOARDING · NTT DATA EMEAL · Profuturo IBM BPM → Appian</div>
+    <h1>Bienvenidos al equipo <span>IBM TWX Suite</span></h1>
+    <p class="hero-sub">
+      Esta guía cubre tu rol específico en el pipeline de análisis y migración automatizada.
+      Incluye qué herramientas usar, cuándo, y cómo colaborar con el resto del equipo.
+    </p>
+    <div class="hero-names">
+      <div class="name-card">
+        <div class="avatar">CA</div>
+        <div class="info">
+          <span class="name">Carlos Alejandro Ávila</span>
+          <span class="role">Arquitecto de Appian</span>
+        </div>
+      </div>
+      <div class="name-card">
+        <div class="avatar" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">PG</div>
+        <div class="info">
+          <span class="name">Pavel Gabriel Morales</span>
+          <span class="role">Responsable de Reingeniería</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ROLES -->
+  <div class="sec" id="roles">
+    <div class="sec-label">Roles y responsabilidades</div>
+    <div class="sec-title">¿Qué hace cada uno?</div>
+    <div class="role-grid">
+      <div class="role-card carlos">
+        <div class="rc-name">Carlos Alejandro Ávila</div>
+        <div class="rc-role">Arquitecto de Appian</div>
+        <ul>
+          <li>Decide qué BOs van al toolkit compartido de Appian</li>
+          <li>Valida el modelo de datos cruzado entre los 10 procesos</li>
+          <li>Define los contratos de integración (REST/SOAP → Appian)</li>
+          <li>Corre el análisis <code>twx-multi-entities</code> cuando llegan nuevos TWX</li>
+          <li>Diseña la automatización de imports hacia Appian</li>
+          <li>Es la referencia técnica para Giovanni, Alejandro y Pavel</li>
+        </ul>
+      </div>
+      <div class="role-card pavel">
+        <div class="rc-name">Pavel Gabriel Morales</div>
+        <div class="rc-role">Responsable de Reingeniería</div>
+        <ul>
+          <li>Analiza los procesos transversales (aplican a múltiples flujos)</li>
+          <li>Identifica dependencias cruzadas entre procesos usando <code>twx-deps</code></li>
+          <li>Diseña la reingeniería de procesos antes del import a Appian</li>
+          <li>Coordina los imports automáticos cuando Carlos define la arquitectura</li>
+          <li>Valida que los flows migrados respetan el sequenceFlow original</li>
+          <li>Gestiona los conflicts de naming/tipado entre procesos</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info info-amber">
+      <span style="flex-shrink:0">⚠️</span>
+      <span><strong>Importante:</strong> Giovanni y Alejandro son las "manos" — implementan en Appian lo que Carlos y Pavel diseñan. Ellos reciben los reportes HTML pero no corren la suite.</span>
+    </div>
+  </div>
+
+  <!-- FLUJO -->
+  <div class="sec" id="flujo">
+    <div class="sec-label">Pipeline de trabajo</div>
+    <div class="sec-title">De un archivo .twx a Appian</div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="fs-num">PASO 1</div>
+        <div class="fs-title">Recibir TWX</div>
+        <div class="fs-who">Repositorio IBM BPM</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,174,239,.4)">
+        <div class="fs-num">PASO 2</div>
+        <div class="fs-title">Extracción técnica</div>
+        <div class="fs-who"><span class="carlos">Carlos</span> · analyze-Twx-Extract</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(0,174,239,.4)">
+        <div class="fs-num">PASO 3</div>
+        <div class="fs-title">Análisis cruzado</div>
+        <div class="fs-who"><span class="carlos">Carlos</span> · twx-multi-entities</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(167,139,250,.4)">
+        <div class="fs-num">PASO 4</div>
+        <div class="fs-title">Reingeniería</div>
+        <div class="fs-who"><span class="pavel">Pavel</span> · twx-deps + flows</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:rgba(16,185,129,.4)">
+        <div class="fs-num">PASO 5</div>
+        <div class="fs-title">Import Appian</div>
+        <div class="fs-who"><span style="color:var(--green)">Ambos</span> · automatización</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="fs-num">PASO 6</div>
+        <div class="fs-title">Ejecución</div>
+        <div class="fs-who">Giovanni · Alejandro</div>
+      </div>
+    </div>
+
+    <div class="info info-blue">
+      <span style="flex-shrink:0">💡</span>
+      <span><strong>Distribución de reportes:</strong> Carlos genera los HTML y los comparte por Teams con Giovanni, Alejandro y Jorge. Jorge solo consume el resumen ejecutivo del reporte cross-model.</span>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="sec" id="skills">
+    <div class="sec-label">Skills disponibles</div>
+    <div class="sec-title">Qué usar y cuándo</div>
+
+    <table class="skills-table">
+      <thead>
+        <tr>
+          <th>Comando</th>
+          <th>Para qué sirve</th>
+          <th>Quién lo usa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="cmd">/nttdata</code></td>
+          <td>Menú launcher — muestra todos los skills disponibles. Punto de entrada si no sabes qué usar.</td>
+          <td><span class="who who-both">Ambos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/analyze-Twx-Extract</code></td>
+          <td>Pipeline completo sobre 1 TWX: extrae XMLs, corre los 9 ciclos y genera el HTML de Extracción Técnica. <strong style="color:#fff">Paso 2 del pipeline.</strong></td>
+          <td><span class="who who-carlos">Carlos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-multi-entities</code></td>
+          <td>Análisis cruzado de N TWX: detecta BOs compartidos, clusters semánticos, candidatos a toolkit. Genera reporte HTML con score IA. <strong style="color:#fff">Paso 3 del pipeline.</strong></td>
+          <td><span class="who who-carlos">Carlos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-deps</code></td>
+          <td>Grafo de dependencias: quién llama a quién entre artefactos. Esencial para Pavel para entender impacto de la reingeniería.</td>
+          <td><span class="who who-pavel">Pavel</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-flows</code></td>
+          <td>Diagramas Mermaid del orden real de pasos (por sequenceFlow). Pavel los usa para validar que la reingeniería respeta el flujo original.</td>
+          <td><span class="who who-pavel">Pavel</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-entities</code></td>
+          <td>Business Objects con campos y herencia. Carlos los usa para decidir qué va al toolkit de Appian.</td>
+          <td><span class="who who-carlos">Carlos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-services</code></td>
+          <td>Servicios IS/GSS/HHS con pasos, inputs/outputs y tipo SYNC/ASYNC. Usado por ambos para entender la lógica antes del import.</td>
+          <td><span class="who who-both">Ambos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/profuturo-twx</code></td>
+          <td>Knowledge base completa de la metodología v3: 11 correcciones, patrones IBM→Appian, NOV_INSTANCE_MANAGEMENT, reglas de botones Coach Views. Consultar mientras se trabaja.</td>
+          <td><span class="who who-both">Ambos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/twx-endpoints</code></td>
+          <td>Endpoints REST/SOAP externos referenciados en el TWX. Carlos los necesita para los contratos de integración en Appian.</td>
+          <td><span class="who who-carlos">Carlos</span></td>
+        </tr>
+        <tr>
+          <td><code class="cmd">/nttdata-update</code></td>
+          <td>Actualiza todos los skills desde GitHub. Ejecutar cuando haya nuevas versiones disponibles.</td>
+          <td><span class="who who-both">Ambos</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- INSTALACIÓN -->
+  <div class="sec" id="instalacion">
+    <div class="sec-label">Instalación</div>
+    <div class="sec-title">Paso a paso — entorno completo</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="st-title">Verificar cuenta GitHub con Copilot activo</div>
+          <div class="st-desc">Necesitas una cuenta GitHub con licencia Copilot (Individual o Business). Confirmar con el responsable de licencias de NTT DATA EMEAL.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="st-title">Instalar GitHub Copilot CLI</div>
+          <div class="st-desc">Seguir la guía de instalación completa en el documento <code style="color:var(--cyan)">02_guia_instalacion.html</code> de esta misma carpeta. Cubre VS Code + extensión + autenticación gh CLI.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="st-title">Instalar Python 3.10+</div>
+          <div class="st-desc">Descargar desde <strong style="color:#fff">python.org</strong>. Durante la instalación marcar ✅ "Add Python to PATH".</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="st-title">Clonar la suite NTT DATA IBM TWX</div>
+          <div class="st-desc">Solicitar acceso al repositorio al owner de la suite. Luego:</div>
+          <div class="term" style="margin-top:8px">
+            <div class="term-bar">
+              <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+              <span class="term-lbl">PowerShell</span>
+            </div>
+            <div class="term-body"><span class="tm"># Clonar el repositorio en Documentos</span>
+<span class="tc">cd</span> <span class="ta">"$env:USERPROFILE\Documents"</span>
+<span class="tc">git clone</span> <span class="tw">https://github.com/llopezdoIAnttData/nttdata-ibm-twx-suite.git</span> <span class="ta">NTTDATA-IBM-TWX-Suite</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="st-title">Instalar el paquete Python ibm_twx_tools</div>
+          <div class="term" style="margin-top:8px">
+            <div class="term-bar">
+              <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+              <span class="term-lbl">PowerShell</span>
+            </div>
+            <div class="term-body"><span class="tc">cd</span> <span class="ta">"$env:USERPROFILE\Documents\NTTDATA-IBM-TWX-Suite\01_herramientas_python"</span>
+<span class="tc">pip install</span> <span class="tw">-e .</span>
+
+<span class="tm"># Verificar instalación</span>
+<span class="tc">python</span> <span class="tw">-m ibm_twx_tools</span> <span class="tg">analyze</span> <span class="tm">--help</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="st-title">Instalar los skills NTT DATA en Copilot CLI</div>
+          <div class="st-desc">Abre Copilot CLI y ejecuta el skill de actualización:</div>
+          <div class="term" style="margin-top:8px">
+            <div class="term-bar">
+              <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+              <span class="term-lbl">Copilot CLI — chat</span>
+            </div>
+            <div class="term-body"><span class="tm"># En el chat de Copilot CLI escribe:</span>
+<span class="tp">/nttdata-update</span>
+
+<span class="tm"># Esto descarga e instala los 16 skills automáticamente</span>
+<span class="tm"># Al terminar verás: ✅ Instalación completada — 16 skills</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="st-title">Verificar que todo funciona</div>
+          <div class="term" style="margin-top:8px">
+            <div class="term-bar">
+              <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+              <span class="term-lbl">Copilot CLI — verificación</span>
+            </div>
+            <div class="term-body"><span class="tm"># Verificar skills instalados</span>
+<span class="tp">/nttdata</span>
+<span class="tm"># Debe mostrar el menú con las 14 opciones</span>
+
+<span class="tm"># Verificar Python</span>
+<span class="tc">python</span> <span class="tw">-m ibm_twx_tools analyze --help</span>
+<span class="tg"># Debe mostrar: usage: ibm_twx_tools analyze ...</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info info-green">
+      <span style="flex-shrink:0">✅</span>
+      <span><strong>¿Necesitas ayuda con la instalación?</strong> Contactar al owner de la suite. La guía detallada está en <code style="color:var(--cyan)">02_guia_instalacion.html</code> de esta misma carpeta.</span>
+    </div>
+  </div>
+
+  <!-- PRIMER DÍA -->
+  <div class="sec" id="primeros-pasos">
+    <div class="sec-label">Primer día</div>
+    <div class="sec-title">Quick start — tu primera sesión</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <!-- Carlos -->
+      <div style="background:rgba(0,174,239,.04);border:1px solid rgba(0,174,239,.3);border-radius:var(--r);padding:20px">
+        <div style="font-weight:800;color:var(--cyan);margin-bottom:16px;font-size:.9rem">🔷 Carlos — Primer análisis</div>
+        <div class="steps" style="margin:0">
+          <div class="step">
+            <div class="step-num" style="background:rgba(0,174,239,.3);width:22px;height:22px;font-size:.68rem">1</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Obtén un archivo .twx</div>
+              <div class="st-desc" style="font-size:.76rem">Pide al equipo el TWX del proceso que vas a analizar primero.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(0,174,239,.3);width:22px;height:22px;font-size:.68rem">2</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Ejecuta el pipeline completo</div>
+              <div class="st-desc" style="font-size:.76rem">En Copilot CLI: <code style="color:var(--cyan)">/analyze-Twx-Extract</code> — pega la ruta del TWX cuando te lo pida.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(0,174,239,.3);width:22px;height:22px;font-size:.68rem">3</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Revisa el reporte HTML</div>
+              <div class="st-desc" style="font-size:.76rem">Se abrirá automáticamente en el navegador. Revisa la sección de BOs y servicios.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(0,174,239,.3);width:22px;height:22px;font-size:.68rem">4</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Comparte el HTML</div>
+              <div class="st-desc" style="font-size:.76rem">Envía el archivo HTML por Teams a Giovanni/Alejandro/Jorge según corresponda.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pavel -->
+      <div style="background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.3);border-radius:var(--r);padding:20px">
+        <div style="font-weight:800;color:var(--purple);margin-bottom:16px;font-size:.9rem">🔮 Pavel — Primera sesión de reingeniería</div>
+        <div class="steps" style="margin:0">
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,.2);width:22px;height:22px;font-size:.68rem">1</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Revisa el reporte cross-model</div>
+              <div class="st-desc" style="font-size:.76rem">El archivo <code style="color:var(--purple)">cross_model_AI_report.html</code> ya existe. Úsalo para entender dependencias entre los 10 procesos.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,.2);width:22px;height:22px;font-size:.68rem">2</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Analiza dependencias de tu proceso</div>
+              <div class="st-desc" style="font-size:.76rem">En Copilot CLI: <code style="color:var(--purple)">/twx-deps</code> sobre el TWX que te asigne Carlos.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,.2);width:22px;height:22px;font-size:.68rem">3</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Valida los flujos</div>
+              <div class="st-desc" style="font-size:.76rem"><code style="color:var(--purple)">/twx-flows</code> para ver los diagramas Mermaid del proceso. Valida que el orden de pasos es el correcto.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,.2);width:22px;height:22px;font-size:.68rem">4</div>
+            <div class="step-body">
+              <div class="st-title" style="font-size:.82rem">Consulta la metodología v3</div>
+              <div class="st-desc" style="font-size:.76rem"><code style="color:var(--purple)">/profuturo-twx</code> para cualquier duda de patrones IBM→Appian mientras trabajas.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- checklist final -->
+    <div style="background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:20px;margin-top:20px">
+      <div style="font-weight:800;color:#fff;margin-bottom:14px;font-size:.9rem">✅ Checklist de onboarding completado</div>
+      <div class="checklist">
+        <div class="chk"><div class="chk-box">□</div><span>Cuenta GitHub con Copilot activo confirmada</span></div>
+        <div class="chk"><div class="chk-box">□</div><span>GitHub Copilot CLI instalado y autenticado</span></div>
+        <div class="chk"><div class="chk-box">□</div><span>Python 3.10+ instalado (<code>python --version</code>)</span></div>
+        <div class="chk"><div class="chk-box">□</div><span>Suite NTT DATA clonada en Documents</span></div>
+        <div class="chk"><div class="chk-box">□</div><span><code>pip install -e .</code> ejecutado sin errores</span></div>
+        <div class="chk"><div class="chk-box">□</div><span>Skills instalados con <code>/nttdata-update</code></span></div>
+        <div class="chk"><div class="chk-box">□</div><span>Menú <code>/nttdata</code> muestra las 14 opciones</span></div>
+        <div class="chk"><div class="chk-box">□</div><span>Primer reporte HTML generado y compartido</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>NTT DATA EMEAL</strong> · IBM TWX Reverse Engineering Suite v1.1.0 · Proyecto Profuturo IBM BPM → Appian<br>
+  <span style="font-size:.7rem">Documento interno · No distribuir fuera del equipo de proyecto</span>
+</footer>
+
+</body>
+</html>

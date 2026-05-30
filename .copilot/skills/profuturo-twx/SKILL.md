@@ -152,6 +152,97 @@ python -m ibm_twx_tools docs "ruta/al/archivo.twx" -o "salida.md"
 
 ---
 
+## Ciclo 10 — Mapeo F3: Arquitectura de Procesos Efímeros (25 mayo 2026)
+
+> **CRÍTICO:** La migración IBM BPM → Appian Fase 3 NO usa procesos long-lived.
+> Cada BPD se descompone en N+1 procesos efímeros. Leer esta sección antes de generar cualquier Process Model.
+
+### Comando
+
+```bash
+python -m ibm_twx_tools parametria "ruta/al/archivo.twx" -o "09_parametria_f3.json"
+```
+
+### Clasificación de Business Objects para F3
+
+En F3 no hay proceso padre que cargue un BO en memoria entre pasos. La categoría determina qué artefacto Appian se genera:
+
+| Categoría | Criterio de detección | Destino Appian |
+|-----------|----------------------|----------------|
+| **domain_entity** | Tiene campo `identificador`/`folio`, O referenciado en correlación UCA, O >10 campos | Record Type con tabla `NOV_*` en BD |
+| **dto** | Solo aparece en inputs/outputs de IS (payload request/response) | CDT o variable local del proceso efímero |
+| **catalog** | Nombre contiene "Catalogo", "Tipo", "Estatus", "Siefore", etc. | Skip — tabla catálogo existente o Constant |
+
+**Ejemplos Profuturo:**
+- `ArchivoBO` (24 usos, campos: identificador, folio, folioSubSecuente, +18) → **domain_entity** → `NOV Archivo Main` Record Type
+- `ETLGenericRequest` (request IS) → **dto** → variable local
+- `CatalogoBO` (id, valor, descripcion) → **catalog** → tabla catálogo existente
+
+### Descomposición de BPDs en procesos efímeros F3
+
+**Regla:** Para cada BPD con N puntos async (IS → UCA), F3 genera N+1 procesos lanzadores + 1 `NOV Respuesta Bus` compartido.
+
+Un "punto de corte F3" ocurre cuando en el `sequenceFlow` un `serviceTask`/`integrationTask` es seguido de un `intermediateEvent` (espera UCA).
+
+**Ejemplo: MP Redención de Bono (3 puntos async → 4 procesos + 1 respuesta-bus):**
+
+| Paso | Proceso F3 | IS IBM que lanza | UCA que esperaba |
+|------|------------|-----------------|-----------------|
+| 1 | `NOV MPRedencionBono Paso1` | IG Validar Solicitud | UCA Respuesta Validar |
+| 2 | `NOV MPRedencionBono Paso2` | IG Acreditar Bono | UCA Respuesta Acreditar |
+| 3 | `NOV MPRedencionBono Paso3` | IG Confirmar Operación | UCA Respuesta Confirmar |
+| 4 | `NOV MPRedencionBono Finalizar` | (cierre) | (ninguno) |
+| Shared | `NOV Respuesta Bus Redencion` | (disparado por IIB response) | — |
+
+### Campos NOV_INSTANCE_MANAGEMENT
+
+Variables IBM que "cruzan" un punto async (seteadas en paso N, leídas en paso N+1) DEBEN persistir en la tabla `NOV_INSTANCE_MANAGEMENT`:
+
+| Variable IBM | Campo Appian | Tipo | Por qué persiste |
+|-------------|-------------|------|-----------------|
+| `tw.local.salida` | `ACTION_OUT` | Integer | Decisión del gateway post-respuesta |
+| `tw.local.exitoso` | `STATUS_ID` | Boolean | Indicador éxito/fallo del IS |
+| `tw.local.folio` | `FOLIO` | Text | Identificador principal del proceso |
+| `tw.local.folioSubSecuente` | `FOLIO_SUBSECUENTE` | Text | Folio derivado |
+| `tw.local.esAcreditacion` | `ES_ACREDITACION` | Boolean | Flujo alternativo |
+| `tw.local.finalizarFlujo` | `FINALIZAR_FLUJO` | Boolean | Señal de cierre |
+| `tw.local.existeNoRechazados` | `EXISTE_NO_RECHAZADOS` | Boolean | Control de pendientes |
+| `tw.local.rechazarFolio` | `RECHAZAR_FOLIO` | Boolean | Acción de rechazo |
+| `tw.local.opcionIDC` | `ACCION_IDC` | Text | Decisión IDC (Fase 3 Traspasos) |
+
+### Template de parametría (tabla BD)
+
+La tabla de parametría gobierna "dado mi estado actual, cuál es el siguiente proceso F3":
+
+```json
+{
+  "proceso": "MP Redencion Bono",
+  "pasos": [
+    {
+      "id_paso": 1,
+      "proceso_appian": "NOV MPRedencionBono Paso1",
+      "integracion_is": "IG Validar Solicitud Redencion",
+      "salidas": [
+        {"condicion": "STATUS_ID=true AND ACTION_OUT=0", "siguiente_paso": 2},
+        {"condicion": "STATUS_ID=false", "siguiente_paso": -1, "accion": "error"}
+      ]
+    }
+  ]
+}
+```
+
+### Regla 8 (corrección v3 → F3): Pattern async actualizado
+
+**Antes (F2 long-lived):**
+> IS → BUS → IIB → UCA → BPD reanuda (proceso sigue en RAM)
+
+**Ahora (F3 efímero):**
+> IS → BUS → IIB → NOV_INSTANCE_MANAGEMENT UPDATE (IS_ACTIVE=0) → NOV Respuesta Bus lee parametría → lanza NUEVO proceso efímero Paso(N+1)
+
+El proceso padre NO reanuda. Termina en el momento en que llama al IS. Un proceso nuevo (disparado por `NOV Respuesta Bus`) recoge la respuesta y decide el siguiente paso usando la tabla de parametría.
+
+---
+
 ## Artefactos de referencia disponibles
 
 La arquitectura de conocimiento completa de la extracción v3 está documentada en:

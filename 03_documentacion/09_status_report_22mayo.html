@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NTT DATA · Status Report · Profuturo IBM BPM → Appian · 22 Mayo 2026</title>
+  <style>
+    :root{
+      --blue:#0077C8;--blue-d:#005BAC;--blue-dd:#003D7A;
+      --cyan:#00AEEF;--green:#10B981;--amber:#F59E0B;
+      --red:#EF4444;--purple:#A78BFA;--pink:#F472B6;
+      --bg:#080D18;--bg2:#0D1529;--bg3:#111827;
+      --brd:#1A2E4A;--brd-hi:#1E4070;
+      --txt:#E2E8F0;--mu:#64748B;--mu2:#94A3B8;
+      --mono:'Cascadia Code','Fira Code','Courier New',monospace;
+      --ui:'Segoe UI',system-ui,sans-serif;
+      --r:10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--txt);font-family:var(--ui);line-height:1.6;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--blue-d);border-radius:3px}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:99;background:rgba(8,13,24,.93);
+        backdrop-filter:blur(16px);border-bottom:1px solid var(--brd)}
+    .nav-in{display:flex;align-items:center;justify-content:space-between;
+            max-width:1060px;margin:0 auto;padding:10px 24px;gap:12px}
+    .nav-brand{font-weight:800;font-size:.9rem;color:#fff;display:flex;align-items:center;gap:8px}
+    .nav-brand span{color:var(--cyan)}
+    .nav-links{display:flex;gap:4px;flex-wrap:wrap}
+    .nav-links a{color:var(--mu2);font-size:.76rem;padding:4px 10px;border-radius:6px;
+                 text-decoration:none;transition:.15s}
+    .nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+
+    /* HERO */
+    .hero{background:linear-gradient(150deg,#001835 0%,#000D22 55%,#080D18 100%);
+          border-bottom:1px solid var(--brd);padding:56px 24px 48px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;top:-60px;right:-60px;
+                  width:380px;height:380px;border-radius:50%;
+                  background:radial-gradient(circle,rgba(0,119,200,.12) 0%,transparent 70%);pointer-events:none}
+    .hero-in{max-width:1060px;margin:0 auto;position:relative;z-index:1}
+    .hero-meta{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+    .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 12px;border-radius:20px;
+         font-size:.7rem;font-weight:700;letter-spacing:.06em}
+    .tag-blue{background:rgba(0,174,239,.12);color:var(--cyan);border:1px solid rgba(0,174,239,.3)}
+    .tag-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+    .tag-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+    .tag-purple{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+    .hero h1{font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:900;color:#fff;line-height:1.15;margin-bottom:10px}
+    .hero h1 span{color:var(--cyan)}
+    .hero-sub{font-size:.95rem;color:var(--mu2);max-width:680px;line-height:1.7}
+
+    /* KPI BAR */
+    .kpi-bar{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);
+             display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+             overflow:hidden;margin:32px 0 0}
+    .kpi{padding:18px 20px;border-right:1px solid var(--brd);text-align:center}
+    .kpi:last-child{border-right:none}
+    .kpi-val{font-size:1.8rem;font-weight:900;color:#fff;line-height:1}
+    .kpi-val span{font-size:.9rem;color:var(--mu2)}
+    .kpi-lbl{font-size:.7rem;color:var(--mu2);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+    /* WRAP */
+    .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+    .sec{padding:44px 0 12px}
+    .sec-label{font-size:.68rem;font-weight:800;letter-spacing:.12em;color:var(--cyan);
+               text-transform:uppercase;margin-bottom:7px}
+    .sec-title{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:22px}
+
+    /* TIMELINE */
+    .timeline{display:flex;flex-direction:column;gap:0}
+    .tl-item{display:flex;gap:0;position:relative}
+    .tl-left{width:110px;flex-shrink:0;text-align:right;padding-right:20px;padding-top:4px}
+    .tl-date{font-size:.72rem;font-weight:700;color:var(--cyan)}
+    .tl-day{font-size:.65rem;color:var(--mu);margin-top:1px}
+    .tl-line{width:2px;background:var(--brd);flex-shrink:0;position:relative;margin:0 0}
+    .tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--cyan);
+             background:var(--bg);position:absolute;left:-5px;top:6px;z-index:1}
+    .tl-content{flex:1;padding:0 0 28px 20px}
+    .tl-title{font-weight:800;color:#fff;font-size:.92rem;margin-bottom:8px}
+    .tl-items{display:flex;flex-direction:column;gap:5px}
+    .tl-row{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:var(--mu2)}
+    .tl-row::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;font-size:.7rem;margin-top:2px}
+    .tl-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:1px 7px;border-radius:4px;
+              margin-left:6px;white-space:nowrap;vertical-align:middle}
+
+    /* DELIVERABLES GRID */
+    .del-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:8px}
+    .del-card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:18px;
+              transition:.15s}
+    .del-card:hover{border-color:var(--brd-hi)}
+    .del-card.highlight{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.03)}
+    .del-icon{font-size:1.5rem;margin-bottom:10px}
+    .del-title{font-weight:800;font-size:.9rem;color:#fff;margin-bottom:5px}
+    .del-desc{font-size:.78rem;color:var(--mu2);line-height:1.5;margin-bottom:10px}
+    .del-tags{display:flex;flex-wrap:wrap;gap:5px}
+    .dt{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:4px;
+        background:rgba(0,119,200,.1);color:var(--cyan);border:1px solid rgba(0,119,200,.25)}
+    .dt-green{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.3)}
+    .dt-purple{background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.3)}
+    .dt-amber{background:rgba(245,158,11,.1);color:var(--amber);border-color:rgba(245,158,11,.3)}
+
+    /* SKILLS GRID */
+    .skills-pill-wrap{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+    .skill-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+                border-radius:20px;font-size:.76rem;font-weight:700;
+                background:rgba(0,119,200,.1);color:var(--cyan);border:1px solid rgba(0,119,200,.25)}
+    .skill-pill.new{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.3)}
+
+    /* TEAM TABLE */
+    .team-table{width:100%;border-collapse:collapse;margin:14px 0}
+    .team-table th{text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);
+                   letter-spacing:.06em;padding:8px 14px;border-bottom:1px solid var(--brd)}
+    .team-table td{padding:11px 14px;border-bottom:1px solid rgba(26,46,74,.5);
+                   font-size:.82rem;color:var(--mu2);vertical-align:middle}
+    .team-table tr:last-child td{border-bottom:none}
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;
+           padding:2px 9px;border-radius:4px;white-space:nowrap}
+    .badge-yes{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+    .badge-no{background:rgba(100,116,139,.1);color:var(--mu2);border:1px solid rgba(100,116,139,.2)}
+
+    /* NEXT STEPS */
+    .next-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+    .next-card{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:16px}
+    .next-card .nc-pri{font-size:.65rem;font-weight:800;letter-spacing:.08em;margin-bottom:8px}
+    .pri-alta{color:var(--red)}
+    .pri-media{color:var(--amber)}
+    .pri-baja{color:var(--green)}
+    .next-card .nc-title{font-weight:800;color:#fff;font-size:.88rem;margin-bottom:5px}
+    .next-card .nc-desc{font-size:.78rem;color:var(--mu2);line-height:1.5}
+
+    /* INFO */
+    .info{display:flex;gap:10px;padding:12px 16px;border-radius:8px;border:1px solid;
+          margin:14px 0;font-size:.82rem}
+    .info-blue{background:rgba(0,119,200,.07);border-color:rgba(0,119,200,.3);color:var(--mu2)}
+    .info-green{background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3);color:var(--mu2)}
+
+    /* FOOTER */
+    footer{background:var(--bg2);border-top:1px solid var(--brd);
+           padding:26px 24px;text-align:center;font-size:.76rem;color:var(--mu);margin-top:40px}
+    footer strong{color:var(--mu2)}
+
+    @media(max-width:640px){
+      .kpi-bar{grid-template-columns:repeat(2,1fr)}
+      .tl-left{width:80px}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="nav-brand"><span>●</span> NTT DATA · Status Report</div>
+    <div class="nav-links">
+      <a href="#resumen">Resumen</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#entregables">Entregables</a>
+      <a href="#skills">Skills</a>
+      <a href="#equipo">Equipo</a>
+      <a href="#siguientes">Próximos pasos</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-in">
+    <div class="hero-meta">
+      <span class="tag tag-blue">📅 Reporte al 22 Mayo 2026</span>
+      <span class="tag tag-green">✅ En progreso</span>
+      <span class="tag tag-amber">🎯 Profuturo · IBM BPM → Appian</span>
+      <span class="tag tag-purple">⚡ NTT DATA EMEAL</span>
+    </div>
+    <h1>Avance del proyecto<br><span>IBM TWX Reverse Engineering Suite</span></h1>
+    <p class="hero-sub">
+      Resumen ejecutivo de todo lo construido del 18 al 21 de mayo de 2026:
+      herramientas de análisis, suite de skills para GitHub Copilot CLI, análisis técnico completo
+      de Redención de Bono y análisis cruzado de los 10 procesos Profuturo.
+    </p>
+
+    <div class="kpi-bar">
+      <div class="kpi">
+        <div class="kpi-val">16</div>
+        <div class="kpi-lbl">Skills Copilot CLI</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">10</div>
+        <div class="kpi-lbl">Procesos TWX analizados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">422</div>
+        <div class="kpi-lbl">Business Objects mapeados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">6</div>
+        <div class="kpi-lbl">Clusters semánticos</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">9</div>
+        <div class="kpi-lbl">Reportes HTML generados</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">43</div>
+        <div class="kpi-lbl">Archivos creados/editados</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- RESUMEN EJECUTIVO -->
+  <div class="sec" id="resumen">
+    <div class="sec-label">Resumen ejecutivo</div>
+    <div class="sec-title">¿Qué se construyó?</div>
+
+    <div class="del-grid">
+      <div class="del-card highlight">
+        <div class="del-icon">🐍</div>
+        <div class="del-title">Suite Python ibm_twx_tools</div>
+        <div class="del-desc">Herramienta CLI completa para extracción y análisis de archivos IBM BPM .twx. 9 comandos de análisis, parser TWX reescrito, generador de reportes HTML, analizador cruzado multi-TWX.</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Producción</span>
+          <span class="dt">Python 3.10+</span>
+          <span class="dt">9 ciclos</span>
+        </div>
+      </div>
+      <div class="del-card highlight">
+        <div class="del-icon">🤖</div>
+        <div class="del-title">Suite de 16 Skills — GitHub Copilot CLI</div>
+        <div class="del-desc">16 skills integrados en GitHub Copilot CLI: análisis individual, análisis cruzado, metodología Profuturo, pipeline completo, actualización automática y menú launcher.</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Producción</span>
+          <span class="dt">Copilot CLI</span>
+          <span class="dt">GitHub Repo</span>
+        </div>
+      </div>
+      <div class="del-card highlight">
+        <div class="del-icon">📊</div>
+        <div class="del-title">Análisis técnico — Redención de Bono</div>
+        <div class="del-desc">Extracción técnica completa v3 del proceso de Redención de Bono: servicios IS/GSS/HHS, BOs, UCAs, endpoints REST/SOAP, flujos con sequenceFlow, botones Coach Views 64.*.</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Entregado</span>
+          <span class="dt">v3 Metodología</span>
+          <span class="dt">HTML</span>
+        </div>
+      </div>
+      <div class="del-card highlight">
+        <div class="del-icon">🌐</div>
+        <div class="del-title">Análisis cruzado — 10 procesos Profuturo</div>
+        <div class="del-desc">Análisis semántico IA de los 10 TWX del proyecto: 422 BOs, 31 compartidos, 6 clusters semánticos, candidatos a toolkit, score de reutilización, plan de acción priorizado.</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Entregado</span>
+          <span class="dt">217 KB HTML</span>
+          <span class="dt">Score 8/100</span>
+        </div>
+      </div>
+      <div class="del-card">
+        <div class="del-icon">📁</div>
+        <div class="del-title">Repositorio GitHub público</div>
+        <div class="del-desc">Repo <code style="color:var(--cyan);font-size:.8rem">llopezdoIAnttData/nttdata-ibm-twx-suite</code> con README, CHANGELOG, LICENSE, templates, página index.html NTT DATA branded con documentación de los 16 skills.</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Publicado</span>
+          <span class="dt">master</span>
+          <span class="dt">16 commits</span>
+        </div>
+      </div>
+      <div class="del-card">
+        <div class="del-icon">📚</div>
+        <div class="del-title">Documentación completa del proyecto</div>
+        <div class="del-desc">8 documentos HTML: overview, guía de instalación, infografía, propuesta de valor, roadmap de automatización, qué hicimos, guía de skills, onboarding del equipo (Carlos & Pavel).</div>
+        <div class="del-tags">
+          <span class="dt dt-green">Completo</span>
+          <span class="dt">8 HTMLs</span>
+          <span class="dt">OneDrive</span>
+        </div>
+      </div>
+      <div class="del-card">
+        <div class="del-icon">👥</div>
+        <div class="del-title">Estrategia de acceso del equipo</div>
+        <div class="del-desc">Definición de roles: Carlos Ávila y Pavel Morales acceden a Copilot CLI + Suite. Giovanni, Alejandro y Jorge reciben reportes HTML. Guía de onboarding personalizada para Carlos y Pavel.</div>
+        <div class="del-tags">
+          <span class="dt dt-amber">Hoy</span>
+          <span class="dt">2 licencias CLI</span>
+          <span class="dt">Onboarding listo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="sec" id="timeline">
+    <div class="sec-label">Cronología</div>
+    <div class="sec-title">Qué se hizo cada día</div>
+
+    <div class="timeline">
+
+      <!-- 18 MAYO -->
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">18 Mayo</div>
+          <div class="tl-day">Domingo</div>
+        </div>
+        <div class="tl-line"><div class="tl-dot"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">🚀 Arranque — Suite Python + Skills Copilot CLI</div>
+          <div class="tl-items">
+            <div class="tl-row">Reescritura completa de <code style="font-size:.75rem;color:var(--cyan)">twx_parser.py</code> para la estructura real de los TWX (prefijos 1.*, 12.*, 25.*, 64.*)</div>
+            <div class="tl-row">Corrección de <code style="font-size:.75rem;color:var(--cyan)">service_extractor.py</code> — tipos IS/GSS/HHS por processType</div>
+            <div class="tl-row">Creación de <code style="font-size:.75rem;color:var(--cyan)">run_analysis.py</code> — script maestro que ejecuta los 9 ciclos en secuencia</div>
+            <div class="tl-row">Banner NTT DATA reescrito y alineado (86 chars por línea, símbolo Shonai sólido)</div>
+            <div class="tl-row">9 skills individuales creados: <span class="tl-badge tag-blue">twx-analyze</span> <span class="tl-badge tag-blue">twx-entities</span> <span class="tl-badge tag-blue">twx-services</span> <span class="tl-badge tag-blue">twx-flows</span> <span class="tl-badge tag-blue">twx-deps</span> <span class="tl-badge tag-blue">twx-endpoints</span> <span class="tl-badge tag-blue">twx-scripts</span> <span class="tl-badge tag-blue">twx-entries</span> <span class="tl-badge tag-blue">twx-docs</span></div>
+            <div class="tl-row">Skill maestro <code style="font-size:.75rem;color:var(--cyan)">twx-suite</code> creado</div>
+            <div class="tl-row">Skill de conocimiento <code style="font-size:.75rem;color:var(--cyan)">profuturo-twx</code> con metodología v3 completa</div>
+            <div class="tl-row">Agente personalizado <code style="font-size:.75rem;color:var(--cyan)">twx-engineer</code> creado en <code style="font-size:.75rem">~/.copilot/agents/</code></div>
+            <div class="tl-row">Instrucciones globales <code style="font-size:.75rem;color:var(--cyan)">copilot-instructions.md</code> configuradas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 19 MAYO -->
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">19 Mayo</div>
+          <div class="tl-day">Lunes</div>
+        </div>
+        <div class="tl-line"><div class="tl-dot" style="border-color:var(--green)"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">📄 Análisis Profuturo v3 + Documentación + GitHub</div>
+          <div class="tl-items">
+            <div class="tl-row">Reporte técnico v3 de Redención de Bono completado: servicios, BOs, UCAs, endpoints, flujos, botones</div>
+            <div class="tl-row"><code style="font-size:.75rem;color:var(--green)">Profuturo_RedencionBono_ExtraccionTecnica_v3.html</code> entregado (limpio, sin referencias Appian)</div>
+            <div class="tl-row">Skill <code style="font-size:.75rem;color:var(--cyan)">analyze-Twx-Extract</code> creado — pipeline completo en un solo comando</div>
+            <div class="tl-row">Generador HTML <code style="font-size:.75rem;color:var(--cyan)">html_report.py</code> creado para salida navigable</div>
+            <div class="tl-row">Documentación creada: propuesta de valor, roadmap de automatización Appian (HTML + Markdown)</div>
+            <div class="tl-row">Repositorio GitHub creado y configurado: README, CHANGELOG, LICENSE, templates .github/</div>
+            <div class="tl-row">Script de instalación Windows <code style="font-size:.75rem;color:var(--cyan)">instalar_windows.ps1</code></div>
+            <div class="tl-row">index.html del proyecto rediseñada con NTT DATA branding (nav, pipeline, skills grid, comandos)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 20 MAYO -->
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">20 Mayo</div>
+          <div class="tl-day">Martes</div>
+        </div>
+        <div class="tl-line"><div class="tl-dot" style="border-color:var(--purple)"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">🌐 Análisis cruzado 10 TWX + 3 nuevos skills</div>
+          <div class="tl-items">
+            <div class="tl-row">Extracción de analyze + entities de los <strong style="color:#fff">10 procesos Profuturo</strong>: General_AP, OSS_Proceso, Liquidacion, OSS_AP, Reintegro, Retiros_ApoVol, Retiros_ESAR65, Retiros_TransfISSSTe, Saldos_Previos, Transferencias_IMSS</div>
+            <div class="tl-row">Analizador cruzado <code style="font-size:.75rem;color:var(--cyan)">cross_model_analyzer.py</code> + generador HTML <code style="font-size:.75rem;color:var(--cyan)">cross_model_html.py</code></div>
+            <div class="tl-row">Reporte <code style="font-size:.75rem;color:var(--green)">cross_model_AI_report.html</code> generado — 217 KB standalone con análisis IA</div>
+            <div class="tl-row">Hallazgo clave: <strong style="color:#fff">General_AP</strong> actúa como librería compartida de facto (165 BOs, 378 artefactos)</div>
+            <div class="tl-row">Score de reutilización: 8/100 — los 10 procesos son mayormente independientes</div>
+            <div class="tl-row">Skill <code style="font-size:.75rem;color:var(--purple)">twx-multi-entities</code> creado — modo agentic, análisis cruzado N TWX</div>
+            <div class="tl-row">Skill <code style="font-size:.75rem;color:var(--cyan)">nttdata</code> launcher creado — menú de todos los skills</div>
+            <div class="tl-row">Skill <code style="font-size:.75rem;color:var(--amber)">dashboard-corporate-design</code> creado — rediseño corporativo tablero GenAI</div>
+            <div class="tl-row">3 nuevos skills pusheados al repositorio GitHub</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 21 MAYO -->
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">21 Mayo</div>
+          <div class="tl-day">Miércoles (hoy)</div>
+        </div>
+        <div class="tl-line"><div class="tl-dot" style="border-color:var(--amber)"></div></div>
+        <div class="tl-content">
+          <div class="tl-title">🔄 Actualización repo + Estrategia de equipo + Onboarding</div>
+          <div class="tl-items">
+            <div class="tl-row">Skill <code style="font-size:.75rem;color:var(--cyan)">nttdata-update</code> creado e integrado — auto-actualización de todos los skills desde GitHub</div>
+            <div class="tl-row"><code style="font-size:.75rem;color:var(--cyan)">index.html</code> del repo actualizado: cards y tabla de los 16 skills completos (incluye analyze-Twx-Extract, nttdata-update, dashboard-corporate-design)</div>
+            <div class="tl-row">Decisión de acceso al equipo: <strong style="color:#fff">Carlos Ávila y Pavel Morales</strong> con Copilot CLI + Suite completa</div>
+            <div class="tl-row">Guía de onboarding personalizada creada: <code style="font-size:.75rem;color:var(--cyan)">08_onboarding_equipo.html</code></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ENTREGABLES -->
+  <div class="sec" id="entregables">
+    <div class="sec-label">Entregables</div>
+    <div class="sec-title">Reportes generados y disponibles</div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <thead>
+        <tr>
+          <th style="text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--brd)">Archivo</th>
+          <th style="text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--brd)">Descripción</th>
+          <th style="text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--brd)">Para quién</th>
+          <th style="text-align:left;font-size:.7rem;font-weight:800;color:var(--mu2);letter-spacing:.06em;padding:8px 12px;border-bottom:1px solid var(--brd)">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.8rem;color:var(--cyan);font-family:var(--mono)">cross_model_AI_report.html</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Análisis cruzado 10 procesos Profuturo. BOs compartidos, clusters semánticos, candidatos toolkit, plan de acción. 217 KB.</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Carlos, Pavel, Jorge (resumen ejecutivo)</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5)"><span class="badge badge-yes">✅ Listo</span></td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.8rem;color:var(--cyan);font-family:var(--mono)">ExtraccionTecnica_v3.html</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Análisis técnico completo de Redención de Bono: servicios, BOs, UCAs, endpoints, flujos, botones Coach Views.</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Giovanni Ramírez, Carlos</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5)"><span class="badge badge-yes">✅ Listo</span></td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.8rem;color:var(--amber);font-family:var(--mono)">ExtraccionTecnica — Comisión por Saldo</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Equivalente a la v3 pero para el proceso de Comisión por Saldo. Aún no generado.</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Alejandro Vega, Carlos</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5)"><span class="badge" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3)">⏳ Pendiente</span></td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.8rem;color:var(--cyan);font-family:var(--mono)">08_onboarding_equipo.html</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Guía de onboarding para Carlos y Pavel: roles, flujo de trabajo, skills a usar, instalación paso a paso, primer día.</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5);font-size:.79rem;color:var(--mu2)">Carlos Ávila, Pavel Morales</td>
+          <td style="padding:10px 12px;border-bottom:1px solid rgba(26,46,74,.5)"><span class="badge badge-yes">✅ Listo — hoy</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info info-blue">
+      <span style="flex-shrink:0">📂</span>
+      <span><strong>Ubicación de reportes:</strong> <code style="color:var(--cyan)">OneDrive · NTT DATA EMEAL\Documentos\NTTDATAIBMTWXSuite\twx-ibm\</code> (cross-model) y <code style="color:var(--cyan)">\Downloads\</code> (Redención de Bono). Compartir por Teams en formato HTML — se abren directamente en el navegador sin instalar nada.</span>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="sec" id="skills">
+    <div class="sec-label">Suite de skills</div>
+    <div class="sec-title">16 skills disponibles en GitHub Copilot CLI</div>
+
+    <div class="skills-pill-wrap">
+      <span class="skill-pill">🔷 nttdata</span>
+      <span class="skill-pill new">🚀 analyze-Twx-Extract</span>
+      <span class="skill-pill">🔷 twx-suite</span>
+      <span class="skill-pill">🔍 twx-analyze</span>
+      <span class="skill-pill">📦 twx-entities</span>
+      <span class="skill-pill">⚙️ twx-services</span>
+      <span class="skill-pill">🔀 twx-flows</span>
+      <span class="skill-pill">🔗 twx-deps</span>
+      <span class="skill-pill">📡 twx-endpoints</span>
+      <span class="skill-pill">📋 twx-entries</span>
+      <span class="skill-pill">📝 twx-docs</span>
+      <span class="skill-pill">{ } twx-scripts</span>
+      <span class="skill-pill new">🌐 twx-multi-entities</span>
+      <span class="skill-pill">🧠 profuturo-twx</span>
+      <span class="skill-pill new">🔄 nttdata-update</span>
+      <span class="skill-pill new">🎨 dashboard-corporate-design</span>
+    </div>
+
+    <div class="info info-green">
+      <span style="flex-shrink:0">💡</span>
+      <span>Los skills marcados en <strong style="color:var(--green)">verde</strong> son los 4 nuevos añadidos esta semana. Todos disponibles via <code style="color:var(--cyan)">/nttdata-update</code> en cualquier sesión de Copilot CLI.</span>
+    </div>
+  </div>
+
+  <!-- EQUIPO -->
+  <div class="sec" id="equipo">
+    <div class="sec-label">Estrategia de equipo</div>
+    <div class="sec-title">Quién usa qué</div>
+
+    <table class="team-table">
+      <thead>
+        <tr>
+          <th>Persona</th>
+          <th>Rol</th>
+          <th>Copilot CLI</th>
+          <th>Suite Python</th>
+          <th>Recibe reportes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#fff;font-weight:700">Carlos Alejandro Ávila</td>
+          <td style="color:var(--cyan)">Arquitecto Appian</td>
+          <td><span class="badge badge-yes">✅ Sí</span></td>
+          <td><span class="badge badge-yes">✅ Sí</span></td>
+          <td><span class="badge badge-yes">✅ Genera</span></td>
+        </tr>
+        <tr>
+          <td style="color:#fff;font-weight:700">Pavel Gabriel Morales</td>
+          <td style="color:var(--purple)">Reingeniería</td>
+          <td><span class="badge badge-yes">✅ Sí</span></td>
+          <td><span class="badge badge-yes">✅ Sí</span></td>
+          <td><span class="badge badge-yes">✅ Genera</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">Jorge Luis Pérez</td>
+          <td>Líder Appian</td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge badge-yes">✅ Resumen ejecutivo</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">José Giovanni Ramírez</td>
+          <td>Migración Redención de Bono</td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge badge-yes">✅ ExtraccionTecnica v3</span></td>
+        </tr>
+        <tr>
+          <td style="color:var(--mu2)">Alejandro Uziel Vega</td>
+          <td>Migración Comisión por Saldo</td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge badge-no">❌ No</span></td>
+          <td><span class="badge" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.3)">⏳ Pendiente generar</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PRÓXIMOS PASOS -->
+  <div class="sec" id="siguientes">
+    <div class="sec-label">Próximos pasos</div>
+    <div class="sec-title">¿Qué sigue?</div>
+
+    <div class="next-grid">
+      <div class="next-card" style="border-color:rgba(239,68,68,.3)">
+        <div class="nc-pri pri-alta">⬆ ALTA PRIORIDAD</div>
+        <div class="nc-title">Onboarding de Carlos y Pavel</div>
+        <div class="nc-desc">Compartir <code style="color:var(--cyan)">08_onboarding_equipo.html</code> + coordinar instalación de Copilot CLI + Suite Python en sus equipos. Guía lista, solo falta ejecución.</div>
+      </div>
+      <div class="next-card" style="border-color:rgba(239,68,68,.3)">
+        <div class="nc-pri pri-alta">⬆ ALTA PRIORIDAD</div>
+        <div class="nc-title">Reporte ExtraccionTecnica — Comisión por Saldo</div>
+        <div class="nc-desc">Alejandro Vega necesita el equivalente del reporte v3 para su proceso. Requiere el archivo .twx de Comisión por Saldo. Correr <code style="color:var(--cyan)">/analyze-Twx-Extract</code>.</div>
+      </div>
+      <div class="next-card" style="border-color:rgba(245,158,11,.3)">
+        <div class="nc-pri pri-media">⬅ MEDIA PRIORIDAD</div>
+        <div class="nc-title">Diseño de automatización imports → Appian</div>
+        <div class="nc-desc">Definir con Carlos la arquitectura del módulo de importación automática a Appian. El roadmap está documentado en <code style="color:var(--cyan)">05_roadmap_automatizacion_appian.html</code>.</div>
+      </div>
+      <div class="next-card" style="border-color:rgba(245,158,11,.3)">
+        <div class="nc-pri pri-media">⬅ MEDIA PRIORIDAD</div>
+        <div class="nc-title">Reportes ExtraccionTecnica — demás 9 procesos</div>
+        <div class="nc-desc">Generar el análisis v3 individual para los 9 procesos restantes (OSS, Liquidacion, Retiros, etc.) para que Pavel tenga el material completo de reingeniería.</div>
+      </div>
+      <div class="next-card">
+        <div class="nc-pri pri-baja">⬇ BAJA PRIORIDAD</div>
+        <div class="nc-title">Refinar score de reutilización</div>
+        <div class="nc-desc">Score actual: 8/100. Con más contexto de negocio se pueden identificar más clusters semánticos y subir el score. Revisar con Carlos los BOs candidatos a toolkit.</div>
+      </div>
+      <div class="next-card">
+        <div class="nc-pri pri-baja">⬇ BAJA PRIORIDAD</div>
+        <div class="nc-title">Profundizar extracción de campos en BOs</div>
+        <div class="nc-desc">La herramienta actualmente devuelve <code>fields: []</code> para todos los BOs. Investigar si los campos están en un namespace diferente en los archivos 12.*.xml de estos TWX.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Luis Héctor López Domínguez</strong> · NTT DATA EMEAL · llopezdo@emeal.nttdata.com<br>
+  IBM TWX Reverse Engineering Suite v1.1.0 · Proyecto Profuturo IBM BPM → Appian<br>
+  <span style="font-size:.7rem">Generado el 21 Mayo 2026 · Documento interno · No distribuir fuera del equipo de proyecto</span>
+</footer>
+
+</body>
+</html>

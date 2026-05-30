@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NTT DATA — Pipeline IBM BPM → Appian | Reporte Técnico</title>
+<style>
+  :root {
+    --ntt-blue:#0066CC;--ntt-dark:#001D4E;--ntt-cyan:#00AEEF;
+    --green:#27AE60;--orange:#E67E22;--red:#E74C3C;--purple:#8E44AD;
+    --gray:#F4F6F9;--border:#DDE3EC;--text:#1A1A2E;--muted:#6B7A99;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4FA;color:var(--text);font-size:14px}
+  /* ── HEADER ── */
+  header{background:linear-gradient(135deg,var(--ntt-dark) 0%,var(--ntt-blue) 100%);color:#fff;padding:40px 48px 32px;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:rgba(0,174,239,.15);border-radius:50%}
+  header::after{content:'';position:absolute;bottom:-80px;right:120px;width:200px;height:200px;background:rgba(255,255,255,.05);border-radius:50%}
+  .header-badge{display:inline-block;background:var(--ntt-cyan);color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:20px;margin-bottom:16px;text-transform:uppercase}
+  header h1{font-size:32px;font-weight:800;line-height:1.2;margin-bottom:8px}
+  header h1 span{color:var(--ntt-cyan)}
+  header p{font-size:14px;opacity:.8;max-width:600px;line-height:1.6}
+  .header-meta{display:flex;gap:24px;margin-top:24px;flex-wrap:wrap}
+  .meta-item{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:8px 16px;border-radius:8px;font-size:12px}
+  .meta-item strong{display:block;font-size:13px;color:var(--ntt-cyan)}
+  /* ── LAYOUT ── */
+  .container{max-width:1200px;margin:0 auto;padding:32px 24px}
+  /* ── SECTION TITLE ── */
+  .section-title{display:flex;align-items:center;gap:10px;margin:40px 0 20px;font-size:20px;font-weight:700;color:var(--ntt-dark)}
+  .section-title .icon{width:36px;height:36px;background:var(--ntt-blue);color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  /* ── TIMELINE / JOURNEY ── */
+  .journey{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:stretch;margin:24px 0 40px}
+  .journey-box{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 16px rgba(0,0,0,.07);border:2px solid var(--border)}
+  .journey-box.ibm{border-left:5px solid #FF6B35}
+  .journey-box.appian{border-left:5px solid var(--ntt-blue)}
+  .journey-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;gap:6px}
+  .arrow-line{width:3px;flex:1;background:linear-gradient(to bottom,#FF6B35,var(--ntt-blue));min-height:60px}
+  .arrow-head{color:var(--ntt-blue);font-size:28px;line-height:1}
+  .journey-box h3{font-size:16px;font-weight:700;margin-bottom:4px}
+  .journey-box .subtitle{font-size:12px;color:var(--muted);margin-bottom:16px}
+  .journey-stat{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .journey-stat:last-child{border-bottom:none}
+  .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .badge.ibm{background:#FFF0E8;color:#FF6B35}
+  .badge.appian{background:#E8F0FF;color:var(--ntt-blue)}
+  .badge.green{background:#E8F7EE;color:var(--green)}
+  /* ── STEPS PIPELINE ── */
+  .pipeline{display:flex;flex-direction:column;gap:0;position:relative;margin:24px 0}
+  .pipeline::before{content:'';position:absolute;left:28px;top:20px;bottom:20px;width:3px;background:linear-gradient(to bottom,var(--ntt-blue),var(--ntt-cyan));border-radius:3px}
+  .step{display:flex;gap:20px;align-items:flex-start;margin-bottom:8px;position:relative}
+  .step-num{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;z-index:1;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .step-body{flex:1;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:12px}
+  .step-body h4{font-size:15px;font-weight:700;margin-bottom:4px}
+  .step-body p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+  .step-detail{background:var(--gray);border-radius:8px;padding:12px 16px;font-size:12px;line-height:1.8}
+  .step-detail code{background:#e8eaf6;padding:1px 6px;border-radius:4px;font-family:monospace;color:var(--ntt-dark)}
+  /* ── DISCOVERY CARDS ── */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin:20px 0}
+  .card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);transition:transform .2s}
+  .card:hover{transform:translateY(-2px)}
+  .card-icon{font-size:28px;margin-bottom:10px}
+  .card h4{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--ntt-dark)}
+  .card p{font-size:12px;color:var(--muted);line-height:1.7}
+  .card .highlight{background:#EBF5FB;border-left:3px solid var(--ntt-blue);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:10px;font-size:12px;font-weight:600;color:var(--ntt-dark)}
+  /* ── TYPE MAPPING TABLE ── */
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  th{background:var(--ntt-dark);color:#fff;padding:12px 16px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px}
+  tr:last-child td{border-bottom:none}
+  tr:nth-child(even) td{background:#F8FAFD}
+  td code{background:#E8EEFF;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--ntt-blue)}
+  td .arrow{color:var(--ntt-cyan);font-weight:700}
+  /* ── ARCHITECTURE ── */
+  .arch{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  .arch-box{background:#fff;border-radius:12px;padding:18px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .arch-box .label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+  .arch-box h4{font-size:13px;font-weight:700;color:var(--ntt-dark);margin-bottom:8px}
+  .module-list{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .module-list li{font-size:12px;padding:5px 10px;border-radius:6px;background:var(--gray);display:flex;justify-content:space-between;align-items:center}
+  .module-list li .m-badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:#E8F7EE;color:var(--green)}
+  /* ── RESULTS ── */
+  .results{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0}
+  .result-card{background:#fff;border-radius:12px;padding:20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border)}
+  .result-card .num{font-size:48px;font-weight:800;line-height:1;color:var(--ntt-blue)}
+  .result-card .label{font-size:13px;color:var(--muted);margin-top:6px}
+  .result-card .sub{font-size:11px;color:var(--ntt-cyan);margin-top:4px;font-weight:600}
+  /* ── CODE BLOCK ── */
+  .code-block{background:#0D1B2A;color:#E8F4FD;border-radius:12px;padding:20px 24px;font-family:'Cascadia Code',monospace;font-size:13px;line-height:1.8;margin:16px 0;overflow-x:auto}
+  .code-block .comment{color:#6A9FB5}
+  .code-block .kw{color:#C792EA}
+  .code-block .str{color:#C3E88D}
+  .code-block .cmd{color:#FFCB6B}
+  /* ── NEXT STEPS ── */
+  .next-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin:20px 0}
+  .next-card{background:#fff;border-radius:12px;padding:18px;border-left:4px solid;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .next-card.done{border-color:var(--green)}
+  .next-card.next{border-color:var(--ntt-blue)}
+  .next-card.future{border-color:var(--muted)}
+  .next-card .status{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .next-card.done .status{color:var(--green)}
+  .next-card.next .status{color:var(--ntt-blue)}
+  .next-card.future .status{color:var(--muted)}
+  .next-card h4{font-size:13px;font-weight:700;margin-bottom:4px}
+  .next-card p{font-size:12px;color:var(--muted);line-height:1.6}
+  /* ── FOOTER ── */
+  footer{background:var(--ntt-dark);color:rgba(255,255,255,.6);text-align:center;padding:24px;font-size:12px;margin-top:48px}
+  footer strong{color:#fff}
+  /* ── ZIP STRUCTURE ── */
+  .zip-tree{background:#0D1B2A;color:#C3E88D;border-radius:12px;padding:20px 24px;font-family:monospace;font-size:13px;line-height:1.9;margin:16px 0}
+  .zip-tree .folder{color:#FFCB6B}
+  .zip-tree .file{color:#89DDFF}
+  .zip-tree .comment{color:#6A9FB5}
+  /* ── RESPONSIVE ── */
+  @media(max-width:768px){
+    .journey{grid-template-columns:1fr}
+    .journey-arrow{display:none}
+    .results{grid-template-columns:repeat(2,1fr)}
+    .arch{grid-template-columns:1fr}
+    header{padding:24px}
+    header h1{font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<header>
+  <div class="header-badge">Reporte Técnico · Mayo 2026</div>
+  <h1>Pipeline Automatizado<br/><span>IBM BPM → Appian</span></h1>
+  <p>Análisis técnico completo de lo que se realizó: desde la ingesta del artefacto IBM (.twx) hasta la generación automática de un paquete importable en Appian v26.3</p>
+  <div class="header-meta">
+    <div class="meta-item"><strong>Proyecto</strong>Profuturo — NCI Redención Bono</div>
+    <div class="meta-item"><strong>Autor</strong>llopezdo@emeal.nttdata.com</div>
+    <div class="meta-item"><strong>Suite</strong>NTT DATA IBM TWX Suite v1.1.0</div>
+    <div class="meta-item"><strong>Fecha</strong>22 Mayo 2026</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ══════════════════════ PUNTO A → PUNTO B -->
+  <div class="section-title">
+    <div class="icon">🗺️</div>
+    De Punto A a Punto B — ¿Qué se automatizó?
+  </div>
+
+  <div class="journey">
+    <div class="journey-box ibm">
+      <h3>📦 PUNTO A — IBM BPM</h3>
+      <p class="subtitle">Archivo .twx exportado de IBM BPM / BAW</p>
+      <div class="journey-stat"><span>Business Objects (BOs)</span><span class="badge ibm">54</span></div>
+      <div class="journey-stat"><span>Variables de entorno (env vars)</span><span class="badge ibm">71</span></div>
+      <div class="journey-stat"><span>Servicios de integración (IS)</span><span class="badge ibm">22</span></div>
+      <div class="journey-stat"><span>Procesos BPD</span><span class="badge ibm">44</span></div>
+      <div class="journey-stat"><span>Coach Views (UI)</span><span class="badge ibm">39</span></div>
+      <div class="journey-stat"><span>Formato del archivo</span><span class="badge ibm">ZIP → XML</span></div>
+    </div>
+
+    <div class="journey-arrow">
+      <div class="arrow-line"></div>
+      <div style="background:linear-gradient(135deg,#FF6B35,var(--ntt-blue));width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.25)">⚡</div>
+      <div style="font-size:10px;text-align:center;color:var(--muted);font-weight:700;letter-spacing:.5px;margin:6px 0">PIPELINE<br/>AUTOMÁTICO</div>
+      <div class="arrow-line"></div>
+      <div style="color:var(--ntt-blue);font-size:24px">▼</div>
+    </div>
+
+    <div class="journey-box appian">
+      <h3>🚀 PUNTO B — Appian v26.3</h3>
+      <p class="subtitle">Paquete .zip listo para importar en Appian</p>
+      <div class="journey-stat"><span>Record Types generados</span><span class="badge appian">54</span></div>
+      <div class="journey-stat"><span>Constants generadas</span><span class="badge appian">71</span></div>
+      <div class="journey-stat"><span>Expression Rule stubs</span><span class="badge appian">54</span></div>
+      <div class="journey-stat"><span>Carpetas organizadoras</span><span class="badge appian">2</span></div>
+      <div class="journey-stat"><span>Total objetos en el ZIP</span><span class="badge green">183</span></div>
+      <div class="journey-stat"><span>Tamaño del paquete</span><span class="badge green">221 KB</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ CÓMO SE DESCUBRIÓ EL FORMATO -->
+  <div class="section-title">
+    <div class="icon">🔍</div>
+    Fase 1 — Ingeniería Inversa del Formato Appian Real
+  </div>
+  <p style="color:var(--muted);margin-bottom:20px;font-size:13px">
+    No existía documentación completa del formato interno del ZIP de Appian. Se realizó ingeniería inversa sobre un paquete real exportado del proyecto Profuturo.
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <h4>Paquete Appian real analizado</h4>
+      <p>Se analizó el archivo <strong>NCI Redención BonoSP2.zip</strong> (exportación real de Appian v26.3.165.0 del proyecto Profuturo, migración ya concluida).</p>
+      <div class="highlight">25 constants · 13 integraciones · 10 rules · 9 interfaces · 27 procesos · 5 record types</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h4>Descubrimiento clave — Estructura real</h4>
+      <p>La documentación oficial decía <code>appian-package.xml</code>. La realidad fue completamente distinta: carpetas por tipo de objeto con archivos "haul" por UUID.</p>
+      <div class="highlight">META-INF/ · application/ · content/ · processModel/ · recordType/ · group/</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔑</div>
+      <h4>UUIDs — Sistema de identidad</h4>
+      <p>Appian identifica objetos por UUID. Si el UUID del paquete coincide con uno existente en el ambiente, <strong>actualiza</strong> el objeto en lugar de crear uno nuevo.</p>
+      <div class="highlight">Se implementó UUID v5 determinístico → misma entrada = mismo UUID siempre</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h4>MANIFEST.MF — 3 líneas solamente</h4>
+      <p>La documentación indicaba un manifest complejo. En la práctica son exactamente 3 líneas: versión, versión Appian y fecha de creación.</p>
+      <div class="highlight">Manifest-Version: 1.0 · Appian-Version: 26.3.165.0 · Created-On: timestamp</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <h4>Record Types → RDBMS_TABLE</h4>
+      <p>Los Business Objects de IBM mapean a Record Types en Appian con fuente RDBMS_TABLE. Cada campo IBM se convierte en columna de tabla con tipo Appian.</p>
+      <div class="highlight">Datasource: jdbc/Appian · Tabla: UPPER_SNAKE_CASE · Campo: camelCase</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h4>Constants desde Env Vars</h4>
+      <p>Las variables de entorno de IBM (URLs, IDs, parámetros de config) se convierten en Constants de Appian. Las que contienen URL/HOST se marcan como <em>environmentSpecific</em>.</p>
+      <div class="highlight">71 variables IBM → 71 constants Appian en carpeta organizada</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ ESTRUCTURA ZIP REAL -->
+  <div class="section-title">
+    <div class="icon">📂</div>
+    Estructura Interna del ZIP Appian (descubierta)
+  </div>
+
+  <div class="zip-tree">
+<span class="comment"># Estructura REAL del ZIP Appian v26.3 (diferente a la documentación oficial)</span>
+<br/>
+<span class="folder">NCI_RB_appian_package.zip/</span>
+<br/>
+├── <span class="folder">META-INF/</span>
+<br/>
+│   └── <span class="file">MANIFEST.MF</span>          <span class="comment"># Solo 3 líneas: versión Appian + fecha</span>
+<br/>
+├── <span class="folder">application/</span>
+<br/>
+│   └── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># applicationHaul: lista de TODOS los UUIDs del paquete</span>
+<br/>
+├── <span class="folder">content/</span>
+<br/>
+│   ├── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># contentHaul → &lt;constant&gt;</span>
+<br/>
+│   ├── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># contentHaul → &lt;rule&gt; (expression rule)</span>
+<br/>
+│   ├── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># contentHaul → &lt;interface&gt; (SAIL UI)</span>
+<br/>
+│   ├── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># contentHaul → &lt;outboundIntegration&gt;</span>
+<br/>
+│   └── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># contentHaul → &lt;rulesFolder&gt; / &lt;folder&gt;</span>
+<br/>
+├── <span class="folder">recordType/</span>
+<br/>
+│   └── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># recordTypeHaul → &lt;recordType&gt; con RDBMS_TABLE</span>
+<br/>
+├── <span class="folder">processModel/</span>
+<br/>
+│   └── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># processModelHaul → &lt;pm&gt; proceso Appian</span>
+<br/>
+└── <span class="folder">group/</span>
+<br/>
+    └── <span class="file">&lt;uuid&gt;.xml</span>          <span class="comment"># Grupos de seguridad</span>
+  </div>
+
+  <!-- ══════════════════════ FASE 2 — IBM TWX PARSER -->
+  <div class="section-title">
+    <div class="icon">⚙️</div>
+    Fase 2 — Análisis del Formato IBM TWX
+  </div>
+  <p style="color:var(--muted);margin-bottom:20px;font-size:13px">
+    El archivo .twx es también un ZIP con XMLs. Se descubrió que las herramientas CLI existentes no extraían los campos de los BOs. Se construyó un parser directo.
+  </p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🔢</div>
+      <h4>Prefijos de tipo en IBM</h4>
+      <p>Cada artefacto en el TWX se nombra con un prefijo numérico que indica su tipo:</p>
+      <div class="highlight">12.* = Business Objects &nbsp;|&nbsp; 25.* = BPDs &nbsp;|&nbsp; 1.* = Services &nbsp;|&nbsp; 64.* = Coach Views &nbsp;|&nbsp; 62.* = Env Vars</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧬</div>
+      <h4>Estructura XML de un BO IBM</h4>
+      <p>Los campos del BO están en <code>&lt;teamworks&gt;&lt;twClass&gt;&lt;definition&gt;&lt;property&gt;</code>. El tipo está en <code>&lt;annotation&gt;&lt;typeName&gt;</code>, no como atributo directo.</p>
+      <div class="highlight">El CLI ibm_twx_tools devolvía fields:[] vacíos → se construyó IBMTwxParser propio</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌿</div>
+      <h4>Variables de entorno IBM</h4>
+      <p>Están en archivos <code>62.*.xml</code> bajo el tag <code>&lt;environmentVariableSet&gt;&lt;envVar&gt;</code> con <code>&lt;envVarDefault&gt;&lt;value&gt;</code>. El proyecto tiene 71.</p>
+      <div class="highlight">URLs de WMB, IDs de subetapas, parámetros de negocio → Constants Appian</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ MAPEO DE TIPOS -->
+  <div class="section-title">
+    <div class="icon">🔄</div>
+    Mapeo de Tipos IBM BPM → Appian
+  </div>
+
+  <table>
+    <tr>
+      <th>Tipo IBM BPM</th>
+      <th style="text-align:center">→</th>
+      <th>Appian Record Type</th>
+      <th>Appian Constant</th>
+      <th>Appian Rule Input</th>
+    </tr>
+    <tr><td><code>string</code> / <code>String</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Text</code></td><td><code>Text</code></td><td><code>string (XSD)</code></td></tr>
+    <tr><td><code>int</code> / <code>Integer</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Integer</code></td><td><code>Integer</code></td><td><code>int (XSD)</code></td></tr>
+    <tr><td><code>decimal</code> / <code>Decimal</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Decimal</code></td><td><code>Decimal</code></td><td><code>decimal (XSD)</code></td></tr>
+    <tr><td><code>boolean</code> / <code>Boolean</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Boolean</code></td><td><code>Boolean</code></td><td><code>boolean (XSD)</code></td></tr>
+    <tr><td><code>date</code> / <code>Date</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Date</code></td><td><code>Date</code></td><td><code>date (XSD)</code></td></tr>
+    <tr><td><code>dateTime</code> / <code>DateTime</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}DateTime</code></td><td><code>DateTime</code></td><td><code>dateTime (XSD)</code></td></tr>
+    <tr><td><code>ANY</code> / <code>Object</code></td><td style="text-align:center" class="arrow">→</td><td><code>{appian}Variant</code></td><td><code>Variant</code></td><td><code>Variant (Appian)</code></td></tr>
+    <tr><td><code>Lista de tipo</code></td><td style="text-align:center" class="arrow">→</td><td><code>List of {appian}Type</code></td><td><code>List of Type</code></td><td><code>Type?list</code></td></tr>
+    <tr><td><code>BO personalizado</code></td><td style="text-align:center" class="arrow">→</td><td><code>{jdbc/Appian}BoName</code></td><td><code>Text (uuid ref)</code></td><td><code>string (ref)</code></td></tr>
+  </table>
+
+  <!-- ══════════════════════ PIPELINE PASO A PASO -->
+  <div class="section-title">
+    <div class="icon">⚡</div>
+    Fase 3 — Pipeline de Transformación (5 Pasos)
+  </div>
+
+  <div class="pipeline">
+    <div class="step">
+      <div class="step-num" style="background:linear-gradient(135deg,#FF6B35,#E55A2B)">1</div>
+      <div class="step-body">
+        <h4>Parser IBM TWX → Extracción de datos</h4>
+        <p>Se abre el .twx como ZIP y se parsean los XMLs internos directamente. Se extraen todos los Business Objects con sus campos tipados y todas las variables de entorno con sus valores por defecto.</p>
+        <div class="step-detail">
+          <strong>Módulo:</strong> <code>IBMTwxParser</code><br/>
+          <strong>Input:</strong> archivo <code>.twx</code> (ZIP de IBM BPM)<br/>
+          <strong>Output:</strong> lista de <code>IBMBusinessObject</code> (con campos) + lista de <code>IBMEnvVar</code><br/>
+          <strong>Profuturo:</strong> 54 BOs con campos + 71 variables de entorno extraídas
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num" style="background:linear-gradient(135deg,#9B59B6,#7D3C98)">2</div>
+      <div class="step-body">
+        <h4>Env Vars → Constants de Appian</h4>
+        <p>Cada variable de entorno IBM se convierte en una Constant de Appian. Las variables que contienen URLs, hosts o puertos se marcan automáticamente como <em>environment-specific</em> (configurables por ambiente).</p>
+        <div class="step-detail">
+          <strong>Módulo:</strong> <code>ConstantsBuilder</code><br/>
+          <strong>Detección automática ENV:</strong> si el nombre contiene URL, HOST, IP, PORT, PATH, KEY, SECRET<br/>
+          <strong>XML generado:</strong> <code>&lt;contentHaul&gt;&lt;constant&gt;&lt;typedValue&gt;...&lt;/constant&gt;&lt;/contentHaul&gt;</code><br/>
+          <strong>Profuturo:</strong> 71 constants en carpeta <em>NCI_RB Constants</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num" style="background:linear-gradient(135deg,#27AE60,#1E8449)">3</div>
+      <div class="step-body">
+        <h4>Business Objects → Record Types</h4>
+        <p>Cada BO de IBM se convierte en un Record Type de Appian respaldado por tabla RDBMS. Los campos se mapean con sus tipos Appian equivalentes. Los nombres de tabla siguen la convención UPPER_SNAKE_CASE.</p>
+        <div class="step-detail">
+          <strong>Módulo:</strong> <code>RecordTypeBuilder</code><br/>
+          <strong>Fuente:</strong> <code>RDBMS_TABLE · datasource: jdbc/Appian</code><br/>
+          <strong>Nombre tabla:</strong> <code>NCI_RB_NombreBO</code> (UPPER_SNAKE_CASE)<br/>
+          <strong>XML generado:</strong> <code>&lt;recordTypeHaul&gt;&lt;recordType&gt;&lt;sourceConfiguration&gt;...&lt;/recordTypeHaul&gt;</code><br/>
+          <strong>Profuturo:</strong> 54 Record Types generados
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num" style="background:linear-gradient(135deg,#2980B9,#1A5276)">4</div>
+      <div class="step-body">
+        <h4>Services → Expression Rule Stubs</h4>
+        <p>Por cada BO se genera un Expression Rule stub con los inputs tipados correctamente y un comentario TODO indicando qué lógica IBM debe traducirse. El equipo Appian puede partir de estas reglas ya creadas y estructuradas.</p>
+        <div class="step-detail">
+          <strong>Módulo:</strong> <code>RuleBuilder</code><br/>
+          <strong>Patrón generado:</strong> <code>NCI_RB_get{NombreBO}ById(id_int: Integer)</code><br/>
+          <strong>Definition:</strong> stub con comentario TODO referenciando el servicio IBM original<br/>
+          <strong>Profuturo:</strong> 54 rule stubs en carpeta <em>NCI_RB Rules</em>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num" style="background:linear-gradient(135deg,#0066CC,#003D7A)">5</div>
+      <div class="step-body">
+        <h4>Ensamblado del ZIP Appian</h4>
+        <p>Se genera el <code>applicationHaul</code> con el inventario completo de UUIDs, se escribe el MANIFEST.MF con la versión de Appian correcta y se ensambla el ZIP con todos los objetos en sus carpetas correspondientes.</p>
+        <div class="step-detail">
+          <strong>Módulos:</strong> <code>ManifestBuilder</code> + <code>ZipPackager</code><br/>
+          <strong>UUID strategy:</strong> UUID v5 determinístico — mismo TWX = mismo UUID siempre (deploys idempotentes)<br/>
+          <strong>Output Profuturo:</strong> <code>NCI_RB_appian_package.zip</code> · 183 archivos · 221 KB<br/>
+          <strong>Compatible con:</strong> Appian v26.3.165.0 (versión del cliente)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ ARQUITECTURA DE MÓDULOS -->
+  <div class="section-title">
+    <div class="icon">🏛️</div>
+    Arquitectura del Módulo Python
+  </div>
+
+  <div class="arch">
+    <div class="arch-box">
+      <div class="label">📥 Capa de Entrada</div>
+      <h4>IBM TWX Parser</h4>
+      <ul class="module-list">
+        <li>ibm_twx_parser.py <span class="m-badge">✅</span></li>
+        <li>IBMTwxParser <span class="m-badge">✅</span></li>
+        <li>IBMBusinessObject <span class="m-badge">✅</span></li>
+        <li>IBMEnvVar <span class="m-badge">✅</span></li>
+      </ul>
+    </div>
+    <div class="arch-box">
+      <div class="label">🔄 Capa de Transformación</div>
+      <h4>Builders Appian</h4>
+      <ul class="module-list">
+        <li>constants_builder.py <span class="m-badge">✅</span></li>
+        <li>record_type_builder.py <span class="m-badge">✅</span></li>
+        <li>rule_builder.py <span class="m-badge">✅</span></li>
+        <li>uuid_registry.py <span class="m-badge">✅</span></li>
+      </ul>
+    </div>
+    <div class="arch-box">
+      <div class="label">📤 Capa de Salida</div>
+      <h4>Package & Deploy</h4>
+      <ul class="module-list">
+        <li>manifest_builder.py <span class="m-badge">✅</span></li>
+        <li>zip_packager.py <span class="m-badge">✅</span></li>
+        <li>ibm_to_appian_pipeline.py <span class="m-badge">✅</span></li>
+        <li>deploy_client.py <span class="m-badge">✅</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ RESULTADOS -->
+  <div class="section-title">
+    <div class="icon">📊</div>
+    Resultados del Test de Integración — Profuturo Redención Bono
+  </div>
+
+  <div class="results">
+    <div class="result-card">
+      <div class="num" style="color:#27AE60">54</div>
+      <div class="label">Record Types</div>
+      <div class="sub">Business Objects → Appian</div>
+    </div>
+    <div class="result-card">
+      <div class="num" style="color:#9B59B6">71</div>
+      <div class="label">Constants</div>
+      <div class="sub">Env Vars IBM → Appian</div>
+    </div>
+    <div class="result-card">
+      <div class="num" style="color:var(--ntt-blue)">54</div>
+      <div class="label">Rule Stubs</div>
+      <div class="sub">Para implementar lógica</div>
+    </div>
+    <div class="result-card">
+      <div class="num" style="color:#E67E22">183</div>
+      <div class="label">Objetos totales</div>
+      <div class="sub">en 221 KB de ZIP</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ USO EN LÍNEA DE COMANDOS -->
+  <div class="section-title">
+    <div class="icon">💻</div>
+    Cómo Usar el Pipeline
+  </div>
+
+  <div class="code-block">
+<span class="comment"># ── Directorio de trabajo</span><br/>
+<span class="kw">cd</span> <span class="str">"C:\Users\llopezdo\OneDrive - NTT DATA EMEAL\...\01_herramientas_python"</span><br/>
+<br/>
+<span class="comment"># ── Generar paquete Appian desde un TWX</span><br/>
+<span class="cmd">python</span> -m appian_generator.ibm_to_appian_pipeline <span class="str">"ruta/archivo.twx"</span> \<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;--prefix <span class="str">NCI_RB</span> \<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;--app-name <span class="str">"NCI Redención Bono"</span> \<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;--output <span class="str">output/paquete_appian.zip</span><br/>
+<br/>
+<span class="comment"># ── Importar a Appian via REST API (requiere API Key del Service Account)</span><br/>
+<span class="kw">$env</span>:APPIAN_URL = <span class="str">"https://profuturo.appiancloud.com"</span><br/>
+<span class="kw">$env</span>:APPIAN_API_KEY = <span class="str">"su-api-key-aqui"</span><br/>
+<span class="cmd">python</span> -c <span class="str">"from appian_generator.deploy_client import AppianDeployClient; c=AppianDeployClient.from_env(); c.deploy('output/paquete.zip')"</span>
+  </div>
+
+  <!-- ══════════════════════ PRÓXIMOS PASOS -->
+  <div class="section-title">
+    <div class="icon">🚀</div>
+    Estado Actual y Próximos Pasos
+  </div>
+
+  <div class="next-steps">
+    <div class="next-card done">
+      <div class="status">✅ Completado</div>
+      <h4>Ingeniería inversa del formato Appian</h4>
+      <p>Análisis del ZIP real de Profuturo. Estructura, XMLs y esquemas descubiertos al 100%.</p>
+    </div>
+    <div class="next-card done">
+      <div class="status">✅ Completado</div>
+      <h4>Parser IBM TWX</h4>
+      <p>54 BOs con campos tipados + 71 env vars extraídas del Profuturo Redención Bono TWX.</p>
+    </div>
+    <div class="next-card done">
+      <div class="status">✅ Completado</div>
+      <h4>Builders + Pipeline + Deploy Client</h4>
+      <p>9 módulos Python. Test de integración pasado. ZIP válido generado y verificado.</p>
+    </div>
+    <div class="next-card next">
+      <div class="status">🔵 Siguiente</div>
+      <h4>Importar ZIP en ambiente Appian Profuturo</h4>
+      <p>El paquete <em>NCI_RB_appian_package.zip</em> está listo. Requiere API Key del Service Account de Appian.</p>
+    </div>
+    <div class="next-card next">
+      <div class="status">🔵 Siguiente</div>
+      <h4>Traducción de lógica de servicios</h4>
+      <p>Las reglas stub tienen TODO. Se usa LLM (Copilot) para traducir JavaScript IBM → Appian Expression Language.</p>
+    </div>
+    <div class="next-card future">
+      <div class="status">🔲 Futuro</div>
+      <h4>Generador de Process Models</h4>
+      <p>Los 44 BPDs de IBM → procesos Appian. Requiere mapeo BPMN → processModelHaul XML (fase más compleja).</p>
+    </div>
+    <div class="next-card future">
+      <div class="status">🔲 Futuro</div>
+      <h4>Traspasos y Recaudación TWX</h4>
+      <p>Se recibieron también los TWX de Profuturo_Traspasos_AP y Profuturo_Recaudacion_AP. El pipeline ya puede procesarlos.</p>
+    </div>
+    <div class="next-card future">
+      <div class="status">🔲 Futuro</div>
+      <h4>Skill de migración automática</h4>
+      <p>Empaquetar el pipeline como nuevo skill <code>/twx-to-appian</code> en la suite NTT DATA para uso por todo el equipo.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ REDUCCION DE TIEMPO -->
+  <div class="section-title">
+    <div class="icon">⏱️</div>
+    Impacto en la Ingesta Técnica
+  </div>
+
+  <div class="cards">
+    <div class="card" style="border-top:3px solid #E74C3C">
+      <div class="card-icon">😓</div>
+      <h4>Antes — Proceso manual</h4>
+      <p>Un analista revisaba el TWX artefacto por artefacto, creaba cada BO a mano en Appian, configuraba cada campo, constante y tipo a mano.</p>
+      <div class="highlight" style="background:#FDEDEC;border-color:#E74C3C;color:#E74C3C">~3-5 días por módulo IBM BPM</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div class="card-icon">🤖</div>
+      <h4>Ahora — Pipeline automatizado</h4>
+      <p>El pipeline procesa el TWX completo en segundos. Genera 183 objetos Appian válidos, nombrados correctamente, tipados y organizados en carpetas.</p>
+      <div class="highlight" style="background:#E8F7EE;border-color:var(--green);color:var(--green)">~30 segundos por módulo IBM BPM</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--ntt-blue)">
+      <div class="card-icon">📈</div>
+      <h4>Reducción de esfuerzo estimada</h4>
+      <p>La creación manual de 54 Record Types + 71 Constants + 54 Rules tomaría días. El pipeline lo genera en segundos con calidad consistente y sin errores humanos.</p>
+      <div class="highlight">+95% reducción en tiempo de ingesta técnica de datos IBM→Appian</div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  <strong>NTT DATA EMEAL</strong> · IBM TWX Reverse Engineering Suite v1.1.0 ·
+  Pipeline IBM BPM → Appian · Generado el 22 de Mayo 2026 ·
+  <strong>llopezdo@emeal.nttdata.com</strong>
+</footer>
+
+</body>
+</html>
